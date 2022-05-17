@@ -12,7 +12,7 @@
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<Description>Frends tasks for local backup.</Description>
 	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.AmazonS3</RepositoryUrl>
+	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Files</RepositoryUrl>
   </PropertyGroup>
 	
   <ItemGroup>
