@@ -1,4 +1,4 @@
-﻿namespace Frends.AmazonS3.DownloadObject.Definitions
+﻿namespace Frends.Files.LocalBackup.Definitions
 {
     /// <summary>
     /// Backup and cleanup result's data.
@@ -14,9 +14,7 @@
         /// Cleanup data.
         /// </summary>
         public string Cleanup { get; set; }
+
     }
+
 }
-
-
-
-

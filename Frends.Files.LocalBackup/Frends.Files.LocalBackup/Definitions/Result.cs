@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Frends.AmazonS3.DownloadObject.Definitions
+namespace Frends.Files.LocalBackup.Definitions
 {
     /// <summary>
     /// Backup and cleanup results.
@@ -11,7 +11,7 @@ namespace Frends.AmazonS3.DownloadObject.Definitions
         /// Backup results.
         /// </summary>
         public List<BackupObject> Backups { get; private set; }
-    
+
         /// <summary>
         /// Cleanup results.
         /// </summary>
