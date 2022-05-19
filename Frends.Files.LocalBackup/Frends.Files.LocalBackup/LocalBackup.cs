@@ -52,7 +52,7 @@ namespace Frends.Files.LocalBackup
                 {
                     var backupFile = Path.Combine(backupDirectory, Path.GetFileName(file));
                     File.Copy(file, backupFile, true);
-                    result.Add(new BackupObject { Backup = $"Backup complete: {file}" });
+                    result.Add(new BackupObject { Backup = $"Backup complete: {file} to {backupFile}" });
                 }
             }
 

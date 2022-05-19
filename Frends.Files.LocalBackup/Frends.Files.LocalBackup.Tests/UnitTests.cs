@@ -49,7 +49,7 @@ public class UnitTests
             string[] files = Directory.GetFiles(x);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt"));  
+                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));  
             }
         }
     }
@@ -79,7 +79,7 @@ public class UnitTests
             string[] files = Directory.GetFiles(x);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt"));
+                Assert.IsTrue(file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));
                 Assert.IsTrue(!file.Contains($@"{x}\Overwrite.txt"));
             }
         }
