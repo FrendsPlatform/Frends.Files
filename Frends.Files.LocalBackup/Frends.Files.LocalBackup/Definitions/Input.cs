@@ -10,7 +10,7 @@ namespace Frends.Files.LocalBackup.Definitions
         /// <summary>
         /// Source file. The file mask uses regular expressions, but for convenience, it has special handling for * and ? wildcards.
         /// </summary>
-        /// <example>test.txt, test*.txt, test?.txt, test.(txt|xml), test.[^t][^x][^t], <regex>^(?!prof).*_test.txt</example>
+        /// <example>test.txt, test*.txt, test?.txt, test.(txt|xml), test.[^t][^x][^t], &lt;regex&gt;^(?!prof).*_test.txt</example>
         [DisplayFormat(DataFormatString = "Text")]
         public string SourceFile { get; set; }
 
