@@ -37,6 +37,7 @@ public class UnitTests
             SourceDirectory = _dir,
             SourceFile = "*",
             BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
             Cleanup = false,
         };
@@ -67,6 +68,7 @@ public class UnitTests
             SourceDirectory = _dir,
             SourceFile = "Test*",
             BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
             Cleanup = false,
         };
@@ -98,6 +100,7 @@ public class UnitTests
             SourceDirectory = _dir,
             SourceFile = "Test1.(txt|xml)",
             BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
             Cleanup = false,
         };
@@ -129,6 +132,7 @@ public class UnitTests
             SourceDirectory = _dir,
             SourceFile = "Test1.[^t][^x][^t]",
             BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
             Cleanup = false,
         };
@@ -160,6 +164,7 @@ public class UnitTests
             SourceDirectory = Path.Combine(_dir, "Pro"),
             SourceFile = "<regex>^(?!prof).*_test.txt",
             BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
             Cleanup = false,
         };
@@ -193,6 +198,7 @@ public class UnitTests
             SourceDirectory = _dir,
             SourceFile = "*",
             BackupDirectory = $@"{_dir}\Cleanup",
+            TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 1,
             Cleanup = true,
         };
