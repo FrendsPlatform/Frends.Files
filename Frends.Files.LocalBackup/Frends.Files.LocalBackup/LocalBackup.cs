@@ -92,7 +92,7 @@ namespace Frends.Files.LocalBackup
         private static bool ShouldBeCleanedUp(string dirPath, Input input)
         {
             var TimestampPattern = "yyyy-MM-dd_HH_mm_ss";
-            var DirNamePatternLength = TimestampPattern.Length + input.TaskExecutionId.Length + 1;
+            var DirNamePatternLength = TimestampPattern.Length + input.TaskExecutionId.Length + 1; // Add one to the Length because of '-' character which separates the timestamp and guid.
             var dirName = Path.GetFileName(dirPath) ?? string.Empty;
 
             if (dirName.Length == DirNamePatternLength)
