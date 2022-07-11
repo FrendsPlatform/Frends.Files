@@ -38,7 +38,18 @@ public class Result
     /// <summary>
     /// Cleanup results.
     /// </summary>
-    /// <example>"Cleanups": null</example>
+    /// <example>
+    /// "Cleanups: [
+	///     {
+	///	        "Backup": null,
+	///	        "Cleanup": "C:\\test\\backup\\2022-07-11_05_44_41-ab214387-98f0-44de-8ec5-16ba01b8ab97 deleted."
+	///     },
+    ///     {
+	///	        "Backup": null,
+	///	        "Cleanup": "C:\\test\\backup\\2022-06-25_06_23_56-ab214387-98f0-44de-8ec5-16ba01b8ab97 deleted."
+	///     }
+    /// ]
+    /// </example>
     public List<BackupObject> Cleanups { get; private set; }
 
     internal Result(string directory, int fileCount, List<BackupObject> backups, List<BackupObject> cleanups)

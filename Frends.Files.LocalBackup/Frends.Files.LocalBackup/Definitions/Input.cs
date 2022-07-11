@@ -23,7 +23,7 @@ namespace Frends.Files.LocalBackup.Definitions
         public string SourceDirectory { get; set; }
 
         /// <summary>
-        /// Destination directory where backup folder will be created. Backup directory's format: {BackupDirectory}-{Guid}.
+        /// Destination directory where backup folder will be created. Backup directory's format: {BackupDirectory}{timestamp}-{Guid}.
         /// </summary>
         /// <example>c:\temp\backups</example>
         [DisplayFormat(DataFormatString = "Text")]
