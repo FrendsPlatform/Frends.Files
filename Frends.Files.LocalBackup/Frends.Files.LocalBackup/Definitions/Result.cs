@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-
 namespace Frends.Files.LocalBackup.Definitions;
+
 /// <summary>
 /// Backup and cleanup results.
 /// </summary>
 public class Result
 {
-
     /// <summary>
     /// Backup directory.
     /// </summary>
@@ -49,11 +48,4 @@ public class Result
         Backups = backups;
         Cleanups = cleanups;
     }
-
-    internal Result()
-    {
-
-    }
 }
-
-
