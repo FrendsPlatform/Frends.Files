@@ -27,7 +27,7 @@ namespace Frends.Files.LocalBackup
         {
             if (string.IsNullOrWhiteSpace(input.SourceDirectory) || string.IsNullOrWhiteSpace(input.SourceFile)) throw new Exception("Source parameters required.");
             if (string.IsNullOrWhiteSpace(input.BackupDirectory)) throw new Exception("Backup directory required.");
-            if (string.IsNullOrWhiteSpace(input.TaskExecutionId)) throw new Exception("Task execution id required.");
+            if (input.CreateSubdirectories && string.IsNullOrWhiteSpace(input.TaskExecutionId)) throw new Exception("Task execution id required.");
 
             var timestampString = DateTime.UtcNow.ToString("yyyy-MM-dd_HH_mm_ss");
             var backupDirectory = input.CreateSubdirectories 
