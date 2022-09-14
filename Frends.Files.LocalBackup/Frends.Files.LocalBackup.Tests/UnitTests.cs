@@ -25,10 +25,42 @@ public class UnitTests
     }
 
     /// <summary>
-    /// Copy all files to backup directory.
+    /// Copy all files to backup directory. Don't create subdir.
     /// </summary>
     [TestMethod]
-    public void CopyAllTest()
+    public void CopyAll_CreateSubdirectoriesFalse_Test()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*",
+            BackupDirectory = buDir,
+            TaskExecutionId = null,
+            DaysOlder = 5,
+            Cleanup = false,
+            CreateSubdirectories = false
+        };
+
+        var result = Files.LocalBackup(input, default);
+        Assert.IsNotNull(result);
+
+        foreach (var x in Directory.GetDirectories(buDir))
+        {
+            string[] files = Directory.GetFiles(x);
+            foreach (string file in files)
+            {
+                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));  
+            }
+        }
+    }
+
+    /// <summary>
+    /// Copy all files to backup directory. Create subdir.
+    /// </summary>
+    [TestMethod]
+    public void CopyAll_CreateSubdirectoriesTrue_Test()
     {
         var buDir = Path.Combine(_dir, "Backup");
 
@@ -40,6 +72,7 @@ public class UnitTests
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
             Cleanup = false,
+            CreateSubdirectories = true
         };
 
         var result = Files.LocalBackup(input, default);
@@ -50,7 +83,39 @@ public class UnitTests
             string[] files = Directory.GetFiles(x);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));  
+                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Copy all files to backup directory. Create subdir and use something else but GUID as TaskExecutionId.
+    /// </summary>
+    [TestMethod]
+    public void CopyAll_CreateSubdirectoriesTrue_NonGUID_Test()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*",
+            BackupDirectory = buDir,
+            TaskExecutionId = "qwerty123",
+            DaysOlder = 5,
+            Cleanup = false,
+            CreateSubdirectories = true
+        };
+
+        var result = Files.LocalBackup(input, default);
+        Assert.IsNotNull(result);
+
+        foreach (var x in Directory.GetDirectories(buDir, "*qwerty123*"))
+        {
+            string[] files = Directory.GetFiles(x);
+            foreach (string file in files)
+            {
+                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));
             }
         }
     }
@@ -184,10 +249,10 @@ public class UnitTests
     }
 
     /// <summary>
-    /// Delete files older than {DaysOlder}.
+    /// Delete files older than {DaysOlder}. CreateSubdirectories = true.
     /// </summary>
     [TestMethod]
-    public void CleanupFileTest()
+    public void CleanupFile_CreateSubdirectoriesTrue_Test()
     {
         var timestampString = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-dd_HH_mm_ss");
         var backupDirectory = Path.Combine($@"{_dir}\Cleanup\", $"{timestampString}-{Guid.NewGuid()}");
@@ -201,10 +266,39 @@ public class UnitTests
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 1,
             Cleanup = true,
+            CreateSubdirectories = true,
         };
 
         var result = Files.LocalBackup(input, default);
         Assert.IsNotNull(result);
+    }
+
+    /// <summary>
+    /// Delete files older than {DaysOlder}. CreateSubdirectories = false.
+    /// </summary>
+    [TestMethod]
+    public void CleanupFile_CreateSubdirectoriesFalse_Test()
+    {
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*",
+            BackupDirectory = $@"{_dir}\Cleanup",
+            TaskExecutionId = null,
+            DaysOlder = 1,
+            Cleanup = true,
+            CreateSubdirectories = false,
+        };
+        
+        
+        var backupDirectory = Path.Combine($@"{_dir}\Cleanup\", $"DeleteThis");
+        Directory.CreateDirectory(backupDirectory);
+        Directory.SetLastWriteTimeUtc(backupDirectory, DateTime.Now.AddDays(-2));
+
+        var result = Files.LocalBackup(input, default);
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.Cleanups);
+        Assert.IsFalse(Directory.Exists(backupDirectory));
     }
 
     public void CreateTestFiles()
@@ -238,7 +332,7 @@ public class UnitTests
 
     public void DeleteTestFolder()
     {
-        DirectoryInfo directoryInfo = new DirectoryInfo(_dir);
+        DirectoryInfo directoryInfo = new(_dir);
         directoryInfo.Delete(true);
     }
 }

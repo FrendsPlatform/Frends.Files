@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-
 namespace Frends.Files.LocalBackup.Definitions;
+
 /// <summary>
 /// Backup and cleanup results.
 /// </summary>
 public class Result
 {
-
     /// <summary>
     /// Backup directory.
     /// </summary>
@@ -16,6 +15,7 @@ public class Result
     /// <summary>
     /// Count of files which were copied to backup directory.
     /// </summary>
+    /// <example>1</example>
     public int FileCountInBackup { get; private set; }
 
     /// <summary>
@@ -49,11 +49,4 @@ public class Result
         Backups = backups;
         Cleanups = cleanups;
     }
-
-    internal Result()
-    {
-
-    }
 }
-
-

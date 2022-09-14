@@ -17,7 +17,7 @@ namespace Frends.Files.LocalBackup
     public class Files
     {
         /// <summary>
-        /// Create and delete local backups.
+        /// Create a local backup. Optionally task can create new subdirectories for backups and delete old backup directories.
         /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.LocalBackup)
         /// </summary>
         /// <param name="input">Input parameters</param>
@@ -27,27 +27,26 @@ namespace Frends.Files.LocalBackup
         {
             if (string.IsNullOrWhiteSpace(input.SourceDirectory) || string.IsNullOrWhiteSpace(input.SourceFile)) throw new Exception("Source parameters required.");
             if (string.IsNullOrWhiteSpace(input.BackupDirectory)) throw new Exception("Backup directory required.");
+            if (input.CreateSubdirectories && string.IsNullOrWhiteSpace(input.TaskExecutionId)) throw new Exception("Task execution id required.");
 
-            var (directory, backup) = CreateBackup(input, cancellationToken);
+            var timestampString = DateTime.UtcNow.ToString("yyyy-MM-dd_HH_mm_ss");
+            var backupDirectory = input.CreateSubdirectories 
+                ? Path.Combine(input.BackupDirectory, $"{timestampString}-{input.TaskExecutionId}")
+                : input.BackupDirectory;
 
-            var cleanup = input.Cleanup ? CleanUp(input, cancellationToken) : null;
+            var (directory, backup) = CreateBackup(input, backupDirectory,  cancellationToken);
+
+            var cleanup = input.Cleanup ? CleanUp(input, backupDirectory, cancellationToken) : null;
 
             return new Result(directory, backup, cleanup);
         }
 
-        private static Tuple<string, List<string>> CreateBackup(Input input, CancellationToken cancellationToken)
+        private static Tuple<string, List<string>> CreateBackup(Input input, string backupDirectory, CancellationToken cancellationToken)
         {
-            var timestampString = DateTime.UtcNow.ToString("yyyy-MM-dd_HH_mm_ss");
-
             var result = new List<string>();
-
-            var guid = (!string.IsNullOrEmpty(input.TaskExecutionId)) ? input.TaskExecutionId : Guid.NewGuid().ToString();
-
-            //Create backup folder
-            var backupDirectory = Path.Combine(input.BackupDirectory, $"{timestampString}-{guid}");
-            Directory.CreateDirectory(backupDirectory);
-
             var files = Directory.GetFiles(input.SourceDirectory);
+
+            Directory.CreateDirectory(backupDirectory);
 
             foreach (string file in files)
             {
@@ -70,21 +69,34 @@ namespace Frends.Files.LocalBackup
             return new Tuple<string, List<string>>(backupDirectory, result);
         }
 
-        private static List<string> CleanUp(Input input, CancellationToken cancellationToken)
+        private static List<string> CleanUp(Input input, string backupDirectory, CancellationToken cancellationToken)
         {
             var result = new List<string>();
-            ConcurrentDictionary<string, DateTime> _lastCleanup = new ConcurrentDictionary<string, DateTime>();
-            _lastCleanup[input.BackupDirectory] = DateTime.Now;
 
-            if (input.DaysOlder < 0)
-                throw new ArgumentException("Days older cannot be a negative number", "daysOlder");
-
-            var directories = Directory.GetDirectories(input.BackupDirectory).Where(dirName => ShouldBeCleanedUp(dirName, input));
-            foreach (var dir in directories)
+            if (!input.CreateSubdirectories)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                Directory.Delete(dir, true);
-                result.Add($"{dir} deleted.");
+                foreach (var dir in Directory.GetDirectories(backupDirectory).Where(f => new DirectoryInfo(f).LastWriteTime < DateTime.Now.AddDays(-input.DaysOlder)))
+                {
+                    Directory.Delete(dir, true);
+                    result.Add($"{dir} deleted.");
+                }
+            }
+            else
+            {
+                ConcurrentDictionary<string, DateTime> _lastCleanup = new();
+                _lastCleanup[backupDirectory] = DateTime.Now;
+
+                if (input.DaysOlder < 0)
+                    throw new ArgumentException("Days older cannot be a negative number", "daysOlder");
+
+                var directories = Directory.GetDirectories(backupDirectory).Where(dirName => ShouldBeCleanedUp(dirName, input));
+
+                foreach (var dir in directories)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    Directory.Delete(dir, true);
+                    result.Add($"{dir} deleted.");
+                }
             }
             return result;
         }
@@ -105,7 +117,6 @@ namespace Frends.Files.LocalBackup
                 }
             }
             return new FileInfo(dirPath).LastWriteTime < DateTime.UtcNow.AddDays(-input.DaysOlder);
-
         }
 
         private static bool FileMatchesMask(string filename, string mask)
