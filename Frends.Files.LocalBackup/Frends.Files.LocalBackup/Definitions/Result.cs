@@ -15,6 +15,7 @@ public class Result
     /// <summary>
     /// Count of files which were copied to backup directory.
     /// </summary>
+    /// <example>1</example>
     public int FileCountInBackup { get; private set; }
 
     /// <summary>
