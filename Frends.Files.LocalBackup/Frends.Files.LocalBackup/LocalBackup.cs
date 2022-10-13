@@ -75,10 +75,15 @@ namespace Frends.Files.LocalBackup
 
             if (!input.CreateSubdirectories)
             {
-                foreach (var dir in Directory.GetDirectories(backupDirectory).Where(f => new DirectoryInfo(f).LastWriteTime < DateTime.Now.AddDays(-input.DaysOlder)))
+                foreach (var dir in Directory.GetDirectories(backupDirectory))
                 {
-                    Directory.Delete(dir, true);
+                    if (Directory.GetLastWriteTime(dir) < DateTime.Now.AddDays(-input.DaysOlder)) Directory.Delete(dir, true);
                     result.Add($"{dir} deleted.");
+                }
+                foreach (var file in Directory.GetFiles(backupDirectory))
+                {
+                    if (File.GetLastWriteTime(file) < DateTime.Now.AddDays(-input.DaysOlder)) File.Delete(file);
+                    result.Add($"{file} deleted.");
                 }
             }
             else

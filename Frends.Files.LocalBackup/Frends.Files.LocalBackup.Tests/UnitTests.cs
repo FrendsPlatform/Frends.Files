@@ -301,6 +301,32 @@ public class UnitTests
         Assert.IsFalse(Directory.Exists(backupDirectory));
     }
 
+    /// <summary>
+    /// Clean individual files when CreateSubdirectories is false.
+    /// </summary>
+    [TestMethod]
+    public void CleanupFile_CleanIndividualFiles_Test()
+    {
+        var backup = Path.Combine(_dir, "Cleanup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*",
+            BackupDirectory = backup,
+            TaskExecutionId = null,
+            DaysOlder = 1,
+            Cleanup = true,
+            CreateSubdirectories = false,
+        };
+
+        Files.LocalBackup(input, default);
+        foreach (var dir in Directory.GetDirectories(backup)) Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
+        foreach (var file in Directory.GetFiles(backup)) File.SetLastWriteTime(file, DateTime.Now.AddDays(-2));
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(4, result.Cleanups.Count);
+    }
+
     public void CreateTestFiles()
     {
         Directory.CreateDirectory($@"{_dir}\Sub");
