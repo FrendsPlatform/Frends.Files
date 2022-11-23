@@ -46,6 +46,7 @@ namespace Frends.Files.LocalBackup.Definitions
 
         /// <summary>
         /// Cleanup older than {DaysOlder} folders from backup directory.
+        /// If Create Subdirectories is false, individual files will also get cleaned.
         /// </summary>
         /// <example>false</example>
         public bool Cleanup { get; set; }

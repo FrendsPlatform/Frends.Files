@@ -46,12 +46,12 @@ public class UnitTests
         var result = Files.LocalBackup(input, default);
         Assert.IsNotNull(result);
 
-        foreach (var x in Directory.GetDirectories(buDir))
+        foreach (var dir in Directory.GetDirectories(buDir))
         {
-            string[] files = Directory.GetFiles(x);
+            string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));  
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));  
             }
         }
     }
@@ -78,12 +78,12 @@ public class UnitTests
         var result = Files.LocalBackup(input, default);
         Assert.IsNotNull(result);
 
-        foreach (var x in Directory.GetDirectories(buDir, "2022-05-*"))
+        foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
         {
-            string[] files = Directory.GetFiles(x);
+            string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
             }
         }
     }
@@ -110,12 +110,12 @@ public class UnitTests
         var result = Files.LocalBackup(input, default);
         Assert.IsNotNull(result);
 
-        foreach (var x in Directory.GetDirectories(buDir, "*qwerty123*"))
+        foreach (var dir in Directory.GetDirectories(buDir, "*qwerty123*"))
         {
-            string[] files = Directory.GetFiles(x);
+            string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Overwrite.txt") || file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
             }
         }
     }
@@ -141,13 +141,13 @@ public class UnitTests
         var result = Files.LocalBackup(input, default);
         Assert.IsNotNull(result);
 
-        foreach (var x in Directory.GetDirectories(buDir, "2022-05-*"))
+        foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
         {
-            string[] files = Directory.GetFiles(x);
+            string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test2.txt") || file.Contains($@"{x}\Test1.xml"));
-                Assert.IsTrue(!file.Contains($@"{x}\Overwrite.txt"));
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
+                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Overwrite.txt")));
             }
         }
     }
@@ -173,13 +173,13 @@ public class UnitTests
         var result = Files.LocalBackup(input, default);
         Assert.IsNotNull(result);
 
-        foreach (var x in Directory.GetDirectories(buDir, "2022-05-*"))
+        foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
         {
-            string[] files = Directory.GetFiles(x);
+            string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Test1.txt") || file.Contains($@"{x}\Test1.xml"));
-                Assert.IsTrue(!file.Contains($@"{x}\Overwrite.txt") || !file.Contains($@"{x}\Test2.txt"));
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
+                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Overwrite.txt")) || !file.Contains(Path.Combine(dir, "Test2.txt")));
             }
         }
     }
@@ -205,13 +205,13 @@ public class UnitTests
         var result = Files.LocalBackup(input, default);
         Assert.IsNotNull(result);
 
-        foreach (var x in Directory.GetDirectories(buDir, "2022-05-*"))
+        foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
         {
-            string[] files = Directory.GetFiles(x);
+            string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\Test1.xml"));
-                Assert.IsTrue(!file.Contains($@"{x}\Test1.txt") || !file.Contains($@"{x}\Overwrite.txt") || !file.Contains($@"{x}\Test2.txt"));
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.xml")));
+                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Test1.txt")) || !file.Contains(Path.Combine(dir, "Overwrite.txt")) || !file.Contains(Path.Combine(dir, "Test2.txt")));
             }
         }
     }
@@ -222,7 +222,7 @@ public class UnitTests
     [TestMethod]
     public void CopyWithPrefix4Test()
     {
-        var buDir = Path.Combine(_dir, "Backup\\Pro");
+        var buDir = Path.Combine(_dir, "Backup", "Pro");
 
         input = new Input()
         {
@@ -237,13 +237,13 @@ public class UnitTests
         var result = Files.LocalBackup(input, default);
         Assert.IsNotNull(result);
 
-        foreach (var x in Directory.GetDirectories(buDir, "2022-05-*"))
+        foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
         {
-            string[] files = Directory.GetFiles(x);
+            string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains($@"{x}\pro_test.txt") || file.Contains($@"{x}\pref_test.txt") || file.Contains($@"{x}\_test.txt"));
-                Assert.IsTrue(!file.Contains($@"{x}\prof_test.txt") || !file.Contains($@"{x}\pro_tet.txt"));
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "pro_test.txt")) || file.Contains(Path.Combine(dir, "pref_test.txt")) || file.Contains(Path.Combine(dir, "_test.txt")));
+                Assert.IsTrue(!file.Contains(Path.Combine(dir, "prof_test.txt")) || !file.Contains(Path.Combine(dir, "pro_tet.txt")));
             }
         }
     }
@@ -255,14 +255,14 @@ public class UnitTests
     public void CleanupFile_CreateSubdirectoriesTrue_Test()
     {
         var timestampString = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-dd_HH_mm_ss");
-        var backupDirectory = Path.Combine($@"{_dir}\Cleanup\", $"{timestampString}-{Guid.NewGuid()}");
+        var backupDirectory = Path.Combine(_dir, "Cleanup", $"{timestampString}-{Guid.NewGuid()}");
         Directory.CreateDirectory(backupDirectory);
 
         input = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*",
-            BackupDirectory = $@"{_dir}\Cleanup",
+            BackupDirectory = Path.Combine(_dir, "Cleanup"),
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 1,
             Cleanup = true,
@@ -283,7 +283,7 @@ public class UnitTests
         {
             SourceDirectory = _dir,
             SourceFile = "*",
-            BackupDirectory = $@"{_dir}\Cleanup",
+            BackupDirectory = Path.Combine(_dir, "Cleanup"),
             TaskExecutionId = null,
             DaysOlder = 1,
             Cleanup = true,
@@ -291,7 +291,7 @@ public class UnitTests
         };
         
         
-        var backupDirectory = Path.Combine($@"{_dir}\Cleanup\", $"DeleteThis");
+        var backupDirectory = Path.Combine(_dir, "Cleanup", "DeleteThis");
         Directory.CreateDirectory(backupDirectory);
         Directory.SetLastWriteTimeUtc(backupDirectory, DateTime.Now.AddDays(-2));
 
@@ -301,30 +301,56 @@ public class UnitTests
         Assert.IsFalse(Directory.Exists(backupDirectory));
     }
 
+    /// <summary>
+    /// Clean individual files when CreateSubdirectories is false.
+    /// </summary>
+    [TestMethod]
+    public void CleanupFile_CleanIndividualFiles_Test()
+    {
+        var backup = Path.Combine(_dir, "Cleanup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*",
+            BackupDirectory = backup,
+            TaskExecutionId = null,
+            DaysOlder = 1,
+            Cleanup = true,
+            CreateSubdirectories = false,
+        };
+
+        Files.LocalBackup(input, default);
+        foreach (var dir in Directory.GetDirectories(backup)) Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
+        foreach (var file in Directory.GetFiles(backup)) File.SetLastWriteTime(file, DateTime.Now.AddDays(-2));
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(4, result.Cleanups.Count);
+    }
+
     public void CreateTestFiles()
     {
-        Directory.CreateDirectory($@"{_dir}\Sub");
-        Directory.CreateDirectory($@"{_dir}\Pro");
+        Directory.CreateDirectory(Path.Combine(_dir, "Sub"));
+        Directory.CreateDirectory(Path.Combine(_dir, "Pro"));
 
         var list = new List<string>
         {
-            $@"{_dir}\Test1.txt",
-            $@"{_dir}\Test2.txt",
-            $@"{_dir}\Test1.xml",
-            $@"{_dir}\Overwrite.txt",
-            $@"{_dir}\Sub\Overwrite.txt",
-            $@"{_dir}\Pro\pro_test.txt",
-            $@"{_dir}\Pro\pref_test.txt",
-            $@"{_dir}\Pro\_test.txt",
-            $@"{_dir}\Pro\prof_test.txt",
-            $@"{_dir}\Pro\pro_tet.txt",
+            Path.Combine(_dir, "Test1.txt"),
+            Path.Combine(_dir, "Test2.txt"),
+            Path.Combine(_dir, "Test1.xml"),
+            Path.Combine(_dir, "Overwrite.txt"),
+            Path.Combine(_dir, "Sub", "Overwrite.txt"),
+            Path.Combine(_dir, "Pro", "pro_test.txt"),
+            Path.Combine(_dir, "Pro", "pref_test.txt"),
+            Path.Combine(_dir, "Pro", "_test.txt"),
+            Path.Combine(_dir, "Pro", "prof_test.txt"),
+            Path.Combine(_dir, "Pro", "pro_test.txt")
         };
 
-        //create test files and edit creationdate
+        // Create test files and edit creationdate.
         foreach (var file in list)
         {
-            if (file.StartsWith($@"{_dir}\Overwrite.txt"))
-                File.AppendAllText(file, $"Overwrite complete.");
+            if (file.StartsWith(Path.Combine(_dir, "Overwrite.txt")))
+                File.AppendAllText(file, "Overwrite complete.");
             else
                 File.AppendAllText(file, $"Test {file}");
         }
