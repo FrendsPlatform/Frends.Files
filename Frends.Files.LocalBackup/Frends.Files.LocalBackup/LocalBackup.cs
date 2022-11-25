@@ -36,7 +36,7 @@ namespace Frends.Files.LocalBackup
 
             var (directory, backup) = CreateBackup(input, backupDirectory,  cancellationToken);
 
-            var cleanup = input.Cleanup ? CleanUp(input, backupDirectory, cancellationToken) : null;
+            var cleanup = input.Cleanup ? CleanUp(input, input.BackupDirectory, cancellationToken) : null;
 
             return new Result(directory, backup, cleanup);
         }
@@ -121,7 +121,7 @@ namespace Frends.Files.LocalBackup
                     return timeStamp < DateTime.UtcNow.AddDays(-input.DaysOlder);
                 }
             }
-            return new FileInfo(dirPath).LastWriteTime < DateTime.UtcNow.AddDays(-input.DaysOlder);
+            return File.GetCreationTimeUtc(dirPath) < DateTime.UtcNow.AddDays(-input.DaysOlder);
         }
 
         private static bool FileMatchesMask(string filename, string mask)

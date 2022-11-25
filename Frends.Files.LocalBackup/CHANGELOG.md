@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.3] - 2022-11-25
+### Fixed
+- Fixed issue when using CreateSubdirectories Cleanup uses same directory which is created in Backup and when there's no files to backup the directory is deleted and cleanup won't find the directory.
+
 ## [2.0.2] - 2022-10-13
 ### Changed
 - Cleanup will clean individual files in addition to directories when CreateSubdirectories is false.
