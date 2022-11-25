@@ -365,8 +365,8 @@ public class UnitTests
             TaskExecutionId = Guid.NewGuid().ToString()
         };
 
-        var result = Files.LocalBackup(input, new CancellationToken());
-        Assert.AreEqual(result.Cleanups.Count, 0);
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(0, result.Cleanups.Count);
     }
 
     public void CreateTestFiles()
