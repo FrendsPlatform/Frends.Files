@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace Frends.Files.LocalBackup.Tests;
 
@@ -325,6 +326,47 @@ public class UnitTests
         foreach (var file in Directory.GetFiles(backup)) File.SetLastWriteTime(file, DateTime.Now.AddDays(-2));
         var result = Files.LocalBackup(input, default);
         Assert.AreEqual(4, result.Cleanups.Count);
+    }
+
+    [TestMethod]
+    public void CleanupFile_CleanWithoutTimestampInDirectoryName()
+    {
+        var backup = Path.Combine(_dir, "Cleanup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*",
+            BackupDirectory = backup,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 2,
+            Cleanup = true,
+            CreateSubdirectories = true
+        };
+
+        var newDir = Path.Combine(backup, Guid.NewGuid().ToString());
+        Directory.CreateDirectory(newDir);
+        Directory.SetCreationTimeUtc(newDir, DateTime.UtcNow.AddDays(-2));
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(1, result.Cleanups.Count);
+    }
+
+    [TestMethod]
+    public void TestCleanupWithoutBackup()
+    {
+        var input = new Input
+        {
+            SourceDirectory = Environment.CurrentDirectory,
+            SourceFile = "FileThatDontExist",
+            BackupDirectory = _dir,
+            CreateSubdirectories = true,
+            Cleanup = true,
+            DaysOlder = 14,
+            TaskExecutionId = Guid.NewGuid().ToString()
+        };
+
+        var result = Files.LocalBackup(input, new CancellationToken());
+        Assert.AreEqual(result.Cleanups.Count, 0);
     }
 
     public void CreateTestFiles()
