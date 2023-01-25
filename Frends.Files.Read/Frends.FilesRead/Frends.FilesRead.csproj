@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<Description>FRENDS File tasks</Description>
+    <Version>1.0.0.0</Version>
+    <PackageId>Frends.FilesRead</PackageId>
+    <Authors>HiQ Finland</Authors>
+    <Product>Frends.FilesRead</Product>
+    <Company>HiQ Finland</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SimpleImpersonation" Version="3.0.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+	<PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="2.2.0" />
+  </ItemGroup>
+
+   <ItemGroup>
+    <None Include="FrendsTaskMetadata.json"  Pack="true" PackagePath="/">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
