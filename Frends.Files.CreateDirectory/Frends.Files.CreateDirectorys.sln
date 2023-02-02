@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.HTTP.RequestBytes", "Frends.HTTP.RequestBytes\Frends.HTTP.RequestBytes.csproj", "{35C305C0-8108-4A98-BB1D-AFE5C926239E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Files.CreateDirectory", "Frends.Files.CreateDirectory\Frends.Files.CreateDirectory.csproj", "{35C305C0-8108-4A98-BB1D-AFE5C926239E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.HTTP.RequestBytes.Tests", "Frends.HTTP.RequestBytes.Tests\Frends.HTTP.RequestBytes.Tests.csproj", "{8CA92187-8E4F-4414-803B-EC899479022E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Files.CreateDirectory.Tests", "Frends.Files.CreateDirectory.Tests\Frends.Files.CreateDirectory.Tests.csproj", "{8CA92187-8E4F-4414-803B-EC899479022E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{35C305C0-8108-4A98-BB1D-AFE5C926239E} = {35C305C0-8108-4A98-BB1D-AFE5C926239E}
 	EndProjectSection
