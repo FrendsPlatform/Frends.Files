@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Files.CreateDirectory.Definitions;
 
@@ -9,30 +8,9 @@ namespace Frends.Files.CreateDirectory.Definitions;
 public class Input
 {
     /// <summary>
-    /// The HTTP Method to be used with the request.
+    /// Directory path.
     /// </summary>
-    /// <example>GET</example>
-    [DefaultValue(Method.GET)]
-    public Method Method { get; set; }
-
-    /// <summary>
-    /// The URL with protocol and path. You can include query parameters directly in the url.
-    /// </summary>
-    /// <example>https://example.org/path/to</example>
-    [DefaultValue("https://example.org/path/to")]
-    [DisplayFormat(DataFormatString = "Text")]
-    public string Url { get; set; }
-
-    /// <summary>
-    /// The message text to be sent with the request.
-    /// </summary>
-    /// <example>{ "Body": "Message" }</example>
-    [UIHint(nameof(Method), "", Method.POST, Method.DELETE, Method.PATCH, Method.PUT)]
-    public string Message { get; set; }
-
-    /// <summary>
-    /// List of HTTP headers to be added to the request.
-    /// </summary>
-    /// <example>Name: Header, Value: HeaderValue</example>
-    public Header[] Headers { get; set; }
+    /// <example>C:\Temp</example>
+    [DefaultValue("\"c:\\temp\"")]
+    public string Directory { get; private set; }
 }
