@@ -1,10 +1,11 @@
 ﻿using Frends.Files.CreateDirectory.Definitions;
 using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
-[assembly: InternalsVisibleTo("Frends.HTTP.RequestBytes.Tests")]
 namespace Frends.Files.CreateDirectory;
 
 /// <summary>
@@ -18,6 +19,9 @@ public class Files
     /// <returns>Object { string Path } </returns>
     public static Result CreateDirectory([PropertyTab] Input input, [PropertyTab] Options options)
     {
+        if (string.IsNullOrEmpty(input.Directory))
+            throw new ArgumentNullException("Directory cannot be empty.");
+
         if (!options.UseGivenUserCredentialsForRemoteConnections)
         {
             return ExecuteCreate(input);
@@ -37,15 +41,16 @@ public class Files
             throw new Exception("Impersonation only supported on Windows systems");
         }
 #endif
+        var credentials = new UserCredentials(domain, username, password);
+        using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
-        return Impersonation.RunAsUser(new UserCredentials(domain, username, password),
-            LogonType.NewCredentials, action);
+        return WindowsIdentity.RunImpersonated(userHandle, action);
     }
 
-    private static CreateResult ExecuteCreate(SharedInput input)
+    private static Result ExecuteCreate(Input input)
     {
         var newFolder = System.IO.Directory.CreateDirectory(input.Directory);
-        return new CreateResult(newFolder.FullName);
+        return new Result(newFolder.FullName);
     }
 
     private static string[] GetDomainAndUserName(string username)
@@ -57,7 +62,5 @@ public class Files
         }
         return domainAndUserName;
     }
-
-}
 }
 
