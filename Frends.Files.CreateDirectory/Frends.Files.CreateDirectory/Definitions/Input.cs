@@ -12,5 +12,5 @@ public class Input
     /// </summary>
     /// <example>C:\Temp</example>
     [DefaultValue("\"c:\\temp\"")]
-    public string Directory { get; private set; }
+    public string Directory { get; set; }
 }
