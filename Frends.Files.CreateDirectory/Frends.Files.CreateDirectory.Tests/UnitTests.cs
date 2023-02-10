@@ -43,7 +43,7 @@ public class UnitTests
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
-    public void ThrowArgumentEmpty()
+    public void ThrowInputEmpty()
     {
         var result = Files.CreateDirectory(new Input() { }, new Options() { });
         Assert.AreEqual("Directory cannot be empty.", result);
