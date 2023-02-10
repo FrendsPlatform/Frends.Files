@@ -1,0 +1,8 @@
+﻿{
+  "Tasks": [
+   
+    {
+      "TaskMethod": "Frends.Files.Read.FilesRead.Read"
+    }
+  ]
+}

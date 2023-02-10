@@ -2,23 +2,13 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-#pragma warning disable 1591
 
-namespace Frends.FilesRead
+namespace Frends.Files.Read
 {
-	public enum FileEncoding { UTF8, ANSI, ASCII, Unicode, Other }
-
-	public class ReadInput
-	{
-		/// <summary>
-		/// Full path of the file
-		/// </summary>
-		[DefaultValue("\"c:\\temp\\foo.txt\"")]
-		public string Path { get; set; }
-	}
-
-
-	public class ReadOption
+	/// <summary>
+	/// Options for read the files with or without credidentials
+	/// </summary>
+	public class ReadOptions
 	{
 		/// <summary>
 		/// If set, allows you to give the user credentials to use to read files on remote hosts.
@@ -34,6 +24,9 @@ namespace Frends.FilesRead
 		[UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
 		public string UserName { get; set; }
 
+		/// <summary>
+		/// Indicates that an object's text representation is obscured by characters such as asterisks. This class cannot be inherited.
+		/// </summary>
 		[PasswordPropertyText]
 		[UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
 		public string Password { get; set; }
@@ -41,32 +34,19 @@ namespace Frends.FilesRead
 		/// <summary>
 		/// Encoding for the read content. By selecting 'Other' you can use any encoding.
 		/// </summary>
-		public FileEncoding FileEncoding { get; set; }
+		public FileEncodings FileEncoding { get; set; }
 
-		[UIHint(nameof(FileEncoding), "", FileEncoding.UTF8)]
+		/// <summary>
+		/// File Encoding UTF8 is set as default value
+		/// </summary>
+		[UIHint(nameof(FileEncoding), "", FileEncodings.UTF8)]
 		public bool EnableBom { get; set; }
 
 		/// <summary>
 		/// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List
 		/// </summary>
-		[UIHint(nameof(FileEncoding), "", FileEncoding.Other)]
+		[UIHint(nameof(FileEncoding), "", FileEncodings.Other)]
 		public string EncodingInString { get; set; }
 	}
-	public class ReadResult
-	{
-		public ReadResult(FileInfo info, string content)
-		{
-			Path = info.FullName;
-			SizeInMegaBytes = Math.Round((info.Length / 1024d / 1024d), 3);
-			Content = content;
-			CreationTime = info.CreationTime;
-			LastWriteTime = info.LastWriteTime;
-		}
-		public string Content { get; set; }
-		public string Path { get; set; }
-		public double SizeInMegaBytes { get; set; }
-		public DateTime CreationTime { get; set; }
-		public DateTime LastWriteTime { get; set; }
-	}
 
-    }
+}

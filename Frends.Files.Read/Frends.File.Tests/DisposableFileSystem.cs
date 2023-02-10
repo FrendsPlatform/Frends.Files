@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Frends.FilesRead.Tests
+namespace Frends.Files.Read.Tests
 {
     public class DisposableFileSystem : IDisposable
     {
@@ -68,8 +68,9 @@ namespace Frends.FilesRead.Tests
             return Path.GetFullPath(Path.Combine(RootPath, relativePath));
         }
 
-        public void Dispose()
-        {
+		public void Dispose()
+
+		{
             try
             {
                 Directory.Delete(RootPath, true);

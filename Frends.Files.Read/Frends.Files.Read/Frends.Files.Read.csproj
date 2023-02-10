@@ -5,11 +5,17 @@
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<Description>FRENDS File tasks</Description>
     <Version>1.0.0.0</Version>
-    <PackageId>Frends.FilesRead</PackageId>
+    <PackageId>Frends.Files.Read</PackageId>
     <Authors>HiQ Finland</Authors>
     <Product>Frends.FilesRead</Product>
     <Company>HiQ Finland</Company>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Definitions\**" />
+    <EmbeddedResource Remove="Definitions\**" />
+    <None Remove="Definitions\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="SimpleImpersonation" Version="3.0.0" />
@@ -18,7 +24,7 @@
   </ItemGroup>
 
    <ItemGroup>
-    <None Include="FrendsTaskMetadata.json"  Pack="true" PackagePath="/">
+    <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
 	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

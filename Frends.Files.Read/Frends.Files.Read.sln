@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.FilesRead", "Frends.FilesRead\Frends.FilesRead.csproj", "{1F1CE076-186C-4746-80EA-274755B31644}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Files.Read", "Frends.Files.Read\Frends.Files.Read.csproj", "{1F1CE076-186C-4746-80EA-274755B31644}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.File.Tests", "Frends.File.Tests\Frends.File.Tests.csproj", "{DB612D87-E879-4238-90A3-F2942FEA7F31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frends.Files.Read.Tests", "Frends.File.Tests\Frends.Files.Read.Tests.csproj", "{DB612D87-E879-4238-90A3-F2942FEA7F31}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CF7A2A89-31AA-40B1-A832-ECA1420C60D3}"
 	ProjectSection(SolutionItems) = preProject
