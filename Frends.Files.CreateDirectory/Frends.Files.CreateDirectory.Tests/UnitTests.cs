@@ -8,15 +8,17 @@ using Frends.Files.CreateDirectory.Definitions;
 namespace Frends.Files.CreateDirectory.Tests;
 
 [TestClass]
-public class UnitTests : IDisposable
+public class UnitTests
 {
     private DisposableFileSystem _context;
 
-    [SetUp]
+    [OneTimeSetUp]
     public void Setup()
     {
         _context = new DisposableFileSystem();
     }
+
+    [OneTimeTearDown]
     public void Dispose()
     {
         _context.Dispose();
