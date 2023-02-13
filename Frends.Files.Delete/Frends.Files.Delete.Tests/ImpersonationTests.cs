@@ -19,7 +19,7 @@ namespace Frends.Files.Delete.Tests
 
         private readonly string _domain = Environment.MachineName;
         private readonly string _name = "test";
-        private readonly string _pwd = "password";
+        private readonly string _pwd = "pas5woRd!";
 
 
         [OneTimeSetUp]

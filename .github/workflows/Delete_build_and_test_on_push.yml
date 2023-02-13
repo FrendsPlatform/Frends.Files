@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@issue-46
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@main
     with:
       workdir: Frends.Files.Delete
     secrets:
