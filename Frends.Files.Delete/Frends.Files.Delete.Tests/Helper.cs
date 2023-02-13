@@ -24,7 +24,7 @@ internal class Helper
             Path.Combine(directory, "prof_test.txt"),
         };
 
-        // Create test files and edit creationdate.
+        // Create test files and edit creation date
         foreach (var path in list)
         {
             File.WriteAllText(path, $"Test {path}");
