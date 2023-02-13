@@ -8,8 +8,9 @@ namespace Frends.Files.Delete.Definitions;
 public class Result
 {
     /// <summary>
-    /// Path 
+    /// List of file items deleted from directory.
     /// </summary>
+    /// <example>[test.txt, test2.txt]</example>
     public IEnumerable<object> Files { get; private set; }
 
     internal Result(List<FileItem> files)
