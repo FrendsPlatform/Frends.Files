@@ -12,7 +12,7 @@ internal class FileItem
     public string Path { get; set; }
 
     public double SizeInMegaBytes { get; set; }
-    
+
     public FileItem(FileInfo file)
     {
         Name = file.Name;

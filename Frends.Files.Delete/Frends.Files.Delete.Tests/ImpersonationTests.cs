@@ -13,7 +13,6 @@ namespace Frends.Files.Delete.Tests
         /// <summary>
         /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
         /// </summary>
-        
         private readonly string _dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
         Input? _input;
         Options? _options;
