@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace Frends.Files.Copy.Tests
@@ -13,8 +14,9 @@ namespace Frends.Files.Copy.Tests
         /// <summary>
         /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
         /// </summary>
-        
-        private readonly string _dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
+
+        private static readonly string _SourceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
+        private static readonly string _TargetDir = Path.Combine(_SourceDir, "destination");
         Input? _input;
         Options? _options;
 
@@ -30,8 +32,9 @@ namespace Frends.Files.Copy.Tests
 
             _input = new Input
             {
-                Directory = _dir,
-                Pattern = "*"
+                Directory = _SourceDir,
+                Pattern = "*",
+                TargetDirectory = _TargetDir
             };
 
             _options = new Options
@@ -51,23 +54,25 @@ namespace Frends.Files.Copy.Tests
         [SetUp]
         public void Setup()
         {
-            Helper.CreateTestFiles(_dir);
+            Helper.CreateTestFiles(_SourceDir);
+            Directory.CreateDirectory(_TargetDir);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Helper.DeleteTestFolder(_dir);
+            Helper.DeleteTestFolder(_SourceDir);
         }
 
         [Test]
-        public void FileDeleteTestWithCredentials()
+        public async Task FileDeleteTestWithCredentials()
         {
-            var result = Files.Copy(
+            var result = await Files.Copy(
                 _input,
                 _options, default);
 
-            Assert.AreEqual(7, result.Files.ToList().Count);
+            Assert.AreEqual(7, result.Files.Count);
+            Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
         }
 
         [Test]
@@ -80,7 +85,7 @@ namespace Frends.Files.Copy.Tests
                 Password = _pwd
             };
 
-            var ex = Assert.Throws<ArgumentException>(() => Files.Copy(_input, options, default));
+            var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Copy(_input, options, default));
             Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
         }
     }

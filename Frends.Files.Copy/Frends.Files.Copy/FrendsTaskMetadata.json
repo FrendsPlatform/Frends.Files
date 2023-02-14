@@ -1,7 +1,7 @@
 {
   "Tasks": [
     {
-      "TaskMethod": "Frends.Files.Delete.Files.Delete"
+      "TaskMethod": "Frends.Files.Copy.Files.Copy"
     }
   ]
 }

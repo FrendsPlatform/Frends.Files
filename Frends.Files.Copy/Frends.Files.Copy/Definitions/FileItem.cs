@@ -1,14 +1,21 @@
-﻿using System.IO;
+﻿namespace Frends.Files.Copy.Definitions;
 
-namespace Frends.Files.Copy.Definitions;
-
-internal class FileItem
+/// <summary>
+/// Class for return items.
+/// </summary>
+public class FileItem
 {
+    /// <summary>
+    /// Source path to the file.
+    /// </summary>
     public string SourcePath { get; set; }
 
+    /// <summary>
+    /// Target path to the file.
+    /// </summary>
     public string TargetPath { get; set; }
     
-    public FileItem(string source, string target)
+    internal FileItem(string source, string target)
     {
         SourcePath = source;
         TargetPath = target;
