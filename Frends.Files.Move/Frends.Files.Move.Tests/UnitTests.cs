@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace Frends.Files.Move.Tests;
@@ -38,30 +39,30 @@ public class UnitTests
     }
 
     [Test]
-    public void FileDeleteAll()
+    public async Task FileDeleteAll()
     {
-        var result = Files.Delete(_input, _options, default);
+        var result = await Files.Move(_input, _options, default);
 
-        Assert.AreEqual(7, result.Files.ToList().Count);
+        Assert.AreEqual(7, result.Files.Count);
     }
 
     [Test]
-    public void FileDeleteWithPattern()
+    public async Task FileDeleteWithPattern()
     {
-        var result = Files.Move(
+        var result = await Files.Move(
             new Input
             {
                 Directory = _dir,
                 Pattern = "Test1*"
             }, _options, default);
 
-        Assert.AreEqual(2, result.Files.ToList().Count);
+        Assert.AreEqual(2, result.Files.Count);
     }
 
     [Test]
-    public void FileDeleteShouldNotThrowIfNoFilesFound()
+    public async Task FileDeleteShouldNotThrowIfNoFilesFound()
     {
-        var result = Files.Move(
+        var result = await Files.Move(
             new Input()
             {
                 Directory = _dir,
@@ -82,7 +83,7 @@ public class UnitTests
             Pattern = "**/*.unknown"
         };
 
-        var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Move(input, _options, default));
+        var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Move(input, _options, default));
         Assert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
     }
 }

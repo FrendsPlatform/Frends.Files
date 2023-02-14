@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace Frends.Files.Move.Tests
@@ -61,13 +62,13 @@ namespace Frends.Files.Move.Tests
         }
 
         [Test]
-        public void FileDeleteTestWithCredentials()
+        public async Task FileDeleteTestWithCredentials()
         {
-            var result = Files.Move(
+            var result = await Files.Move(
                 _input,
                 _options, default);
 
-            Assert.AreEqual(7, result.Files.ToList().Count);
+            Assert.AreEqual(7, result.Files.Count);
         }
 
         [Test]
@@ -80,7 +81,7 @@ namespace Frends.Files.Move.Tests
                 Password = _pwd
             };
 
-            var ex = Assert.Throws<ArgumentException>(() => Files.Move(_input, options, default));
+            var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Move(_input, options, default));
             Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
         }
     }

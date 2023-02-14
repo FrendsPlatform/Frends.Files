@@ -22,5 +22,12 @@ namespace Frends.Files.Move.Definitions
         [DisplayFormat(DataFormatString = "Text")]
         [DefaultValue("\"**\\Folder\\*.xml\"")]
         public string Pattern { get; set; }
+
+        /// <summary>
+        /// Target directory where the found files should be copied to
+        /// </summary>
+        /// <example>d:\backup\</example>
+        [DefaultValue("\"d:\\backup\"")]
+        public string TargetDirectory { get; set; }
     }
 }

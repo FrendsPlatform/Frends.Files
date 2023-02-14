@@ -10,7 +10,7 @@ public class Result
     /// <summary>
     /// Path 
     /// </summary>
-    public IEnumerable<object> Files { get; private set; }
+    public List<FileItem> Files { get; private set; }
 
     internal Result(List<FileItem> files)
     {

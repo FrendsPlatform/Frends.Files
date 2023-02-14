@@ -7,17 +7,20 @@ namespace Frends.Files.Move.Definitions;
 /// </summary>
 public class FileItem
 {
-    public string Name { get; set; }
+    /// <summary>
+    /// Source path to the file.
+    /// </summary>
+    public string SourcePath { get; set; }
 
-    public string Path { get; set; }
+    /// <summary>
+    /// Target path to the file.
+    /// </summary>
+    public string TargetPath { get; set; }
 
-    public double SizeInMegaBytes { get; set; }
-    
-    public FileItem(FileInfo file)
+    internal FileItem(string source, string target)
     {
-        Name = file.Name;
-        Path = file.FullName;
-        SizeInMegaBytes = file.Length / 1024d / 1024d;
+        SourcePath = source;
+        TargetPath = target;
     }
 }
 
