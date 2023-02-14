@@ -66,7 +66,8 @@ namespace Frends.Files.Delete.Tests
                 _input,
                 _options, default);
 
-            Assert.AreEqual(7, result.Files.ToList().Count);
+            Assert.AreEqual(7, result.Files.Count);
+            Assert.IsFalse(File.Exists(result.Files[0].Path));
         }
 
         [Test]

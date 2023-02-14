@@ -42,7 +42,8 @@ public class UnitTests
     {
         var result = Files.Delete(_input, _options, default);
 
-        Assert.AreEqual(7, result.Files.ToList().Count);
+        Assert.AreEqual(7, result.Files.Count);
+        Assert.IsFalse(File.Exists(result.Files[0].Path));
     }
 
     [Test]
@@ -55,7 +56,8 @@ public class UnitTests
                 Pattern = "Test1*"
             }, _options, default);
 
-        Assert.AreEqual(2, result.Files.ToList().Count);
+        Assert.AreEqual(2, result.Files.Count);
+        Assert.IsFalse(File.Exists(result.Files[0].Path));
     }
 
     [Test]
