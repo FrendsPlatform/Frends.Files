@@ -65,7 +65,7 @@ namespace Frends.Files.Copy.Tests
         }
 
         [Test]
-        public async Task FileDeleteTestWithCredentials()
+        public async Task FileCopyTestWithCredentials()
         {
             var result = await Files.Copy(
                 _input,
@@ -76,7 +76,7 @@ namespace Frends.Files.Copy.Tests
         }
 
         [Test]
-        public void FileDeleteTestWithUsernameWithoutDomain()
+        public void FileCopyTestWithUsernameWithoutDomain()
         {
             var options = new Options
             {
