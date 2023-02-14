@@ -11,35 +11,40 @@ namespace Frends.Files.Move.Tests;
 [TestFixture]
 public class UnitTests
 {
-    private readonly string _dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
-    Input? _input;
-    Options? _options;
+    private static readonly string _SourceDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"));
+    private static readonly string _TargetDir = Path.Combine(_SourceDir, "destination");
+    private Input _input = new Input();
+    private Options _options = new Options();
 
     [SetUp]
     public void Setup()
     {
-        Helper.CreateTestFiles(_dir);
+        Helper.CreateTestFiles(_SourceDir);
 
         _input = new Input
         {
-            Directory = _dir,
-            Pattern = "*"
+            Directory = _SourceDir,
+            Pattern = "*",
+            TargetDirectory = _TargetDir
         };
 
         _options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = false
+            UseGivenUserCredentialsForRemoteConnections = false,
+            CreateTargetDirectories = false,
+            IfTargetFileExists = FileExistsAction.Throw,
+            PreserveDirectoryStructure = true,
         };
     }
 
     [TearDown]
     public void TearDown()
     {
-        Helper.DeleteTestFolder(_dir);
+        Helper.DeleteTestFolder(_SourceDir);
     }
 
     [Test]
-    public async Task FileDeleteAll()
+    public async Task FileMoveAll()
     {
         var result = await Files.Move(_input, _options, default);
 
@@ -47,26 +52,28 @@ public class UnitTests
     }
 
     [Test]
-    public async Task FileDeleteWithPattern()
+    public async Task FileMoveWithPattern()
     {
         var result = await Files.Move(
             new Input
             {
-                Directory = _dir,
-                Pattern = "Test1*"
+                Directory = _SourceDir,
+                Pattern = "Test1*",
+                TargetDirectory = _TargetDir
             }, _options, default);
 
         Assert.AreEqual(2, result.Files.Count);
     }
 
     [Test]
-    public async Task FileDeleteShouldNotThrowIfNoFilesFound()
+    public async Task FileMoveShouldNotThrowIfNoFilesFound()
     {
         var result = await Files.Move(
             new Input()
             {
-                Directory = _dir,
-                Pattern = "**/*.unknown"
+                Directory = _SourceDir,
+                Pattern = "**/*.unknown",
+                TargetDirectory = _TargetDir
             },
             _options,
             default);
@@ -75,7 +82,7 @@ public class UnitTests
     }
 
     [Test]
-    public void FileDeleteShouldThrowIfDirectoryIsNotFound()
+    public void FileMoveShouldThrowIfDirectoryIsNotFound()
     {
         var input = new Input()
         {
