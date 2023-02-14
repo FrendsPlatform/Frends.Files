@@ -20,6 +20,7 @@ public class UnitTests
     public void Setup()
     {
         Helper.CreateTestFiles(_SourceDir);
+        Directory.CreateDirectory(_TargetDir);
 
         _input = new Input
         {
@@ -49,6 +50,42 @@ public class UnitTests
         var result = await Files.Move(_input, _options, default);
 
         Assert.AreEqual(7, result.Files.Count);
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+    }
+
+    [Test]
+    public async Task FileMovePreserveDirectoryStructure()
+    {
+        var options = new Options
+        {
+            UseGivenUserCredentialsForRemoteConnections = false,
+            CreateTargetDirectories = false,
+            IfTargetFileExists = FileExistsAction.Throw,
+            PreserveDirectoryStructure = true
+        };
+        var result = await Files.Move(_input, options, default);
+
+        Assert.AreEqual(7, result.Files.Count);
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+    }
+
+    [Test]
+    public async Task FileMoveCreateTargetDirectories()
+    {
+        var options = new Options
+        {
+            UseGivenUserCredentialsForRemoteConnections = false,
+            CreateTargetDirectories = true,
+            IfTargetFileExists = FileExistsAction.Throw,
+            PreserveDirectoryStructure = true
+        };
+
+        Directory.Delete(_TargetDir, true);
+
+        var result = await Files.Move(_input, options, default);
+
+        Assert.AreEqual(7, result.Files.Count);
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
     }
 
     [Test]
@@ -87,10 +124,26 @@ public class UnitTests
         var input = new Input()
         {
             Directory = @"F:\directory\that\dont\exists",
-            Pattern = "**/*.unknown"
+            Pattern = "**/*.unknown",
+            TargetDirectory = _TargetDir
         };
 
         var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Move(input, _options, default));
         Assert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
+    }
+
+    [Test]
+    public void FileMoveShouldThrowIfFileExists()
+    {
+        var testFile = "Test1.txt";
+        var input = new Input()
+        {
+            Directory = _SourceDir,
+            Pattern = testFile,
+            TargetDirectory = _TargetDir
+        };
+        File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
+        var ex = Assert.ThrowsAsync<IOException>(() => Files.Move(input, _options, default));
+        Assert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files moved.", ex.Message);
     }
 }
