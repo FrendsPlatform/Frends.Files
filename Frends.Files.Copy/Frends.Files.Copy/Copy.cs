@@ -61,45 +61,37 @@ public class Files
             Directory.CreateDirectory(input.TargetDirectory);
 
         var fileResults = new List<FileItem>();
-        try
+
+        foreach (var entry in fileTransferEntries)
         {
-            foreach (var entry in fileTransferEntries)
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var sourceFilePath = entry.Key;
+            var targetFilePath = entry.Value;
+
+            if (options.CreateTargetDirectories)
+                Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
+
+            switch (options.IfTargetFileExists)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                case FileExistsAction.Rename:
+                    targetFilePath = GetNonConflictingDestinationFilePath(sourceFilePath, targetFilePath);
+                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken);
+                    break;
 
-                var sourceFilePath = entry.Key;
-                var targetFilePath = entry.Value;
+                case FileExistsAction.Overwrite:
+                    if (File.Exists(targetFilePath))
+                        File.Delete(targetFilePath);
+                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
+                    break;
 
-                if (options.CreateTargetDirectories)
-                    Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
-
-                switch (options.IfTargetFileExists)
-                {
-                    case FileExistsAction.Rename:
-                        targetFilePath = GetNonConflictingDestinationFilePath(sourceFilePath, targetFilePath);
-                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken);
-                        break;
-
-                    case FileExistsAction.Overwrite:
-                        if (File.Exists(targetFilePath))
-                            File.Delete(targetFilePath);
-                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
-                        break;
-
-                    case FileExistsAction.Throw:
-                        if (File.Exists(targetFilePath))
-                            throw new IOException($"File '{targetFilePath}' already exists. No files copied.");
-                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
-                        break;
-                }
-                fileResults.Add(new FileItem(sourceFilePath, targetFilePath));
+                case FileExistsAction.Throw:
+                    if (File.Exists(targetFilePath))
+                        throw new IOException($"File '{targetFilePath}' already exists. No files copied.");
+                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
+                    break;
             }
-        }
-        catch (Exception)
-        {
-            //Delete the target files that were already moved before a file that exists breaks the move command
-            DeleteExistingFiles(fileResults.Select(x => x.TargetPath));
-            throw;
+            fileResults.Add(new FileItem(sourceFilePath, targetFilePath));
         }
 
         return fileResults;
@@ -161,17 +153,10 @@ public class Files
         return values.GroupBy(v => v).Where(x => x.Count() > 1).Select(k => k.Key).ToList();
     }
 
-    internal static void DeleteExistingFiles(IEnumerable<string> files)
-    {
-        foreach (var file in files)
-            if (File.Exists(file))
-                File.Delete(file);
-    }
-
     internal static string GetNonConflictingDestinationFilePath(string sourceFilePath, string destFilePath)
     {
         var count = 1;
-        while (System.IO.File.Exists(destFilePath))
+        while (File.Exists(destFilePath))
         {
             string tempFileName = $"{Path.GetFileNameWithoutExtension(sourceFilePath)}({count++})";
             destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath));
