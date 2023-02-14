@@ -11,7 +11,7 @@ public class Result
     /// List of file items deleted from directory.
     /// </summary>
     /// <example>[test.txt, test2.txt]</example>
-    public IEnumerable<object> Files { get; private set; }
+    public List<FileItem> Files { get; private set; }
 
     internal Result(List<FileItem> files)
     {
