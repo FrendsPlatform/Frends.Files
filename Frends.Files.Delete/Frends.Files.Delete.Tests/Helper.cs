@@ -49,7 +49,7 @@ internal class Helper
         DirectoryEntry grp;
 
         grp = AD.Children.Find("Administrators", "group");
-        if (grp != null) 
+        if (grp != null)
             grp.Invoke("Add", new object[] { NewUser.Path.ToString() });
     }
 
