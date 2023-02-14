@@ -119,7 +119,7 @@ public class UnitTests
     }
 
     [Test]
-    public void FileDeleteShouldThrowIfDirectoryIsNotFound()
+    public void FileCopyShouldThrowIfDirectoryIsNotFound()
     {
         var input = new Input()
         {
@@ -133,7 +133,7 @@ public class UnitTests
     }
 
     [Test]
-    public void FileDeleteShouldThrowIfFileExists()
+    public void FileCopyShouldThrowIfFileExists()
     {
         var testFile = "Test1.txt";
         var input = new Input()
@@ -148,7 +148,7 @@ public class UnitTests
     }
 
     [Test]
-    public void FileDeleteShouldThrowIfFileExists2()
+    public void FileCopyShouldThrowIfFileExists2()
     {
         var testFile = "pref_test.txt";
         var input = new Input()
