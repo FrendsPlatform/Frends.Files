@@ -78,11 +78,8 @@ namespace Frends.Files.Delete
         {
             var domainAndUserName = username.Split('\\');
             if (domainAndUserName.Length != 2)
-            {
                 throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-            }
-            var test = domainAndUserName[0];
-            var test2 = domainAndUserName[1];
+
             return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
         }
 
@@ -91,9 +88,7 @@ namespace Frends.Files.Delete
             // Check the user can access the folder
             // This will return false if the path does not exist or you do not have read permissions.
             if (!Directory.Exists(directoryPath))
-            {
                 throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
-            }
 
             var matcher = new Matcher();
             matcher.AddInclude(pattern);

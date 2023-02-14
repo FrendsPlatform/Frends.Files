@@ -7,7 +7,7 @@ Frends tasks for deleting files.
 
 # Installing
 
-You can install the Task via frends UI Task View or you can find the NuGet package from the following NuGet feed https://www.myget.org/F/frends-tasks/api/v2.
+You can install the Task via Frends UI Task View.
 
 ## Building
 

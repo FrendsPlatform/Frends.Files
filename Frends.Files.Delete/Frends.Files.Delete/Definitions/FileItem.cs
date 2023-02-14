@@ -2,9 +2,6 @@
 
 namespace Frends.Files.Delete.Definitions;
 
-/// <summary>
-/// 
-/// </summary>
 internal class FileItem
 {
     public string Name { get; set; }
