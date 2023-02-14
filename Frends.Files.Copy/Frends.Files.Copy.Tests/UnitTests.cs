@@ -58,7 +58,7 @@ public class UnitTests
             {
                 Directory = _SourceDir,
                 Pattern = "Test1*",
-                TargetDirectory= _TargetDir
+                TargetDirectory = _TargetDir
             }, _options, default);
 
         Assert.AreEqual(2, result.Files.Count);

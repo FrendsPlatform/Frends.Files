@@ -14,7 +14,7 @@ public class FileItem
     /// Target path to the file.
     /// </summary>
     public string TargetPath { get; set; }
-    
+
     internal FileItem(string source, string target)
     {
         SourcePath = source;
