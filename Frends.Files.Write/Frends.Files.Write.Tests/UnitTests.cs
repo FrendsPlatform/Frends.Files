@@ -46,7 +46,6 @@ public class UnitTests
         var result = await Files.Write(_input, _options);
         Assert.IsTrue(File.Exists(result.Path));
         Assert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
-        
     }
 
     [Test]

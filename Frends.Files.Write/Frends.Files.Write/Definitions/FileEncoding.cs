@@ -5,12 +5,11 @@ namespace Frends.Files.Write.Definitions;
 /// <summary>
 /// File encoding for write operations.
 /// </summary>
-public enum FileEncoding 
-{ 
-    UTF8, 
-    ANSI, 
-    ASCII, 
-    Unicode, 
-    Other 
+public enum FileEncoding
+{
+    UTF8,
+    ANSI,
+    ASCII,
+    Unicode,
+    Other
 }
-
