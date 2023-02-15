@@ -3,13 +3,14 @@
 namespace Frends.Files.Move.Definitions;
 
 /// <summary>
-/// Backup and cleanup results.
+/// Move result class.
 /// </summary>
 public class Result
 {
     /// <summary>
-    /// Path 
+    /// List of FileItem objects with source path and target path attributes.
     /// </summary>
+    /// <example>[object {SourcePath: C:\test\testfolder\test1.txt, TargetPath: C:\test\moved\test1.txt}, object {SourcePath: C:\test\testfolder\test2.txt, TargetPath: C:\test\moved\test2.txt}]</example>
     public List<FileItem> Files { get; private set; }
 
     internal Result(List<FileItem> files)

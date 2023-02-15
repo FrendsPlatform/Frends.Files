@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Frends.Files.Move.Definitions;
+﻿namespace Frends.Files.Move.Definitions;
 
 /// <summary>
 /// Class for return items.
