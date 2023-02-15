@@ -1,12 +1,8 @@
 ﻿using Frends.Files.Write.Definitions;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using System;
 using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
 using SimpleImpersonation;
 using System.Security.Principal;
@@ -20,7 +16,7 @@ namespace Frends.Files.Write;
 public class Files
 {
     /// <summary>
-    /// Move files.
+    /// Write file.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Write)
     /// </summary>
     /// <param name="input">Input parameters</param>
