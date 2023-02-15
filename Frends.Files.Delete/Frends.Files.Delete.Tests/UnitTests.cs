@@ -2,8 +2,6 @@ using Frends.Files.Delete.Definitions;
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Linq;
-
 
 namespace Frends.Files.Delete.Tests;
 
