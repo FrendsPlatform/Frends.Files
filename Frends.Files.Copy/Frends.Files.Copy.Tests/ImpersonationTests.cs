@@ -2,91 +2,90 @@
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 
-namespace Frends.Files.Copy.Tests
+namespace Frends.Files.Copy.Tests;
+
+[TestFixture]
+class ImpersonationTests
 {
-    [TestFixture]
-    class ImpersonationTests
+    /// <summary>
+    /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
+    /// </summary>
+
+    private static readonly string _SourceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
+    private static readonly string _TargetDir = Path.Combine(_SourceDir, "destination");
+    Input? _input;
+    Options? _options;
+
+    private readonly string _domain = Environment.MachineName;
+    private readonly string _name = "test";
+    private readonly string _pwd = "pas5woRd!";
+
+
+    [OneTimeSetUp]
+    public void OneTimeSetup()
     {
-        /// <summary>
-        /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
-        /// </summary>
+        Helper.CreateTestUser(_domain, _name, _pwd);
 
-        private static readonly string _SourceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
-        private static readonly string _TargetDir = Path.Combine(_SourceDir, "destination");
-        Input? _input;
-        Options? _options;
-
-        private readonly string _domain = Environment.MachineName;
-        private readonly string _name = "test";
-        private readonly string _pwd = "pas5woRd!";
-
-
-        [OneTimeSetUp]
-        public void OneTimeSetup()
+        _input = new Input
         {
-            Helper.CreateTestUser(_domain, _name, _pwd);
+            Directory = _SourceDir,
+            Pattern = "*",
+            TargetDirectory = _TargetDir
+        };
 
-            _input = new Input
-            {
-                Directory = _SourceDir,
-                Pattern = "*",
-                TargetDirectory = _TargetDir
-            };
-
-            _options = new Options
-            {
-                UseGivenUserCredentialsForRemoteConnections = true,
-                UserName = $"{_domain}\\{_name}",
-                Password = _pwd
-            };
-        }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
+        _options = new Options
         {
-            Helper.DeleteTestUser(_name);
-        }
+            UseGivenUserCredentialsForRemoteConnections = true,
+            UserName = $"{_domain}\\{_name}",
+            Password = _pwd
+        };
+    }
 
-        [SetUp]
-        public void Setup()
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        Helper.DeleteTestUser(_name);
+    }
+
+    [SetUp]
+    public void Setup()
+    {
+        Helper.CreateTestFiles(_SourceDir);
+        Directory.CreateDirectory(_TargetDir);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        Helper.DeleteTestFolder(_SourceDir);
+    }
+
+    [Test]
+    public async Task FileCopyTestWithCredentials()
+    {
+        var result = await Files.Copy(
+            _input,
+            _options, default);
+
+        Assert.AreEqual(7, result.Files.Count);
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+    }
+
+    [Test]
+    public void FileCopyTestWithUsernameWithoutDomain()
+    {
+        var options = new Options
         {
-            Helper.CreateTestFiles(_SourceDir);
-            Directory.CreateDirectory(_TargetDir);
-        }
+            UseGivenUserCredentialsForRemoteConnections = true,
+            UserName = "test",
+            Password = _pwd
+        };
 
-        [TearDown]
-        public void TearDown()
-        {
-            Helper.DeleteTestFolder(_SourceDir);
-        }
-
-        [Test]
-        public async Task FileCopyTestWithCredentials()
-        {
-            var result = await Files.Copy(
-                _input,
-                _options, default);
-
-            Assert.AreEqual(7, result.Files.Count);
-            Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        }
-
-        [Test]
-        public void FileCopyTestWithUsernameWithoutDomain()
-        {
-            var options = new Options
-            {
-                UseGivenUserCredentialsForRemoteConnections = true,
-                UserName = "test",
-                Password = _pwd
-            };
-
-            var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Copy(_input, options, default));
-            Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
-        }
+        var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Copy(_input, options, default));
+        Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
     }
 }
+

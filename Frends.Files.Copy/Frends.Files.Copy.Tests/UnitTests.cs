@@ -2,7 +2,6 @@ using Frends.Files.Copy.Definitions;
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 
