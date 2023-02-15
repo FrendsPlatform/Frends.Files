@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace Frends.Files.Delete.Definitions;
+namespace Frends.Files.Write.Definitions;
 
 /// <summary>
 /// Options parameters.
@@ -32,5 +32,34 @@ public class Options
     [PasswordPropertyText]
     [UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
     public string Password { get; set; }
+
+    /// <summary>
+    /// Encoding for the written content. By selecting 'Other' you can use any encoding.
+    /// </summary>
+    /// <example>FileEncoding.UTF8</example>
+    [DefaultValue(FileEncoding.UTF8)]
+    public FileEncoding FileEncoding { get; set; }
+
+    /// <summary>
+    /// Enable BOM for UTF-8
+    /// </summary>
+    /// <example>true</example>
+    [UIHint(nameof(FileEncoding), "", FileEncoding.UTF8)]
+    [DefaultValue(false)]
+    public bool EnableBom { get; set; }
+
+    /// <summary>
+    /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List
+    /// </summary>
+    /// <example>ISO-8859-2</example>
+    [UIHint(nameof(FileEncoding), "", FileEncoding.Other)]
+    public string EncodingInString { get; set; }
+
+    /// <summary>
+    /// How the file write should work if a file with the new name already exists
+    /// </summary>
+    /// <example>WriteBehaviour.Throw</example>
+    [DefaultValue(WriteBehaviour.Throw)]
+    public WriteBehaviour WriteBehaviour { get; set; }
 }
 

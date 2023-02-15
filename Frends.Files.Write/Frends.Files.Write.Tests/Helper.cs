@@ -4,7 +4,7 @@ using System.IO;
 using System.DirectoryServices;
 using System.Runtime.InteropServices;
 
-namespace Frends.Files.Delete.Tests;
+namespace Frends.Files.Write.Tests;
 
 internal class Helper
 {
@@ -31,9 +31,10 @@ internal class Helper
         }
     }
 
-    public static void DeleteTestFolder(string directory)
+    public static void DeleteTestFolder(string? directory)
     {
-        Directory.Delete(directory, true);
+        if (Directory.Exists(directory))
+            Directory.Delete(directory, true);
     }
 
     public static void CreateTestUser(string domain, string name, string pwd)

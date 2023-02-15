@@ -11,9 +11,9 @@
 	<PackageTags>Frends</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<Description>Frends tasks for deleting files.</Description>
+	<Description>Frends tasks for moving files.</Description>
 	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Files/tree/main/Frends.Files.Delete</RepositoryUrl>
+	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Files/tree/main/Frends.Files.Move</RepositoryUrl>
   </PropertyGroup>
 	
   <ItemGroup>
