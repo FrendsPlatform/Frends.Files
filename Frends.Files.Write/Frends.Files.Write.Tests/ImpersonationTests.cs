@@ -47,6 +47,12 @@ class ImpersonationTests
         Helper.DeleteTestUser(_name);
     }
 
+    [SetUp]
+    public void Setup()
+    {
+        Directory.CreateDirectory(Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/")));
+    }
+
     [TearDown]
     public void TearDown()
     {
