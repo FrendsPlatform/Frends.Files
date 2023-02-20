@@ -24,7 +24,7 @@ internal class Helper
             Path.Combine(directory, "prof_test.txt"),
         };
 
-        // Create test files and edit creationdate.
+        // Create test files and edit creation date
         foreach (var path in list)
         {
             File.WriteAllText(path, $"Test {path}");
@@ -49,7 +49,8 @@ internal class Helper
         DirectoryEntry grp;
 
         grp = AD.Children.Find("Administrators", "group");
-        if (grp != null) { grp.Invoke("Add", new object[] { NewUser.Path.ToString() }); }
+        if (grp != null)
+            grp.Invoke("Add", new object[] { NewUser.Path.ToString() });
     }
 
     public static void DeleteTestUser(string name)
