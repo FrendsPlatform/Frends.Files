@@ -4,7 +4,7 @@ using System.IO;
 using System.DirectoryServices;
 using System.Runtime.InteropServices;
 
-namespace Frends.Files.Delete.Tests;
+namespace Frends.Files.Copy.Tests;
 
 internal class Helper
 {
@@ -26,9 +26,7 @@ internal class Helper
 
         // Create test files and edit creation date
         foreach (var path in list)
-        {
             File.WriteAllText(path, $"Test {path}");
-        }
     }
 
     public static void DeleteTestFolder(string directory)

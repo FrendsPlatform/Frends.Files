@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace Frends.Files.Delete.Definitions;
-
+namespace Frends.Files.Copy.Definitions;
 /// <summary>
 /// Input parameters.
 /// </summary>
@@ -22,4 +21,11 @@ public class Input
     [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("\"**\\Folder\\*.xml\"")]
     public string Pattern { get; set; }
+
+    /// <summary>
+    /// Target directory where the found files should be copied to
+    /// </summary>
+    /// <example>d:\backup\</example>
+    [DefaultValue("\"d:\\backup\"")]
+    public string TargetDirectory { get; set; }
 }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace Frends.Files.Delete.Definitions;
+namespace Frends.Files.Copy.Definitions;
 
 /// <summary>
 /// Options parameters.
@@ -32,5 +32,29 @@ public class Options
     [PasswordPropertyText]
     [UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
     public string Password { get; set; }
+
+    /// <summary>
+    /// If set, will recreate the directory structure from the SourceDirectory under the TargetDirectory for copied files
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(false)]
+    public bool PreserveDirectoryStructure { get; set; }
+
+    /// <summary>
+    /// If set, will create the target directory if it does not exist,
+    /// as well as any sub directories if <see cref="PreserveDirectoryStructure"/> is set.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool CreateTargetDirectories { get; set; }
+
+    /// <summary>
+    /// What should happen if a file with the same name already exists in the target directory.
+    /// * Throw - Throw an error and roll back all transfers
+    /// * Overwrite - Overwrites the target file
+    /// * Rename - Renames the transferred file by appending a number to the end
+    /// </summary>
+    /// <example>FileExistsAction.Overwrite</example>
+    public FileExistsAction IfTargetFileExists { get; set; }
 }
 
