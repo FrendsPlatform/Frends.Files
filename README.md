@@ -5,6 +5,8 @@ File related tasks. This is different from Frends.File in repo structure, naming
 
 - [Frends.Files.LocalBackup](Frends.Files.LocalBackup/README.md)
 - [Frends.Files.Delete](Frends.Files.Delete/README.md)
+- [Frends.Files.Copy](Frends.Files.Copy/README.md)
+- [Frends.Files.Move](Frends.Files.Move/README.md)
 
 # Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
