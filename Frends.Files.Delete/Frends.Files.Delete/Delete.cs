@@ -114,7 +114,7 @@ public class Files
 
     internal static PatternMatchingResult FindMatchingFiles(string directoryPath, string pattern)
     {
-        // Check the user can access the folder
+        // Check the user can access the folder.
         // This will return false if the path does not exist or you do not have read permissions.
         if (!Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
