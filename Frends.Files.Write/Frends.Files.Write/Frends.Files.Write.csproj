@@ -11,7 +11,7 @@
 	<PackageTags>Frends</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<Description>Frends tasks for moving files.</Description>
+	<Description>Frends tasks for writing a file.</Description>
 	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Files/tree/main/Frends.Files.Move</RepositoryUrl>
   </PropertyGroup>

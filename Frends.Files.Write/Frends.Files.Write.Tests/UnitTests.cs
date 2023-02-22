@@ -93,7 +93,7 @@ public class UnitTests
     }
 
     [Test]
-    public async Task FilesWriteShouldThrowIfDirectoryNotExists()
+    public void FilesWriteShouldThrowIfDirectoryNotExists()
     {
         var input = new Input
         {

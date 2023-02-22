@@ -1,7 +1,7 @@
 {
   "Tasks": [
     {
-      "TaskMethod": "Frends.Files.Move.Files.Move"
+      "TaskMethod": "Frends.Files.Write.Files.Write"
     }
   ]
 }
