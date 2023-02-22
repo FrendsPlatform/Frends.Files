@@ -1,15 +1,17 @@
 ﻿using Frends.Files.Delete.Definitions;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using System.Linq;
-using System.ComponentModel;
-using SimpleImpersonation;
-using System.Security.Principal;
 using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.Loader;
+using System.Reflection;
+using System.Security.Principal;
 using System.Threading;
 
 namespace Frends.Files.Delete;
@@ -19,6 +21,14 @@ namespace Frends.Files.Delete;
 /// </summary>
 public class Files
 {
+    static Files()
+    {
+        var currentAssembly = Assembly.GetExecutingAssembly();
+        var currentContext = AssemblyLoadContext.GetLoadContext(currentAssembly);
+        if (currentContext != null)
+            currentContext.Unloading += OnPluginUnloadingRequested;
+    }
+
     /// <summary>
     /// Delete files.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Delete)
@@ -123,5 +133,10 @@ public class Files
         matcher.AddInclude(pattern);
         var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
         return results;
+    }
+
+    private static void OnPluginUnloadingRequested(AssemblyLoadContext obj)
+    {
+        obj.Unloading -= OnPluginUnloadingRequested;
     }
 }
