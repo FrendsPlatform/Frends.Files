@@ -28,7 +28,7 @@ public class UnitTests
     public void CreateFolderShouldCreateWholePath()
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { });
+        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
         Assert.That(result.Path, Is.EqualTo(newPath));
     }
 
@@ -37,7 +37,7 @@ public class UnitTests
     {
         _context.CreateFiles("temp/foo/bar/foo.txt");
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { });
+        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
         Assert.That(result.Path, Is.EqualTo(newPath));
     }
 

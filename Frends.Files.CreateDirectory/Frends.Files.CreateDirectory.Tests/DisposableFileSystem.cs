@@ -5,13 +5,14 @@ namespace Frends.Files.CreateDirectory.Tests;
 
 public class DisposableFileSystem : IDisposable
 {
-    public string RootPath { get; private set; }
+    public string RootPath { get; set; }
 
-    public DirectoryInfo DirectoryInfo { get; private set; }
+    public DirectoryInfo DirectoryInfo { get; set; }
 
     public DisposableFileSystem()
     {
         RootPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Console.WriteLine(RootPath);
         Directory.CreateDirectory(RootPath);
         DirectoryInfo = new DirectoryInfo(RootPath);
     }
