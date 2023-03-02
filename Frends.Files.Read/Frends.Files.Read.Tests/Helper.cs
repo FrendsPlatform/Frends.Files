@@ -7,12 +7,6 @@ namespace Frends.Files.Read.Tests;
 
 internal class Helper
 {
-    public static void DeleteTestFolder(string? directory)
-    {
-        if (Directory.Exists(directory))
-            Directory.Delete(directory, true);
-    }
-
     public static void CreateTestUser(string domain, string name, string pwd)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

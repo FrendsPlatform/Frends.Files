@@ -11,7 +11,7 @@ public class Result
     /// File content.
     /// </summary>
     /// <example>This is a test file.</example>
-    public string Content { get; set; }
+    public string Content { get; private set; }
 
     /// <summary>
     /// Full path to the file.
@@ -28,14 +28,14 @@ public class Result
     /// <summary>
     /// DateTime when file was created.
     /// </summary>
-    /// <example></example>
-    public DateTime CreationTime { get; set; }
+    /// <example>2023-01-31T12:54:17.6431957+02:00</example>
+    public DateTime CreationTime { get; private set; }
 
     /// <summary>
     /// DateTime for last write time of the file.
     /// </summary>
-    /// <example></example>
-    public DateTime LastWriteTime { get; set; }
+    /// <example>2023-02-06T11:59:13.8696745+02:00</example>
+    public DateTime LastWriteTime { get; private set; }
 
     internal Result(FileInfo info, string content)
     {

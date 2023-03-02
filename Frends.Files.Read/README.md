@@ -1,5 +1,5 @@
 # Frends.Files.Read
-Frends tasks for reading input to a file.
+Frends tasks for reading a file.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
 [![Build](https://github.com/FrendsPlatform/Frends.Files/actions/workflows/Read_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Files/actions)
