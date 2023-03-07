@@ -12,13 +12,13 @@ public class UnitTests
 {
     private DisposableFileSystem _context;
 
-    [OneTimeSetUp]
+    [TestInitialize]
     public void Setup()
     {
         _context = new DisposableFileSystem();
     }
 
-    [OneTimeTearDown]
+    [TestCleanup]
     public void Dispose()
     {
         _context.Dispose();

@@ -12,7 +12,6 @@ public class DisposableFileSystem : IDisposable
     public DisposableFileSystem()
     {
         RootPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-        Console.WriteLine(RootPath);
         Directory.CreateDirectory(RootPath);
         DirectoryInfo = new DirectoryInfo(RootPath);
     }
