@@ -42,6 +42,24 @@ public class UnitTests
     }
 
     [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void ThrowUsernameInvalidError()
+    {
+        var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
+        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" });
+        Assert.AreEqual("UserName field must be of format domain\\username was: domain/example", result);
+    }
+
+    [TestMethod]
+    public void ThrowRemoteConnectionError()
+    {
+        var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
+        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
+        Console.Write(result.Path);
+        Assert.That(result.Path, Is.EqualTo(newPath));
+    }
+
+    [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
     public void ThrowInputEmpty()
     {
