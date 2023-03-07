@@ -55,7 +55,6 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
-        Console.Write(result.Path);
         Assert.That(result.Path, Is.EqualTo(newPath));
     }
 
