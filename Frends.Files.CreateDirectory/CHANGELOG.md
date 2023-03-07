@@ -1,5 +1,5 @@
 # Changelog
 
-## [1.0.0] - 2023-02-02
+## [1.0.0] - 2023-03-07
 ### Added
-- Initial implementation of Frends.HTTP.Request.
+- Initial implementation of Frends.Files.CreateDirectory.
