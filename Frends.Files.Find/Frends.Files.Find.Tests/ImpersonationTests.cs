@@ -11,7 +11,7 @@ class ImpersonationTests
     /// <summary>
     /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
     /// </summary>
-    private static readonly string _FullPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/test.txt"));
+    private static readonly string _FullPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"));
     Input? _input;
     Options? _options;
 
@@ -28,7 +28,7 @@ class ImpersonationTests
         _input = new Input
         {
             Directory = _FullPath,
-            Pattern = @"**\Folder\*.xml"
+            Pattern = "*"
         };
 
         _options = new Options
@@ -61,7 +61,7 @@ class ImpersonationTests
     public void FileFindTestWithCredentials()
     {
         var result = Files.Find(_input, _options);
-        Assert.AreEqual(3, result.Files.Count);
+        Assert.AreEqual(7, result.Files.Count);
     }
 
     [Test]
