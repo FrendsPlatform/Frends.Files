@@ -14,7 +14,8 @@ namespace Frends.Files.CreateDirectory;
 public class Files
 {
     /// <summary>
-    /// Creates all directories and subdirectories in the specified path unless they already exist. Will not do anything if the directory exists. See https://github.com/FrendsPlatform/Frends.Directory
+    /// Creates all directories and subdirectories in the specified path unless they already exist. Will not do anything if the directory exists.
+    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Files.CreateDirectory)
     /// </summary>
     /// <returns>Object { string Path } </returns>
     public static Result CreateDirectory([PropertyTab] Input input, [PropertyTab] Options options)
