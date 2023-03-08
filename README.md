@@ -9,6 +9,7 @@ File related Tasks. This is different from Frends.File in repo structure, naming
 - [Frends.Files.Move](Frends.Files.Move/README.md)
 - [Frends.Files.Write](Frends.Files.Write/README.md)
 - [Frends.Files.Read](Frends.Files.Read/README.md)
+- [Frends.Files.CreateDirectory](Frends.Files.CreateDirectory/README.md)
 
 # Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
