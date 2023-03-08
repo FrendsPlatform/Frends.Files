@@ -7,11 +7,6 @@ Frends Task for creating a directory.
 
 Returns the object of body, body size in megabytes, content-type of headers, headers and statuscode.
 
-## Installing
-
-You can install the Task via Frends UI Task View or you can find the NuGet package from the following NuGet feed
-https://www.myget.org/F/frends-tasks/api/v2.
-
 ## Building
 
 Rebuild the project
