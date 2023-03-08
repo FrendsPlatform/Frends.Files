@@ -6,9 +6,9 @@
 public class Result
 {
     /// <summary>
-    /// Body of response
+    /// Path of directory
     /// </summary>
-    /// <example>{"id": "abcdefghijkl123456789",  "success": true,  "errors": []}</example>
+    /// <example>C:/User/NewDirectory</example>
     public string Path { get; private set; }
 
     internal Result(string path)

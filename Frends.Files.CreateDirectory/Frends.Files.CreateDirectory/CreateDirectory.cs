@@ -34,14 +34,11 @@ public class Files
 
     private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
     {
-#if !NET461
-        // For some reason impersonation is not working on the Core agent even when running on Windows, will have to be investigated
-        // Works fine on the Framework agent for both framework and standard Processes
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             throw new Exception("Impersonation only supported on Windows systems");
         }
-#endif
+
         var credentials = new UserCredentials(domain, username, password);
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
