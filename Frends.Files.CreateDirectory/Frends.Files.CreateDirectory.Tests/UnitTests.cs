@@ -29,7 +29,7 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
-        Assert.AreEqual(result.Path, Is.EqualTo(newPath));
+        Assert.AreEqual(result.Path, newPath);
     }
 
     [TestMethod]
@@ -38,7 +38,7 @@ public class UnitTests
         _context.CreateFiles("temp/foo/bar/foo.txt");
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
-        Assert.AreEqual(result.Path, Is.EqualTo(newPath));
+        Assert.AreEqual(result.Path, newPath);
     }
 
     [TestMethod]
@@ -55,7 +55,7 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
-        Assert.AreEqual(result.Path, Is.EqualTo(newPath));
+        Assert.AreEqual(result.Path, newPath);
     }
 
     [TestMethod]
