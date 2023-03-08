@@ -2,7 +2,6 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = NUnit.Framework.Assert;
-using NUnit.Framework;
 using Frends.Files.CreateDirectory.Definitions;
 
 namespace Frends.Files.CreateDirectory.Tests;
