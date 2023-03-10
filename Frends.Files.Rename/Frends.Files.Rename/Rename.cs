@@ -45,6 +45,10 @@ public class Files
 
     private static Result ExecuteRename(Input input, RenameBehaviour fileExistsAction)
     {
+        if (!Directory.Exists(Path.GetDirectoryName(input.Path)))
+            throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{Path.GetDirectoryName(input.Path)}'.");
+        if (!File.Exists(input.Path))
+            throw new FileNotFoundException($"Could't find part of the path '{input.Path}'.");
         var directoryPath = Path.GetDirectoryName(input.Path);
         var newFileFullPath = Path.Combine(directoryPath, input.NewFileName);
 
@@ -77,7 +81,7 @@ public class Files
         var count = 1;
         while (File.Exists(destFilePath))
         {
-            string tempFileName = $"{Path.GetFileNameWithoutExtension(sourceFilePath)}({count++})";
+            string tempFileName = $"{Path.GetFileNameWithoutExtension(destFilePath)}({count++})";
             destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath));
         }
 

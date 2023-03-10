@@ -2,8 +2,6 @@
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Threading.Tasks;
-
 
 namespace Frends.Files.Rename.Tests;
 
@@ -13,7 +11,7 @@ class ImpersonationTests
     /// <summary>
     /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
     /// </summary>
-    private static readonly string _FullPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/test.txt"));
+    private static readonly string _FullPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"));
     Input? _input;
     Options? _options;
 
@@ -29,8 +27,8 @@ class ImpersonationTests
 
         _input = new Input
         {
-            Content = "This is a test file.",
-            Path = _FullPath
+            Path = Path.Combine(_FullPath, "Test1.txt"),
+            NewFileName = "NewTestFile.txt"
         };
 
         _options = new Options
@@ -50,7 +48,7 @@ class ImpersonationTests
     [SetUp]
     public void Setup()
     {
-        Directory.CreateDirectory(Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/")));
+        Helper.CreateTestFiles(_FullPath);
     }
 
     [TearDown]
@@ -60,12 +58,10 @@ class ImpersonationTests
     }
 
     [Test]
-    public async Task FileMoveTestWithCredentials()
+    public void FileMoveTestWithCredentials()
     {
-        var result = await Files.Write(_input, _options);
-
-        Assert.IsTrue(File.Exists(_FullPath));
-        Assert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
+        var result = Files.Rename(_input, _options);
+        Assert.IsTrue(File.Exists(result.Path));
     }
 
     [Test]
@@ -78,7 +74,7 @@ class ImpersonationTests
             Password = _pwd
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Write(_input, options));
+        var ex = Assert.Throws<ArgumentException>(() => Files.Rename(_input, options));
         Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Runtime.InteropServices;
 
@@ -7,6 +8,26 @@ namespace Frends.Files.Rename.Tests;
 
 internal class Helper
 {
+    public static void CreateTestFiles(string directory)
+    {
+        if (!File.Exists(directory))
+            Directory.CreateDirectory(directory);
+
+        var list = new List<string>
+        {
+            Path.Combine(directory, "Test1.txt"),
+            Path.Combine(directory, "Test2.txt"),
+            Path.Combine(directory, "Test1.xml"),
+            Path.Combine(directory, "pro_test.txt"),
+            Path.Combine(directory, "pref_test.txt"),
+            Path.Combine(directory, "_test.txt"),
+            Path.Combine(directory, "prof_test.txt"),
+        };
+        foreach (var path in list)
+        {
+            File.WriteAllText(path, $"Test {path}");
+        }
+    }
     public static void DeleteTestFolder(string? directory)
     {
         if (Directory.Exists(directory))
