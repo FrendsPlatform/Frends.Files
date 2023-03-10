@@ -2,6 +2,7 @@ using Frends.Files.Rename.Definitions;
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Threading;
 
 namespace Frends.Files.Rename.Tests;
 
@@ -59,6 +60,7 @@ public class UnitTests
         var path = Path.Combine(_FullPath, _input.NewFileName);
         File.WriteAllText(path, $"Test {path}");
         var lastAccessed = File.GetLastAccessTime(path);
+        Thread.Sleep(10);
 
         _options.RenameBehaviour = RenameBehaviour.Overwrite;
 
