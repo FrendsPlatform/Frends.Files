@@ -46,7 +46,8 @@ public class UnitTests
     [Test]
     public void FilesRenameBehaviourThrow()
     {
-        Files.Rename(_input, _options);
+        var path = Path.Combine(_FullPath, _input.NewFileName);
+        File.WriteAllText(path, $"Test {path}");
 
         var ex = Assert.Throws<IOException>(() => Files.Rename(_input, _options));
         Assert.AreEqual($"File already exists {Path.Combine(_FullPath, _input.NewFileName)}. No file renamed.", ex.Message);
@@ -55,20 +56,22 @@ public class UnitTests
     [Test]
     public void FilesRenameBehaviourOverwrite()
     {
-        var result = Files.Rename(_input, _options);
-        var lastAccessed = File.GetLastAccessTime(result.Path);
+        var path = Path.Combine(_FullPath, _input.NewFileName);
+        File.WriteAllText(path, $"Test {path}");
+        var lastAccessed = File.GetLastAccessTime(path);
 
         _options.RenameBehaviour = RenameBehaviour.Overwrite;
 
-        result = Files.Rename(_input, _options);
+        var result = Files.Rename(_input, _options);
         Assert.IsTrue(File.Exists(result.Path));
-        Assert.IsTrue(lastAccessed > File.GetLastAccessTime(result.Path));
+        Assert.IsTrue(lastAccessed < File.GetLastAccessTime(result.Path));
     }
 
     [Test]
     public void FilesRenameBehaviourRename()
     {
-        Files.Rename(_input, _options);
+        var path = Path.Combine(_FullPath, _input.NewFileName);
+        File.WriteAllText(path, $"Test {path}");
 
         _options.RenameBehaviour = RenameBehaviour.Rename;
 

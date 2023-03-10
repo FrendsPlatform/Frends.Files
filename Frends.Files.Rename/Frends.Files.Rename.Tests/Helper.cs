@@ -16,12 +16,6 @@ internal class Helper
         var list = new List<string>
         {
             Path.Combine(directory, "Test1.txt"),
-            Path.Combine(directory, "Test2.txt"),
-            Path.Combine(directory, "Test1.xml"),
-            Path.Combine(directory, "pro_test.txt"),
-            Path.Combine(directory, "pref_test.txt"),
-            Path.Combine(directory, "_test.txt"),
-            Path.Combine(directory, "prof_test.txt"),
         };
         foreach (var path in list)
         {
