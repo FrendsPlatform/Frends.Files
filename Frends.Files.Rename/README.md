@@ -1,9 +1,9 @@
-# Frends.Files.Write
-Frends tasks for writing input to a file.
+# Frends.Files.Rename
+Frends tasks for renaming a file.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
-[![Build](https://github.com/FrendsPlatform/Frends.Files/actions/workflows/Write_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Files/actions)
-![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Files/Frends.Files.Write|main)
+[![Build](https://github.com/FrendsPlatform/Frends.Files/actions/workflows/Rename_build_and_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Files/actions)
+![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Files/Frends.Files.Rename|main)
 
 # Installing
 
