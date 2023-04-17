@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 
@@ -27,9 +28,11 @@ class ImpersonationTests
     {
         Helper.CreateTestUser(_domain, _name, _pwd);
 
+        var content = Encoding.ASCII.GetBytes("This is a test file.");
+
         _input = new Input
         {
-            ContentBytes = "This is a test file.",
+            ContentBytes = content,
             Path = _FullPath
         };
 
