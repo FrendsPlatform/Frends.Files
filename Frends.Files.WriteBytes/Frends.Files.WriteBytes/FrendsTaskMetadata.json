@@ -1,0 +1,7 @@
+{
+  "Tasks": [
+    {
+      "TaskMethod": "Frends.Files.WriteBytes.Files.WriteBytes"
+    }
+  ]
+}
