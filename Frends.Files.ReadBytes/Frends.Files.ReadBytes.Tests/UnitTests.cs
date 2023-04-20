@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 
@@ -17,7 +16,7 @@ public class UnitTests
     public async Task ReadFileContent()
     {
         var binaryTestFilePath = Path.Combine(_root, "frends_favicon.png");
-        var result = await Files.ReadBytes(new Input() { Path = binaryTestFilePath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false  }, default);
+        var result = await Files.ReadBytes(new Input() { Path = binaryTestFilePath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false }, default);
 
         var expectedData = File.ReadAllBytes(binaryTestFilePath);
 
