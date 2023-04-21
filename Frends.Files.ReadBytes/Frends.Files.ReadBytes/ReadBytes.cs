@@ -23,7 +23,7 @@ public class Files
     /// <param name="input">Input parameters</param>
     /// <param name="options">Options parameters</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Object { string Content, string Path, double SizeInMegaBytes, DateTime CreationTime, DateTime LastWriteTime }</returns>
+    /// <returns>Object { string ContentBytes, string Path, double SizeInMegaBytes, DateTime CreationTime, DateTime LastWriteTime }</returns>
     public static async Task<Result> ReadBytes([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         return await ExecuteActionAsync(

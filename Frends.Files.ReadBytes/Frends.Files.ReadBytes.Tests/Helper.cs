@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.DirectoryServices;
 using System.Runtime.InteropServices;
 
@@ -12,7 +11,7 @@ internal class Helper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        DirectoryEntry AD = new DirectoryEntry("WinNT://" + domain + ",computer");
+        DirectoryEntry AD = new("WinNT://" + domain + ",computer");
         DirectoryEntry NewUser = AD.Children.Add(name, "user");
         NewUser.Invoke("SetPassword", new object[] { pwd });
         NewUser.Invoke("Put", new object[] { "Description", "Test User from .NET" });
