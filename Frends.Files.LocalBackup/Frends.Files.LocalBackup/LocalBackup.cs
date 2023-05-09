@@ -30,11 +30,11 @@ namespace Frends.Files.LocalBackup
             if (input.CreateSubdirectories && string.IsNullOrWhiteSpace(input.TaskExecutionId)) throw new Exception("Task execution id required.");
 
             var timestampString = DateTime.UtcNow.ToString("yyyy-MM-dd_HH_mm_ss");
-            var backupDirectory = input.CreateSubdirectories 
+            var backupDirectory = input.CreateSubdirectories
                 ? Path.Combine(input.BackupDirectory, $"{timestampString}-{input.TaskExecutionId}")
                 : input.BackupDirectory;
 
-            var (directory, backup) = CreateBackup(input, backupDirectory,  cancellationToken);
+            var (directory, backup) = CreateBackup(input, backupDirectory, cancellationToken);
 
             var cleanup = input.Cleanup ? CleanUp(input, input.BackupDirectory, cancellationToken) : null;
 
@@ -96,7 +96,6 @@ namespace Frends.Files.LocalBackup
                         }
                     }
                 }
-                
             }
             else
             {
