@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace Frends.Files.LocalBackup.Tests;
@@ -322,8 +323,15 @@ public class UnitTests
         };
 
         Files.LocalBackup(input, default);
-        foreach (var dir in Directory.GetDirectories(backup)) Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
-        foreach (var file in Directory.GetFiles(backup)) File.SetLastWriteTime(file, DateTime.Now.AddDays(-2));
+        foreach (var dir in Directory.GetDirectories(backup)) 
+            Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
+        var files = Directory.GetFiles(backup).ToList();
+        foreach (var file in files)
+        {
+            File.SetLastWriteTime(file, DateTime.Now.AddDays(-2));
+            var newName = Path.GetFileNameWithoutExtension(file) + "(1)" + Path.GetExtension(file);
+            File.Move(file, Path.Combine(Path.GetDirectoryName(file) ?? backup, newName));
+        }
         var result = Files.LocalBackup(input, default);
         Assert.AreEqual(4, result.Cleanups.Count);
     }
