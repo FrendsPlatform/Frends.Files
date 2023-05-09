@@ -53,7 +53,7 @@ public class UnitTests
             string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));  
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
             }
         }
     }
@@ -291,8 +291,7 @@ public class UnitTests
             Cleanup = true,
             CreateSubdirectories = false,
         };
-        
-        
+
         var backupDirectory = Path.Combine(_dir, "Cleanup", "DeleteThis");
         Directory.CreateDirectory(backupDirectory);
         Directory.SetLastWriteTimeUtc(backupDirectory, DateTime.Now.AddDays(-2));
@@ -323,7 +322,7 @@ public class UnitTests
         };
 
         Files.LocalBackup(input, default);
-        foreach (var dir in Directory.GetDirectories(backup)) 
+        foreach (var dir in Directory.GetDirectories(backup))
             Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
         var files = Directory.GetFiles(backup).ToList();
         foreach (var file in files)
