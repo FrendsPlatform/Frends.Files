@@ -148,7 +148,7 @@ public class UnitTests
             foreach (string file in files)
             {
                 Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
-                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Overwrite.txt")));
+                Assert.IsFalse(file.Contains(Path.Combine(dir, "Overwrite.txt")));
             }
         }
     }
@@ -180,7 +180,7 @@ public class UnitTests
             foreach (string file in files)
             {
                 Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
-                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Overwrite.txt")) || !file.Contains(Path.Combine(dir, "Test2.txt")));
+                Assert.IsFalse(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")));
             }
         }
     }
@@ -212,7 +212,7 @@ public class UnitTests
             foreach (string file in files)
             {
                 Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.xml")));
-                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Test1.txt")) || !file.Contains(Path.Combine(dir, "Overwrite.txt")) || !file.Contains(Path.Combine(dir, "Test2.txt")));
+                Assert.IsFalse(file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")));
             }
         }
     }
@@ -244,7 +244,7 @@ public class UnitTests
             foreach (string file in files)
             {
                 Assert.IsTrue(file.Contains(Path.Combine(dir, "pro_test.txt")) || file.Contains(Path.Combine(dir, "pref_test.txt")) || file.Contains(Path.Combine(dir, "_test.txt")));
-                Assert.IsTrue(!file.Contains(Path.Combine(dir, "prof_test.txt")) || !file.Contains(Path.Combine(dir, "pro_tet.txt")));
+                Assert.IsFalse(file.Contains(Path.Combine(dir, "prof_test.txt")) || file.Contains(Path.Combine(dir, "pro_tet.txt")));
             }
         }
     }
