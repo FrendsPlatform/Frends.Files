@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
+using System.Linq;
 
 namespace Frends.Files.LocalBackup.Tests;
 
@@ -52,7 +52,7 @@ public class UnitTests
             string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));  
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
             }
         }
     }
@@ -148,7 +148,7 @@ public class UnitTests
             foreach (string file in files)
             {
                 Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
-                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Overwrite.txt")));
+                Assert.IsFalse(file.Contains(Path.Combine(dir, "Overwrite.txt")));
             }
         }
     }
@@ -180,7 +180,7 @@ public class UnitTests
             foreach (string file in files)
             {
                 Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
-                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Overwrite.txt")) || !file.Contains(Path.Combine(dir, "Test2.txt")));
+                Assert.IsFalse(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")));
             }
         }
     }
@@ -212,7 +212,7 @@ public class UnitTests
             foreach (string file in files)
             {
                 Assert.IsTrue(file.Contains(Path.Combine(dir, "Test1.xml")));
-                Assert.IsTrue(!file.Contains(Path.Combine(dir, "Test1.txt")) || !file.Contains(Path.Combine(dir, "Overwrite.txt")) || !file.Contains(Path.Combine(dir, "Test2.txt")));
+                Assert.IsFalse(file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")));
             }
         }
     }
@@ -244,7 +244,7 @@ public class UnitTests
             foreach (string file in files)
             {
                 Assert.IsTrue(file.Contains(Path.Combine(dir, "pro_test.txt")) || file.Contains(Path.Combine(dir, "pref_test.txt")) || file.Contains(Path.Combine(dir, "_test.txt")));
-                Assert.IsTrue(!file.Contains(Path.Combine(dir, "prof_test.txt")) || !file.Contains(Path.Combine(dir, "pro_tet.txt")));
+                Assert.IsFalse(file.Contains(Path.Combine(dir, "prof_test.txt")) || file.Contains(Path.Combine(dir, "pro_tet.txt")));
             }
         }
     }
@@ -290,8 +290,7 @@ public class UnitTests
             Cleanup = true,
             CreateSubdirectories = false,
         };
-        
-        
+
         var backupDirectory = Path.Combine(_dir, "Cleanup", "DeleteThis");
         Directory.CreateDirectory(backupDirectory);
         Directory.SetLastWriteTimeUtc(backupDirectory, DateTime.Now.AddDays(-2));
@@ -322,8 +321,15 @@ public class UnitTests
         };
 
         Files.LocalBackup(input, default);
-        foreach (var dir in Directory.GetDirectories(backup)) Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
-        foreach (var file in Directory.GetFiles(backup)) File.SetLastWriteTime(file, DateTime.Now.AddDays(-2));
+        foreach (var dir in Directory.GetDirectories(backup))
+            Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
+        var files = Directory.GetFiles(backup).ToList();
+        foreach (var file in files)
+        {
+            File.SetLastWriteTime(file, DateTime.Now.AddDays(-2));
+            var newName = Path.GetFileNameWithoutExtension(file) + "(1)" + Path.GetExtension(file);
+            File.Move(file, Path.Combine(Path.GetDirectoryName(file) ?? backup, newName));
+        }
         var result = Files.LocalBackup(input, default);
         Assert.AreEqual(4, result.Cleanups.Count);
     }

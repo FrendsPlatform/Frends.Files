@@ -30,11 +30,11 @@ namespace Frends.Files.LocalBackup
             if (input.CreateSubdirectories && string.IsNullOrWhiteSpace(input.TaskExecutionId)) throw new Exception("Task execution id required.");
 
             var timestampString = DateTime.UtcNow.ToString("yyyy-MM-dd_HH_mm_ss");
-            var backupDirectory = input.CreateSubdirectories 
+            var backupDirectory = input.CreateSubdirectories
                 ? Path.Combine(input.BackupDirectory, $"{timestampString}-{input.TaskExecutionId}")
                 : input.BackupDirectory;
 
-            var (directory, backup) = CreateBackup(input, backupDirectory,  cancellationToken);
+            var (directory, backup) = CreateBackup(input, backupDirectory, cancellationToken);
 
             var cleanup = input.Cleanup ? CleanUp(input, input.BackupDirectory, cancellationToken) : null;
 
@@ -75,15 +75,26 @@ namespace Frends.Files.LocalBackup
 
             if (!input.CreateSubdirectories)
             {
-                foreach (var dir in Directory.GetDirectories(backupDirectory))
+                if (Directory.Exists(backupDirectory))
                 {
-                    if (Directory.GetLastWriteTime(dir) < DateTime.Now.AddDays(-input.DaysOlder)) Directory.Delete(dir, true);
-                    result.Add($"{dir} deleted.");
-                }
-                foreach (var file in Directory.GetFiles(backupDirectory))
-                {
-                    if (File.GetLastWriteTime(file) < DateTime.Now.AddDays(-input.DaysOlder)) File.Delete(file);
-                    result.Add($"{file} deleted.");
+                    var directories = Directory.GetDirectories(backupDirectory);
+                    foreach (var dir in directories)
+                    {
+                        if (Directory.GetLastWriteTime(dir) < DateTime.Now.AddDays(-input.DaysOlder))
+                        {
+                            Directory.Delete(dir, true);
+                            result.Add($"{dir} deleted.");
+                        }
+                    }
+                    var files = Directory.GetFiles(backupDirectory);
+                    foreach (var file in files)
+                    {
+                        if (File.GetLastWriteTime(file) < DateTime.Now.AddDays(-input.DaysOlder))
+                        {
+                            File.Delete(file);
+                            result.Add($"{file} deleted.");
+                        }
+                    }
                 }
             }
             else

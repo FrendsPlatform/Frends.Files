@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.4] - 2023-05-09
+### Fixed
+- Fixed issue where Cleanup adds deleted message even if files were not deleted.
+
 ## [2.0.3] - 2022-11-25
 ### Fixed
 - Fixed issue when using CreateSubdirectories Cleanup uses same directory which is created in Backup and when there's no files to backup the directory is deleted and cleanup won't find the directory.
