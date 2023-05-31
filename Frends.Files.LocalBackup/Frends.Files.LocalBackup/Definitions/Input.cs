@@ -23,6 +23,14 @@ namespace Frends.Files.LocalBackup.Definitions
         public string SourceFile { get; set; }
 
         /// <summary>
+        /// The paths to the files to be backuped, mainly meant to be used with the file trigger with the syntax: #trigger.data.filePaths
+        /// FilePaths will overwrite SourceDirectory and SourceFile parameters.
+        /// </summary>
+        /// <example>#trigger.data.filePaths</example>
+        [DefaultValue("")]
+        public object FilePaths { get; set; }
+
+        /// <summary>
         /// Destination directory where backup folder will be created. Backup directory's format if CreateSubdirectories=true: {BackupDirectory}{timestamp}-{Guid}.
         /// </summary>
         /// <example>c:\temp\backups, c:\temp\backups\ </example>

@@ -375,6 +375,75 @@ public class UnitTests
         Assert.AreEqual(0, result.Cleanups.Count);
     }
 
+    [TestMethod]
+    public void TestBackupWithFilePaths()
+    {
+        var input = new Input
+        {
+            SourceDirectory = "",
+            SourceFile = "",
+            FilePaths = new string[]
+            {
+                Path.Combine(_dir, "Test1.txt"),
+                Path.Combine(_dir, "Test2.txt"),
+                Path.Combine(_dir, "Test1.xml"),
+            },
+            BackupDirectory = _dir,
+            CreateSubdirectories = true,
+            Cleanup = true,
+            DaysOlder = 14,
+            TaskExecutionId = Guid.NewGuid().ToString()
+        };
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(3, result.FileCountInBackup);
+    }
+
+    [TestMethod]
+    public void TestBackup_OnlyFilePathsAreUsedEvenIfDirectoryAndFileMaskIsSet()
+    {
+        var input = new Input
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*",
+            FilePaths = new string[]
+            {
+                Path.Combine(_dir, "Test1.txt"),
+                Path.Combine(_dir, "Test2.txt"),
+                Path.Combine(_dir, "Test1.xml"),
+            },
+            BackupDirectory = _dir,
+            CreateSubdirectories = true,
+            Cleanup = true,
+            DaysOlder = 14,
+            TaskExecutionId = Guid.NewGuid().ToString()
+        };
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(3, result.FileCountInBackup);
+    }
+
+    [TestMethod]
+    public void TestBackup_FilePathsFilesNotFound()
+    {
+        var input = new Input
+        {
+            SourceDirectory = "",
+            SourceFile = "",
+            FilePaths = new string[]
+            {
+                Path.Combine(_dir, "Test56.txt"),
+                Path.Combine(_dir, "Test57.txt"),
+                Path.Combine(_dir, "Test59.xml"),
+            },
+            BackupDirectory = _dir,
+            CreateSubdirectories = true,
+            Cleanup = true,
+            DaysOlder = 14,
+            TaskExecutionId = Guid.NewGuid().ToString()
+        };
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(0, result.FileCountInBackup);
+    }
+
     public void CreateTestFiles()
     {
         Directory.CreateDirectory(Path.Combine(_dir, "Sub"));

@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.0] - 2023-05-31
+### Enchanced
+- Added feature for the Task to use file paths. Added new parameter FilePaths. 
+
 ## [2.0.4] - 2023-05-09
 ### Fixed
 - Fixed issue where Cleanup adds deleted message even if files were not deleted.
