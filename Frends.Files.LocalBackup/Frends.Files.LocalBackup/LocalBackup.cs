@@ -76,7 +76,7 @@ namespace Frends.Files.LocalBackup
                         result.Add($"Backup complete: {file} to {backupFile}");
                     }
                 }
-            }   
+            }
 
             if (!Directory.GetFiles(backupDirectory).Any())
             {
