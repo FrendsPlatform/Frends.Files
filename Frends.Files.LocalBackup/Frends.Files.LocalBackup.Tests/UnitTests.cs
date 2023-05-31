@@ -343,6 +343,7 @@ public class UnitTests
         {
             SourceDirectory = _dir,
             SourceFile = "*",
+            FilePaths = null,
             BackupDirectory = backup,
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 2,
@@ -364,6 +365,7 @@ public class UnitTests
         {
             SourceDirectory = Environment.CurrentDirectory,
             SourceFile = "FileThatDontExist",
+            FilePaths = null,
             BackupDirectory = _dir,
             CreateSubdirectories = true,
             Cleanup = true,
