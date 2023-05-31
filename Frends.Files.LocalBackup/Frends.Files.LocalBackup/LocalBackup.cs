@@ -25,7 +25,7 @@ namespace Frends.Files.LocalBackup
         /// <returns>Result object { string Directory, int FileCountInBackup, List&lt;string&gt; Backups, List&lt;string&gt; Cleanups }</returns>
         public static Result LocalBackup([PropertyTab] Input input, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(input.SourceDirectory) || string.IsNullOrWhiteSpace(input.SourceFile)) throw new Exception("Source parameters required.");
+            if (input.FilePaths == null && (string.IsNullOrWhiteSpace(input.SourceDirectory) || string.IsNullOrWhiteSpace(input.SourceFile))) throw new Exception("Source parameters required.");
             if (string.IsNullOrWhiteSpace(input.BackupDirectory)) throw new Exception("Backup directory required.");
             if (input.CreateSubdirectories && string.IsNullOrWhiteSpace(input.TaskExecutionId)) throw new Exception("Task execution id required.");
 
@@ -44,19 +44,35 @@ namespace Frends.Files.LocalBackup
         private static Tuple<string, List<string>> CreateBackup(Input input, string backupDirectory, CancellationToken cancellationToken)
         {
             var result = new List<string>();
-            var files = Directory.GetFiles(input.SourceDirectory);
-
             Directory.CreateDirectory(backupDirectory);
 
-            foreach (string file in files)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+            string[] files;
 
-                if (FileMatchesMask(Path.GetFileName(file), input.SourceFile))
+            if (input.FilePaths != null)
+            {
+                files = (string[])input.FilePaths;
+                foreach (string file in files)
                 {
-                    var backupFile = Path.Combine(backupDirectory, Path.GetFileName(file));
-                    File.Copy(file, backupFile, true);
-                    result.Add($"Backup complete: {file} to {backupFile}");
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (File.Exists(file))
+                    {
+                        var backupFile = Path.Combine(backupDirectory, Path.GetFileName(file));
+                        File.Copy(file, backupFile, true);
+                        result.Add($"Backup complete: {file} to {backupFile}");
+                    }
+                }
+            }
+            else
+            {
+                files = Directory.GetFiles(input.SourceDirectory);
+                foreach (string file in files)
+                {
+                    if (FileMatchesMask(Path.GetFileName(file), input.SourceFile))
+                    {
+                        var backupFile = Path.Combine(backupDirectory, Path.GetFileName(file));
+                        File.Copy(file, backupFile, true);
+                        result.Add($"Backup complete: {file} to {backupFile}");
+                    }
                 }
             }
 

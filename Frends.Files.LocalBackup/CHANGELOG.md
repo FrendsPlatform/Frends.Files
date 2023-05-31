@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.0] - 2023-05-31
+### Enchanced
+- Added feature for the Task to use file paths. Added new parameter FilePaths. 
+
 ## [2.0.3] - 2022-11-25
 ### Fixed
 - Fixed issue when using CreateSubdirectories Cleanup uses same directory which is created in Backup and when there's no files to backup the directory is deleted and cleanup won't find the directory.
