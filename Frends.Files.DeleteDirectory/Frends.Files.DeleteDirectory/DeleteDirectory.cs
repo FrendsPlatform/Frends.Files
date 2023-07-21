@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
+using System.IO;
 
 namespace Frends.Files.DeleteDirectory;
 
@@ -24,9 +25,7 @@ public class Files
             throw new ArgumentNullException("Directory cannot be empty.");
 
         if (!options.UseGivenUserCredentialsForRemoteConnections)
-        {
             return ExecuteDelete(input, options.DeleteRecursively);
-        }
 
         var domainAndUserName = GetDomainAndUserName(options.UserName);
         return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () => ExecuteDelete(input, options.DeleteRecursively));
@@ -47,11 +46,10 @@ public class Files
 
     private static Result ExecuteDelete(Input input, bool optionsDeleteRecursivly)
     {
-        if (!System.IO.Directory.Exists(input.Directory))
-        {
+        if (!Directory.Exists(input.Directory))
             return new Result(input.Directory, false);
-        }
-        System.IO.Directory.Delete(input.Directory, optionsDeleteRecursivly);
+
+        Directory.Delete(input.Directory, optionsDeleteRecursivly);
         return new Result(input.Directory, true);
     }
 
@@ -59,9 +57,8 @@ public class Files
     {
         var domainAndUserName = username.Split('\\');
         if (domainAndUserName.Length != 2)
-        {
             throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        }
+
         return domainAndUserName;
     }
 }

@@ -2,7 +2,6 @@
 using System.IO;
 using Frends.Files.DeleteDirectory.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 
 namespace Frends.Files.DeleteDirectory.Tests;
