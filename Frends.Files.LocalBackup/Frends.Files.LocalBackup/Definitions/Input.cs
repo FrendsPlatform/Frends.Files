@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
 namespace Frends.Files.LocalBackup.Definitions
@@ -21,6 +21,14 @@ namespace Frends.Files.LocalBackup.Definitions
         /// <example>test.txt, test*.txt, test?.txt, test.(txt|xml), test.[^t][^x][^t], &lt;regex&gt;^(?!prof).*_test.txt</example>
         [DisplayFormat(DataFormatString = "Text")]
         public string SourceFile { get; set; }
+
+        /// <summary>
+        /// The paths to the files to be backuped, mainly meant to be used with the file trigger with the syntax: #trigger.data.filePaths
+        /// FilePaths will overwrite SourceDirectory and SourceFile parameters.
+        /// </summary>
+        /// <example>#trigger.data.filePaths</example>
+        [DefaultValue("")]
+        public object FilePaths { get; set; }
 
         /// <summary>
         /// Destination directory where backup folder will be created. Backup directory's format if CreateSubdirectories=true: {BackupDirectory}{timestamp}-{Guid}.
