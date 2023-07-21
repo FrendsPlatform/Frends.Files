@@ -14,6 +14,7 @@ File related Tasks. This is different from Frends.File in repo structure, naming
 - [Frends.Files.ReadBytes](Frends.Files.ReadBytes/README.md)
 - [Frends.Files.WriteBytes](Frends.Files.WriteBytes/README.md)
 - [Frends.Files.CreateDirectory](Frends.Files.CreateDirectory/README.md)
+- [Frends.Files.DeleteDirectory](Frends.Files.DeleteDirectory/README.md)
 
 # Contributing
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
