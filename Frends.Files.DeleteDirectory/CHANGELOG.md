@@ -1,5 +1,5 @@
 # Changelog
 
-## [1.0.0] - 2023-03-07
+## [1.0.0] - 2023-07-021
 ### Added
-- Initial implementation of Frends.Files.CreateDirectory.
+- Initial implementation of Frends.Files.DeleteDirectory.
