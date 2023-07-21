@@ -25,11 +25,11 @@ public class Files
 
         if (!options.UseGivenUserCredentialsForRemoteConnections)
         {
-            return ExecuteCreate(input);
+            return ExecuteDelete(input, options.DeleteRecursively);
         }
 
         var domainAndUserName = GetDomainAndUserName(options.UserName);
-        return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () => ExecuteCreate(input));
+        return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () => ExecuteDelete(input, options.DeleteRecursively));
     }
 
     private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
@@ -45,10 +45,14 @@ public class Files
         return WindowsIdentity.RunImpersonated(userHandle, action);
     }
 
-    private static Result ExecuteCreate(Input input)
+    private static Result ExecuteDelete(Input input, bool optionsDeleteRecursivly)
     {
-        var newFolder = System.IO.Directory.CreateDirectory(input.Directory);
-        return new Result(newFolder.FullName);
+        if (!System.IO.Directory.Exists(input.Directory))
+        {
+            return new Result(input.Directory, false);
+        }
+        System.IO.Directory.Delete(input.Directory, optionsDeleteRecursivly);
+        return new Result(input.Directory, true);
     }
 
     private static string[] GetDomainAndUserName(string username)

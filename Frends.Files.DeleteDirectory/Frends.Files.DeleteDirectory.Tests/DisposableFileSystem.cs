@@ -16,6 +16,12 @@ public class DisposableFileSystem : IDisposable
         DirectoryInfo = new DirectoryInfo(RootPath);
     }
 
+    public DisposableFileSystem CreateFolder(string path)
+    {
+        Directory.CreateDirectory(Path.Combine(RootPath, path));
+        return this;
+    }
+
     public DisposableFileSystem CreateFiles(params string[] fileRelativePaths)
     {
         foreach (var path in fileRelativePaths)

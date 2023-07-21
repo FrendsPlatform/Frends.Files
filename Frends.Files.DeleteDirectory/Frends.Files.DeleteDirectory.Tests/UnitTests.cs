@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Assert = NUnit.Framework.Assert;
 using Frends.Files.DeleteDirectory.Definitions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Assert = NUnit.Framework.Assert;
 
 namespace Frends.Files.DeleteDirectory.Tests;
 
@@ -24,20 +25,46 @@ public class UnitTests
     }
 
     [TestMethod]
-    public void CreateFolderShouldCreateWholePath()
+    public void DeleteFolderNotEmptyShouldThrowIfOptionNotSet()
     {
-        var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
-        Assert.AreEqual(result.Path, newPath);
+        _context.CreateFiles("temp/foo.txt");
+        var ex = Assert.Throws<IOException>(() => Files.DeleteDirectory(new Input() { Directory = Path.Combine(_context.RootPath, "temp") }, new Options()));
+        Assert.IsTrue(ex.Message.Contains("The directory is not empty"));
     }
 
     [TestMethod]
-    public void CreateFolderShouldDoNothingIfPathExists()
+    public void DeleteFolderNotEmptyShouldNotThrowIfOptionSet()
     {
-        _context.CreateFiles("temp/foo/bar/foo.txt");
+        _context.CreateFiles("temp/foo.txt", "temp/foo1.txt", "temp/foo2.txt", "temp/foo3.txt", "temp/foo4.txt", "temp/foo5.txt");
+        var result = Files.DeleteDirectory(new Input() { Directory = Path.Combine(_context.RootPath, "temp") }, new Options() { DeleteRecursively = true });
+        Assert.AreEqual(result.Path, Path.Combine(_context.RootPath, "temp"));
+        Assert.IsTrue(result.Success);
+    }
+
+    [TestMethod]
+    public void DeleteFolderShouldNotThrowIfNotExists()
+    {
+        _context.CreateFiles("temp/foo.txt");
+        var result = Files.DeleteDirectory(new Input() { Directory = Path.Combine(_context.RootPath, "temp/whatever") }, new Options());
+        Assert.IsFalse(result.Success, "The error flag should have been set");
+    }
+
+    [TestMethod]
+    public void DeleteFolderShouldDeleteEmptyDirectory()
+    {
+        _context.CreateFolder("temp");
+        var result = Files.DeleteDirectory(new Input() { Directory = Path.Combine(_context.RootPath, "temp") }, new Options());
+        Assert.AreEqual(result.Path, Path.Combine(_context.RootPath, "temp"));
+        Assert.IsTrue(result.Success);
+    }
+
+    [TestMethod]
+    public void DeleteFolderShouldDoNothingIfPathDoesNotExists()
+    {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
+        var result = Files.DeleteDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
         Assert.AreEqual(result.Path, newPath);
+        Assert.IsFalse(result.Success);
     }
 
     [TestMethod]
@@ -45,7 +72,7 @@ public class UnitTests
     public void ThrowUsernameInvalidError()
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" });
+        var result = Files.DeleteDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" });
         Assert.AreEqual("UserName field must be of format domain\\username was: domain/example", result);
     }
 
@@ -53,15 +80,16 @@ public class UnitTests
     public void ThrowRemoteConnectionError()
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
+        var result = Files.DeleteDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
         Assert.AreEqual(result.Path, newPath);
+        Assert.IsFalse(result.Success);
     }
 
     [TestMethod]
     [ExpectedException(typeof(ArgumentNullException))]
     public void ThrowInputEmpty()
     {
-        var result = Files.CreateDirectory(new Input() { }, new Options() { });
+        var result = Files.DeleteDirectory(new Input() { }, new Options() { });
         Assert.AreEqual("Directory cannot be empty.", result);
     }
 }

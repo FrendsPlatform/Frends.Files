@@ -9,6 +9,13 @@ namespace Frends.Files.DeleteDirectory.Definitions;
 public class Options
 {
     /// <summary>
+    /// Delete all files and sub folders.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(false)]
+    public bool DeleteRecursively { get; set; }
+
+    /// <summary>
     /// If set, allows you to give the user credentials to use to create directories on remote hosts.
     /// If not set, the agent service user credentials will be used.
     /// Note: For creating directories on the local machine, the agent service user credentials will always be used, even if this option is set.
