@@ -116,7 +116,7 @@ public class UnitTests
             string[] files = Directory.GetFiles(dir);
             foreach (string file in files)
             {
-                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")));
+                Assert.IsTrue(file.Contains(Path.Combine(dir, "Overwrite.txt")) || file.Contains(Path.Combine(dir, "Test1.txt")) || file.Contains(Path.Combine(dir, "Test2.txt")) || file.Contains(Path.Combine(dir, "Test1.xml")) || file.Contains(Path.Combine(dir, "p}ro(_tes[t.txt")));
             }
         }
     }
@@ -446,23 +446,124 @@ public class UnitTests
         Assert.AreEqual(0, result.FileCountInBackup);
     }
 
+    [TestMethod]
+    public void TestBackup_FileIncludesSpecialCharacters()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+
+        input = new Input()
+        {
+            SourceDirectory = Path.Combine(_dir, "Special"),
+            SourceFile = "p}ro(_tes[t.txt",
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(1, result.Backups.Count);
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, input.SourceFile)));
+    }
+
+    [TestMethod]
+    public void TestBackup_FileIncludesSpecialCharactersInSameSourceFolder()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "p}ro(_tes[t.txt",
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(1, result.Backups.Count);
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, input.SourceFile)));
+    }
+
+
+    [TestMethod]
+    public void TestBackup_FileIncludesSpecialCharactersFoundWithPattern()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*.txt",
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(3, result.Backups.Count);
+    }
+
+    [TestMethod]
+    public void TestBackup_FilePatternIncludesSpecialCharacters()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "p}ro(_tes[*",
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(1, result.Backups.Count);
+    }
+
+    [TestMethod]
+    public void TestBackup_FilePatternIncludesSpecialCharacters2()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*}ro(_tes[t.txt",
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(1, result.Backups.Count);
+    }
+
     public void CreateTestFiles()
     {
         Directory.CreateDirectory(Path.Combine(_dir, "Sub"));
         Directory.CreateDirectory(Path.Combine(_dir, "Pro"));
+        Directory.CreateDirectory(Path.Combine(_dir, "Special"));
 
         var list = new List<string>
         {
             Path.Combine(_dir, "Test1.txt"),
             Path.Combine(_dir, "Test2.txt"),
             Path.Combine(_dir, "Test1.xml"),
-            Path.Combine(_dir, "Overwrite.txt"),
+            Path.Combine(_dir, "p}ro(_tes[t.txt"),
+            Path.Combine(_dir, "Test1.xml"),
             Path.Combine(_dir, "Sub", "Overwrite.txt"),
             Path.Combine(_dir, "Pro", "pro_test.txt"),
             Path.Combine(_dir, "Pro", "pref_test.txt"),
             Path.Combine(_dir, "Pro", "_test.txt"),
             Path.Combine(_dir, "Pro", "prof_test.txt"),
-            Path.Combine(_dir, "Pro", "pro_test.txt")
+            Path.Combine(_dir, "Pro", "pro_test.txt"),
+            Path.Combine(_dir, "Special", "p}ro(_tes[t.txt")
         };
 
         // Create test files and edit creationdate.
