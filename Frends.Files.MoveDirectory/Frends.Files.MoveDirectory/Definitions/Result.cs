@@ -6,13 +6,20 @@
 public class Result
 {
     /// <summary>
-    /// Path of directory
+    /// Source path of directory
     /// </summary>
-    /// <example>C:/User/NewDirectory</example>
-    public string Path { get; private set; }
+    /// <example>C:/User/SourceDirectory</example>
+    public string SourcePath { get; private set; }
 
-    internal Result(string path)
+    /// <summary>
+    /// Target path of directory
+    /// </summary>
+    /// <example>C:/User/TargetDirectory</example>
+    public string TargetPath { get; private set; }
+
+    internal Result(string sourcePath, string targetPath)
     {
-        Path = path;
+        SourcePath = sourcePath;
+        TargetPath = targetPath;
     }
 }

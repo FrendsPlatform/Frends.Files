@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
+using System.Xml.Linq;
 
 namespace Frends.Files.MoveDirectory;
 
@@ -14,22 +15,49 @@ namespace Frends.Files.MoveDirectory;
 public class Files
 {
     /// <summary>
-    /// Creates all directories and subdirectories in the specified path unless they already exist. Will not do anything if the directory exists.
+    /// Moves a directory. By default will throw an error if the directory already exists.
     /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Files.CreateDirectory)
     /// </summary>
     /// <returns>Object { string Path } </returns>
-    public static Result CreateDirectory([PropertyTab] Input input, [PropertyTab] Options options)
+    public static Result MoveDirectory([PropertyTab] Input input, [PropertyTab] Options options)
     {
         if (string.IsNullOrEmpty(input.Directory))
             throw new ArgumentNullException("Directory cannot be empty.");
 
         if (!options.UseGivenUserCredentialsForRemoteConnections)
         {
-            return ExecuteCreate(input);
+            return ExecuteMove(input, options.IfTargetDirectoryExists);
         }
 
         var domainAndUserName = GetDomainAndUserName(options.UserName);
-        return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () => ExecuteCreate(input));
+        return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () =>
+                ExecuteMove(input, options.IfTargetDirectoryExists));
+    }
+
+    private static Result ExecuteMove(Input input, DirectoryExistsAction directoryExistsAction)
+    {
+        var destinationFolderPath = input.TargetDirectory;
+        switch (directoryExistsAction)
+        {
+            case DirectoryExistsAction.Rename:
+                var count = 1;
+                while (System.IO.Directory.Exists(destinationFolderPath))
+                {
+                    destinationFolderPath = $"{destinationFolderPath}({count++})";
+                }
+                break;
+            case DirectoryExistsAction.Overwrite:
+                if (System.IO.Directory.Exists(destinationFolderPath))
+                {
+                    System.IO.Directory.Delete(destinationFolderPath, true);
+                }
+                break;
+            case DirectoryExistsAction.Throw: //Will throw if target folder exist
+                break;
+        }
+
+        System.IO.Directory.Move(input.SourceDirectory, destinationFolderPath);
+        return new Result(destinationFolderPath, input.SourceDirectory);
     }
 
     private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result

@@ -7,10 +7,18 @@ namespace Frends.Files.MoveDirectory.Definitions;
 /// </summary>
 public class Input
 {
+
     /// <summary>
-    /// Directory path.
+    /// Source Directory path.
     /// </summary>
     /// <example>C:\Temp</example>
     [DefaultValue("\"c:\\temp\"")]
-    public string Directory { get; set; }
+    public string SourceDirectory { get; set; }
+
+    /// <summary>
+    /// Target Directory path.
+    /// </summary>
+    /// <example>C:\Temp</example>
+    [DefaultValue("\"c:\\temp\"")]
+    public string TargetDirectory { get; set; }
 }
