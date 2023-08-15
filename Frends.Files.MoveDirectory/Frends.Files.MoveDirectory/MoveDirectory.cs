@@ -1,4 +1,4 @@
-﻿using Frends.Files.CreateDirectory.Definitions;
+﻿using Frends.Files.MoveDirectory.Definitions;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -6,7 +6,7 @@ using System.Security.Principal;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
 
-namespace Frends.Files.CreateDirectory;
+namespace Frends.Files.MoveDirectory;
 
 /// <summary>
 /// Task class.

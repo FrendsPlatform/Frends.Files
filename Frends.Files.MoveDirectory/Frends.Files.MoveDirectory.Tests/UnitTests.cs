@@ -2,9 +2,9 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = NUnit.Framework.Assert;
-using Frends.Files.CreateDirectory.Definitions;
+using Frends.Files.MoveDirectory.Definitions;
 
-namespace Frends.Files.CreateDirectory.Tests;
+namespace Frends.Files.MoveDirectory.Tests;
 
 [TestClass]
 public class UnitTests

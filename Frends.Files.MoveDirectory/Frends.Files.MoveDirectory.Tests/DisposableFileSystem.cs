@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Frends.Files.CreateDirectory.Tests;
+namespace Frends.Files.MoveDirectory.Tests;
 
 public class DisposableFileSystem : IDisposable
 {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Frends.Files.CreateDirectory.Definitions;
+namespace Frends.Files.MoveDirectory.Definitions;
 
 /// <summary>
 /// Options class

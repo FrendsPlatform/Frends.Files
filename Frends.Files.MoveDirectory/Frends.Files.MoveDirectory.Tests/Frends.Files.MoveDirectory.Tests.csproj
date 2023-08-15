@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Frends.Files.CreateDirectory\Frends.Files.CreateDirectory.csproj" />
+    <ProjectReference Include="..\Frends.Files.MoveDirectory\Frends.Files.MoveDirectory.csproj" />
   </ItemGroup>
 
 </Project>

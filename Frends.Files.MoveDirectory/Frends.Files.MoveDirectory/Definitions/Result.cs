@@ -1,4 +1,4 @@
-﻿namespace Frends.Files.CreateDirectory.Definitions;
+﻿namespace Frends.Files.MoveDirectory.Definitions;
 
 /// <summary>
 /// Result class
