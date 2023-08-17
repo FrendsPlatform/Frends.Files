@@ -1,7 +1,7 @@
 {
   "Tasks": [
     {
-      "TaskMethod": "Frends.Files.CreateDirectory.Files.CreateDirectory"
+      "TaskMethod": "Frends.Files.MoveDirectory.Files.MoveDirectory"
     }
   ]
 }
