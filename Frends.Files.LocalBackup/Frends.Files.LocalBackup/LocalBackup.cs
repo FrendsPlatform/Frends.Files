@@ -167,10 +167,23 @@ namespace Frends.Files.LocalBackup
                 pattern = mask.Replace(".", "\\.");
                 pattern = pattern.Replace("*", ".*");
                 pattern = pattern.Replace("?", ".+");
-                pattern = String.Concat("^", pattern, "$");
+                pattern = string.Concat("^", pattern, "$");
             }
 
-            return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase);
+            try
+            {
+                return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase);
+            }
+            catch
+            {
+                if (filename.Equals(mask, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (mask.StartsWith("*") && filename.EndsWith(mask.Replace("*", "")))
+                    return true;
+                if (mask.EndsWith("*") && filename.StartsWith(mask.Replace("*", "")))
+                    return true;
+                return false;
+            }
         }
     }
 }

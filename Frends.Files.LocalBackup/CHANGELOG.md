@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.1] - 2023-08-08
+### Fixed
+- Added check for implicit match for the file and filemask.
+
 ## [2.1.0] - 2023-05-31
 ### Added
 - Added parameter for FilePaths. If FilePaths is used it will overwrite the SourceDirectory and SourceFile parameters.

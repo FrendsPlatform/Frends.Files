@@ -46,19 +46,15 @@ public class Files
 
     private static async Task<Result> ExecuteWriteBytes(Input input, Options options)
     {
-        var bytes = input?.ContentBytes as byte[];
+        byte[] bytes = input?.ContentBytes as byte[];
         if (bytes == null)
-        {
             throw new ArgumentException("Input.ContentBytes must be a byte array", nameof(input.ContentBytes));
-        }
 
         var fileMode = GetAndCheckWriteMode(options.WriteBehaviour, input.Path);
 
-        using (var fileStream = new FileStream(input.Path, fileMode, FileAccess.Write, FileShare.Write, 4096, useAsync: true))
-        {
-            var memoryStream = new MemoryStream(bytes);
-            await memoryStream.CopyToAsync(fileStream).ConfigureAwait(false);
-        }
+        using var fileStream = new FileStream(input.Path, fileMode, FileAccess.Write, FileShare.Write, 4096, useAsync: true);
+        using var memoryStream = new MemoryStream(bytes);
+        await memoryStream.CopyToAsync(fileStream).ConfigureAwait(false);
 
         return new Result(new FileInfo(input.Path));
     }
@@ -83,9 +79,7 @@ public class Files
 
             case WriteBehaviour.Throw:
                 if (File.Exists(filePath))
-                {
                     throw new IOException($"File already exists: {filePath}.");
-                }
                 return FileMode.Create;
             default:
                 throw new ArgumentException("Unsupported write option: " + givenWriteBehaviour);
