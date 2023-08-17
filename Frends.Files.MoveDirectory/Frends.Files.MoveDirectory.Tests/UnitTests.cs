@@ -32,7 +32,8 @@ public class UnitTests
         var sourcePath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
         var ex = Assert.Throws<IOException>(() => Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Throw }));
-        Assert.IsTrue(ex.Message.ToString().Contains("Cannot create a file when that file already exists"));
+        Console.WriteLine(ex.Message);
+        Assert.IsTrue(ex.Message.ToString().Contains("Cannot create '" + targetPath + "' because a file or directory with the same name already exists."));
     }
 
     [TestMethod]
@@ -43,10 +44,10 @@ public class UnitTests
         var sourcePath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
         var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Rename });
-        Assert.AreEqual(result.TargetPath, targetPath + "(1)");
+        Assert.AreEqual(targetPath + "(1)", result.TargetPath);
     }
 
-    [Test]
+    [TestMethod]
     public void MoveShouldOverwriteIfDestinationFolderExistsAndBehaviourIsOverwrite()
     {
         _context.CreateFiles("temp/foo/bar/foo.txt");
@@ -55,7 +56,7 @@ public class UnitTests
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
 
         var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Overwrite });
-        Assert.AreEqual(result.TargetPath, targetPath);
+        Assert.AreEqual(targetPath, result.TargetPath);
     }
 
     [TestMethod]
@@ -79,7 +80,7 @@ public class UnitTests
         var sourcePath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
 
-        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
+        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Overwrite, UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
         Assert.AreEqual(result.TargetPath, targetPath);
     }
 

@@ -6,6 +6,7 @@ using System.Security.Principal;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
 using System.Xml.Linq;
+using System.IO;
 
 namespace Frends.Files.MoveDirectory;
 
@@ -21,8 +22,8 @@ public class Files
     /// <returns>Object { string Path } </returns>
     public static Result MoveDirectory([PropertyTab] Input input, [PropertyTab] Options options)
     {
-        if (string.IsNullOrEmpty(input.Directory))
-            throw new ArgumentNullException("Directory cannot be empty.");
+        if (string.IsNullOrEmpty(input.SourceDirectory) || string.IsNullOrEmpty(input.TargetDirectory))
+            throw new ArgumentNullException("Source or Target Directory cannot be empty.");
 
         if (!options.UseGivenUserCredentialsForRemoteConnections)
         {
@@ -41,23 +42,23 @@ public class Files
         {
             case DirectoryExistsAction.Rename:
                 var count = 1;
-                while (System.IO.Directory.Exists(destinationFolderPath))
+                while (Directory.Exists(destinationFolderPath))
                 {
                     destinationFolderPath = $"{destinationFolderPath}({count++})";
                 }
                 break;
             case DirectoryExistsAction.Overwrite:
-                if (System.IO.Directory.Exists(destinationFolderPath))
+                if (Directory.Exists(destinationFolderPath))
                 {
-                    System.IO.Directory.Delete(destinationFolderPath, true);
+                    Directory.Delete(destinationFolderPath, true);
                 }
                 break;
             case DirectoryExistsAction.Throw: //Will throw if target folder exist
                 break;
         }
 
-        System.IO.Directory.Move(input.SourceDirectory, destinationFolderPath);
-        return new Result(destinationFolderPath, input.SourceDirectory);
+        Directory.Move(input.SourceDirectory, destinationFolderPath);
+        return new Result(input.SourceDirectory, destinationFolderPath);
     }
 
     private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
@@ -71,12 +72,6 @@ public class Files
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
         return WindowsIdentity.RunImpersonated(userHandle, action);
-    }
-
-    private static Result ExecuteCreate(Input input)
-    {
-        var newFolder = System.IO.Directory.CreateDirectory(input.Directory);
-        return new Result(newFolder.FullName);
     }
 
     private static string[] GetDomainAndUserName(string username)
