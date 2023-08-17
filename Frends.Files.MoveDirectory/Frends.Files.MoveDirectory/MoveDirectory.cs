@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
-using System.Xml.Linq;
 using System.IO;
 
 namespace Frends.Files.MoveDirectory;
@@ -19,7 +18,7 @@ public class Files
     /// Moves a directory. By default will throw an error if the directory already exists.
     /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Files.CreateDirectory)
     /// </summary>
-    /// <returns>Object { string Path } </returns>
+    /// <returns>Object { string SourcePath, string TargetPath } </returns>
     public static Result MoveDirectory([PropertyTab] Input input, [PropertyTab] Options options)
     {
         if (string.IsNullOrEmpty(input.SourceDirectory) || string.IsNullOrEmpty(input.TargetDirectory))
