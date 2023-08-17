@@ -1,21 +1,22 @@
 ﻿namespace Frends.Files.MoveDirectory.Definitions;
 
 /// <summary>
-/// Enum class
+/// Action to be executed when the directory exits in destination.
 /// </summary>
-public enum DirectoryExistsAction {
+public enum DirectoryExistsAction
+{
     /// <summary>
-    /// Throw error on default.
+    /// Throw an error
     /// </summary>
     Throw,
 
     /// <summary>
-    /// Create a new directory with a name that appends a number to the end, e.g. "directory(2)".
+    /// Overwrite the target directory.
     /// </summary>
-    Rename,
+    Overwrite,
 
     /// <summary>
-    /// Overwrite the target directory, by removing it first before moving the source directory.
+    /// Rename the transferred directory by appending a number to the end.
     /// </summary>
-    Overwrite
+    Rename
 }
