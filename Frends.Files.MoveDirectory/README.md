@@ -7,6 +7,10 @@ Frends Task for moving a directory.
 
 Returns the object of source directory and target directory.
 
+##Installing
+
+You can install the Task via Frends UI Task View.
+
 ## Building
 
 Rebuild the project

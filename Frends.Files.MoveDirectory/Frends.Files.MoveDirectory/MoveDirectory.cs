@@ -16,7 +16,7 @@ public class Files
 {
     /// <summary>
     /// Moves a directory. By default will throw an error if the directory already exists.
-    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Files.CreateDirectory)
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.MoveDirectory)
     /// </summary>
     /// <returns>Object { string SourcePath, string TargetPath } </returns>
     public static Result MoveDirectory([PropertyTab] Input input, [PropertyTab] Options options)

@@ -3,7 +3,6 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = NUnit.Framework.Assert;
 using Frends.Files.MoveDirectory.Definitions;
-using NUnit.Framework;
 
 namespace Frends.Files.MoveDirectory.Tests;
 
