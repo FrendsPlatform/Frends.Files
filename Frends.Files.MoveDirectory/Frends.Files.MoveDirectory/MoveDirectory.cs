@@ -23,11 +23,8 @@ public class Files
     {
         if (string.IsNullOrEmpty(input.SourceDirectory) || string.IsNullOrEmpty(input.TargetDirectory))
             throw new ArgumentNullException("Source or Target Directory cannot be empty.");
-
         if (!options.UseGivenUserCredentialsForRemoteConnections)
-        {
             return ExecuteMove(input, options.IfTargetDirectoryExists);
-        }
 
         var domainAndUserName = GetDomainAndUserName(options.UserName);
         return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () =>
@@ -48,9 +45,7 @@ public class Files
                 break;
             case DirectoryExistsAction.Overwrite:
                 if (Directory.Exists(destinationFolderPath))
-                {
                     Directory.Delete(destinationFolderPath, true);
-                }
                 break;
             case DirectoryExistsAction.Throw: //Will throw if target folder exist
                 break;
@@ -63,9 +58,7 @@ public class Files
     private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
             throw new Exception("Impersonation only supported on Windows systems");
-        }
 
         var credentials = new UserCredentials(domain, username, password);
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
@@ -77,9 +70,7 @@ public class Files
     {
         var domainAndUserName = username.Split('\\');
         if (domainAndUserName.Length != 2)
-        {
             throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        }
         return domainAndUserName;
     }
 }

@@ -14,6 +14,7 @@ public class Options
     ///  * Rename - Create a new directory with a name that appends a number to the end, e.g. "directory(2)"
     ///  * Overwrite - Overwrite the target directory, by removing it first before moving the source directory
     /// </summary>
+    /// <example>Throw</example>
     public DirectoryExistsAction IfTargetDirectoryExists { get; set; }
 
     /// <summary>

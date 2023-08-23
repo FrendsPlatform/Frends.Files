@@ -12,7 +12,7 @@
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<Description>Frends task to move a directory.</Description>
 	<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Files/tree/main/Frends.Files.CreateDirectory</RepositoryUrl>
+	<RepositoryUrl>https://github.com/FrendsPlatform/Frends.Files/tree/main/Frends.Files.MoveDirectory</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
