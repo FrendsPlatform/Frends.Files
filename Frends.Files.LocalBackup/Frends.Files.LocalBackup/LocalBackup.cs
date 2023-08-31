@@ -78,7 +78,7 @@ namespace Frends.Files.LocalBackup
                 }
             }
 
-            if (!Directory.GetFiles(backupDirectory).Any())
+            if (!Directory.GetFiles(backupDirectory).Any() && !Directory.GetDirectories(backupDirectory).Any())
             {
                 Directory.Delete(backupDirectory, false);
                 return new Tuple<string, List<string>>("No source files present to backup.", new List<string>());

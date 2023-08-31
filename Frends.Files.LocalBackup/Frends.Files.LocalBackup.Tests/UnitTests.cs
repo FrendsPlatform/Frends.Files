@@ -447,6 +447,29 @@ public class UnitTests
     }
 
     [TestMethod]
+    public void TestBackup_NoFilesForBackupShouldNotDeleteExistingDirectory()
+    {
+        var backup = Path.Combine(_dir, "Backup");
+
+        Directory.CreateDirectory(Path.Combine(backup, Guid.NewGuid().ToString()));
+
+        var input = new Input
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*.8CO",
+            BackupDirectory = backup,
+            CreateSubdirectories = false,
+            Cleanup = false,
+            TaskExecutionId = Guid.NewGuid().ToString()
+        };
+
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(0, result.FileCountInBackup);
+
+        Directory.Delete(backup, true);
+    }
+
+    [TestMethod]
     public void TestBackup_FileIncludesSpecialCharacters()
     {
         var buDir = Path.Combine(_dir, "Backup");
@@ -556,7 +579,6 @@ public class UnitTests
             Path.Combine(_dir, "Test2.txt"),
             Path.Combine(_dir, "Test1.xml"),
             Path.Combine(_dir, "p}ro(_tes[t.txt"),
-            Path.Combine(_dir, "Test1.xml"),
             Path.Combine(_dir, "Sub", "Overwrite.txt"),
             Path.Combine(_dir, "Pro", "pro_test.txt"),
             Path.Combine(_dir, "Pro", "pref_test.txt"),
