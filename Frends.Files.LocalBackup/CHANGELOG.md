@@ -1,6 +1,6 @@
 # Changelog
 
-##[2.1.2] - 2023-08-31
+## [2.1.2] - 2023-08-31
 ### Fixed
 - Fixed bug in CreateBackup which was caused by Task not been able to delete the directory if there are directories present.
 
