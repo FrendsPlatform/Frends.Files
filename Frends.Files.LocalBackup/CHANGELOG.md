@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.2] - 2023-08-31
+### Fixed
+- Fixed bug in CreateBackup which was caused by Task not been able to delete the directory if there are directories present.
+
 ## [2.1.1] - 2023-08-08
 ### Fixed
 - Added check for implicit match for the file and filemask.
