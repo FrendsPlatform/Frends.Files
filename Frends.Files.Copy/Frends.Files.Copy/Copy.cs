@@ -99,7 +99,7 @@ public class Files
 
     private static async Task CopyFileAsync(string source, string destination, CancellationToken cancellationToken)
     {
-        using FileStream sourceStream = File.Open(source, FileMode.Open);
+        using FileStream sourceStream = File.Open(source, FileMode.Open, FileAccess.Read);
         using FileStream destinationStream = File.Open(destination, FileMode.CreateNew);
 
         await sourceStream.CopyToAsync(destinationStream, 81920, cancellationToken).ConfigureAwait(false);
