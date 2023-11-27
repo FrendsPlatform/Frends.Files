@@ -26,7 +26,7 @@ public class Files
     /// <param name="input">Input parameters for the Task.</param>
     /// <param name="options">Additional options for the Task.</param>
     /// <param name="cancellationToken">CancellationToken given by Frends.</param>
-    /// <returns>List [ Object { string SourcePath, string TargetPath } ]</returns>
+    /// <returns>Object { List&lt;Object { string SourcePath, string TargetPath }&gt; Files } ]</returns>
     public static async Task<Result> Copy([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         var result = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
