@@ -10,8 +10,8 @@ namespace Frends.Files.Find.Tests;
 public class UnitTests
 {
     private static readonly string _FullPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"));
-    private Input _input = new Input();
-    private Options _options = new Options();
+    private Input _input = new();
+    private Options _options = new();
 
     [SetUp]
     public void Setup()
@@ -58,7 +58,9 @@ public class UnitTests
     [Test]
     public void FilesFindPatternSubfolders()
     {
-        foreach (var file in new DirectoryInfo(_FullPath).GetFiles()) file.Delete();
+        foreach (var file in new DirectoryInfo(_FullPath).GetFiles())
+            file.Delete();
+
         Helper.CreateTestFiles(Path.Combine(_FullPath, "sub"));
 
         var input = new Input
@@ -66,6 +68,7 @@ public class UnitTests
             Directory = _FullPath,
             Pattern = @"\**\sub\*.txt",
         };
+
         var result = Files.Find(input, _options);
         Assert.AreEqual(6, result.Files.Count);
     }

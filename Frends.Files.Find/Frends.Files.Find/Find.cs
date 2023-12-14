@@ -23,7 +23,7 @@ public class Files
     /// </summary>
     /// <param name="input">Input parameters</param>
     /// <param name="options">Options parameters</param>
-    /// <returns>Object {List &lt;FileItem&gt;}</returns>
+    /// <returns>Object { List [object { string Extension, string DirectoryName, string FullPath, string FileName, bool IsReadOnly, double SizeInMegaBytes, DateTime CreationTime, DateTime CreationTimeUtc, DateTime LastAccessTime, DateTime LastAccessTimeUtc, DateTime LastWriteTime, DateTime LastWriteTimeUtc }] Files }</returns>
     public static Result Find([PropertyTab] Input input, [PropertyTab] Options options)
     {
         return ExecuteAction(() => ExecuteFind(input),
@@ -40,7 +40,7 @@ public class Files
 
         var (domain, user) = GetDomainAndUsername(username);
 
-        UserCredentials credentials = new UserCredentials(domain, user, password);
+        var credentials = new UserCredentials(domain, user, password);
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
         return WindowsIdentity.RunImpersonated(userHandle, () => action());
@@ -67,9 +67,7 @@ public class Files
         // Check the user can access the folder
         // This will return false if the path does not exist or you do not have read permissions.
         if (!Directory.Exists(directoryPath))
-        {
             throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'.");
-        }
 
         var matcher = new Matcher();
         matcher.AddInclude(pattern);

@@ -26,9 +26,7 @@ internal class Helper
 
         // Create test files and edit creation date
         foreach (var path in list)
-        {
             File.WriteAllText(path, $"Test {path}");
-        }
     }
 
     public static void DeleteTestFolder(string? directory)
@@ -42,15 +40,13 @@ internal class Helper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        DirectoryEntry AD = new DirectoryEntry("WinNT://" + domain + ",computer");
-        DirectoryEntry NewUser = AD.Children.Add(name, "user");
+        var AD = new DirectoryEntry("WinNT://" + domain + ",computer");
+        var NewUser = AD.Children.Add(name, "user");
         NewUser.Invoke("SetPassword", new object[] { pwd });
         NewUser.Invoke("Put", new object[] { "Description", "Test User from .NET" });
         NewUser.CommitChanges();
-        DirectoryEntry grp;
-
-        grp = AD.Children.Find("Administrators", "group");
-        if (grp != null) { grp.Invoke("Add", new object[] { NewUser.Path.ToString() }); }
+        var grp = AD.Children.Find("Administrators", "group");
+        grp?.Invoke("Add", new object[] { NewUser.Path.ToString() });
     }
 
     public static void DeleteTestUser(string name)
@@ -58,9 +54,9 @@ internal class Helper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        DirectoryEntry localDirectory = new DirectoryEntry("WinNT://" + Environment.MachineName.ToString());
-        DirectoryEntries users = localDirectory.Children;
-        DirectoryEntry user = users.Find(name);
+        var localDirectory = new DirectoryEntry("WinNT://" + Environment.MachineName.ToString());
+        var users = localDirectory.Children;
+        var user = users.Find(name);
         users.Remove(user);
     }
 }
