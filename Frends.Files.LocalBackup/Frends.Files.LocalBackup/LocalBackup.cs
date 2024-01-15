@@ -50,7 +50,7 @@ namespace Frends.Files.LocalBackup
 
             if (input.FilePaths != null)
             {
-                files = (string[])input.FilePaths;
+                files = ConvertObjectToStringArray(input.FilePaths);
                 foreach (string file in files)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -184,6 +184,14 @@ namespace Frends.Files.LocalBackup
                     return true;
                 return false;
             }
+        }
+
+        private static string[] ConvertObjectToStringArray(object objectArray)
+        {
+            if (!objectArray.GetType().IsArray)
+            throw new ArgumentException($"Invalid type for parameter FilePaths. Expected array but was {objectArray.GetType()}");
+        var res = objectArray as object[];
+        return res.OfType<string>().ToArray();
         }
     }
 }

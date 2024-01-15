@@ -424,6 +424,29 @@ public class UnitTests
     }
 
     [TestMethod]
+    public void TestBackup_FilePathsAsObjectArray()
+    {
+        var input = new Input
+        {
+            SourceDirectory = _dir,
+            SourceFile = "*",
+            FilePaths = new object[]
+            {
+                Path.Combine(_dir, "Test1.txt"),
+                Path.Combine(_dir, "Test2.txt"),
+                Path.Combine(_dir, "Test1.xml"),
+            },
+            BackupDirectory = _dir,
+            CreateSubdirectories = true,
+            Cleanup = true,
+            DaysOlder = 14,
+            TaskExecutionId = Guid.NewGuid().ToString()
+        };
+        var result = Files.LocalBackup(input, default);
+        Assert.AreEqual(3, result.FileCountInBackup);
+    }
+
+    [TestMethod]
     public void TestBackup_FilePathsFilesNotFound()
     {
         var input = new Input
