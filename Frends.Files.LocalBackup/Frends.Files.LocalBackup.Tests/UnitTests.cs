@@ -11,7 +11,7 @@ namespace Frends.Files.LocalBackup.Tests;
 public class UnitTests
 {
     private readonly string _dir = Path.Combine(Environment.CurrentDirectory, "Tests"); // ...Test\bin\Debug\net6.0\
-    Input? input;
+    Input? paramInput;
 
     [TestInitialize]
     public void Setup()
@@ -33,7 +33,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -44,7 +44,7 @@ public class UnitTests
             CreateSubdirectories = false
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir))
@@ -65,7 +65,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -76,7 +76,7 @@ public class UnitTests
             CreateSubdirectories = true
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -97,7 +97,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -108,7 +108,7 @@ public class UnitTests
             CreateSubdirectories = true
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "*qwerty123*"))
@@ -129,7 +129,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "Test*",
@@ -139,7 +139,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -161,7 +161,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "Test1.(txt|xml)",
@@ -171,7 +171,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -193,7 +193,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "Test1.[^t][^x][^t]",
@@ -203,7 +203,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -225,7 +225,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup", "Pro");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = Path.Combine(_dir, "Pro"),
             SourceFile = "<regex>^(?!prof).*_test.txt",
@@ -235,7 +235,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -259,7 +259,7 @@ public class UnitTests
         var backupDirectory = Path.Combine(_dir, "Cleanup", $"{timestampString}-{Guid.NewGuid()}");
         Directory.CreateDirectory(backupDirectory);
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -270,7 +270,7 @@ public class UnitTests
             CreateSubdirectories = true,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
     }
 
@@ -280,7 +280,7 @@ public class UnitTests
     [TestMethod]
     public void CleanupFile_CreateSubdirectoriesFalse_Test()
     {
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -295,7 +295,7 @@ public class UnitTests
         Directory.CreateDirectory(backupDirectory);
         Directory.SetLastWriteTimeUtc(backupDirectory, DateTime.Now.AddDays(-2));
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Cleanups);
         Assert.IsFalse(Directory.Exists(backupDirectory));
@@ -309,7 +309,7 @@ public class UnitTests
     {
         var backup = Path.Combine(_dir, "Cleanup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -320,7 +320,7 @@ public class UnitTests
             CreateSubdirectories = false,
         };
 
-        Files.LocalBackup(input, default);
+        Files.LocalBackup(paramInput, default);
         foreach (var dir in Directory.GetDirectories(backup))
             Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
         var files = Directory.GetFiles(backup).ToList();
@@ -330,7 +330,7 @@ public class UnitTests
             var newName = Path.GetFileNameWithoutExtension(file) + "(1)" + Path.GetExtension(file);
             File.Move(file, Path.Combine(Path.GetDirectoryName(file) ?? backup, newName));
         }
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(4, result.Cleanups.Count);
     }
 
@@ -339,7 +339,7 @@ public class UnitTests
     {
         var backup = Path.Combine(_dir, "Cleanup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -354,14 +354,14 @@ public class UnitTests
         var newDir = Path.Combine(backup, Guid.NewGuid().ToString());
         Directory.CreateDirectory(newDir);
         Directory.SetCreationTimeUtc(newDir, DateTime.UtcNow.AddDays(-2));
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(1, result.Cleanups.Count);
     }
 
     [TestMethod]
     public void TestCleanupWithoutBackup()
     {
-        var input = new Input
+        var paramInput = new Input
         {
             SourceDirectory = Environment.CurrentDirectory,
             SourceFile = "FileThatDontExist",
@@ -373,14 +373,14 @@ public class UnitTests
             TaskExecutionId = Guid.NewGuid().ToString()
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(0, result.Cleanups.Count);
     }
 
     [TestMethod]
     public void TestBackupWithFilePaths()
     {
-        var input = new Input
+        var paramInput = new Input
         {
             SourceDirectory = "",
             SourceFile = "",
@@ -396,14 +396,14 @@ public class UnitTests
             DaysOlder = 14,
             TaskExecutionId = Guid.NewGuid().ToString()
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(3, result.FileCountInBackup);
     }
 
     [TestMethod]
     public void TestBackup_OnlyFilePathsAreUsedEvenIfDirectoryAndFileMaskIsSet()
     {
-        var input = new Input
+        var paramInput = new Input
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -419,14 +419,14 @@ public class UnitTests
             DaysOlder = 14,
             TaskExecutionId = Guid.NewGuid().ToString()
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(3, result.FileCountInBackup);
     }
 
     [TestMethod]
     public void TestBackup_FilePathsAsObjectArray()
     {
-        var input = new Input
+        var paramInput = new Input
         {
             SourceDirectory = _dir,
             SourceFile = "*",
@@ -442,14 +442,14 @@ public class UnitTests
             DaysOlder = 14,
             TaskExecutionId = Guid.NewGuid().ToString()
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(3, result.FileCountInBackup);
     }
 
     [TestMethod]
     public void TestBackup_FilePathsFilesNotFound()
     {
-        var input = new Input
+        var paramInput = new Input
         {
             SourceDirectory = "",
             SourceFile = "",
@@ -465,7 +465,7 @@ public class UnitTests
             DaysOlder = 14,
             TaskExecutionId = Guid.NewGuid().ToString()
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(0, result.FileCountInBackup);
     }
 
@@ -476,7 +476,7 @@ public class UnitTests
 
         Directory.CreateDirectory(Path.Combine(backup, Guid.NewGuid().ToString()));
 
-        var input = new Input
+        var paramInput = new Input
         {
             SourceDirectory = _dir,
             SourceFile = "*.8CO",
@@ -486,7 +486,7 @@ public class UnitTests
             TaskExecutionId = Guid.NewGuid().ToString()
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(0, result.FileCountInBackup);
 
         Directory.Delete(backup, true);
@@ -497,7 +497,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = Path.Combine(_dir, "Special"),
             SourceFile = "p}ro(_tes[t.txt",
@@ -507,9 +507,9 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(1, result.Backups.Count);
-        Assert.IsTrue(File.Exists(Path.Combine(buDir, input.SourceFile)));
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, paramInput.SourceFile)));
     }
 
     [TestMethod]
@@ -517,7 +517,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "p}ro(_tes[t.txt",
@@ -527,9 +527,9 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(1, result.Backups.Count);
-        Assert.IsTrue(File.Exists(Path.Combine(buDir, input.SourceFile)));
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, paramInput.SourceFile)));
     }
 
 
@@ -538,7 +538,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*.txt",
@@ -548,7 +548,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(3, result.Backups.Count);
     }
 
@@ -557,7 +557,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "p}ro(_tes[*",
@@ -567,7 +567,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(1, result.Backups.Count);
     }
 
@@ -576,7 +576,7 @@ public class UnitTests
     {
         var buDir = Path.Combine(_dir, "Backup");
 
-        input = new Input()
+        paramInput = new Input()
         {
             SourceDirectory = _dir,
             SourceFile = "*}ro(_tes[t.txt",
@@ -586,7 +586,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(paramInput, default);
         Assert.AreEqual(1, result.Backups.Count);
     }
 
