@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.1.3] - 2024-01-15
+## [2.1.3] - 2024-01-16
 ### Fixed
 - Fixed how FilePaths were handled. Changed casting to string[] to convert the object into a string[] by casting it first as a object[].
 
