@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.3] - 2024-01-16
+### Fixed
+- Fixed how FilePaths were handled. Changed casting to string[] to convert the object into a string[] by casting it first as a object[].
+
 ## [2.1.2] - 2023-08-31
 ### Fixed
 - Fixed bug in CreateBackup which was caused by Task not been able to delete the directory if there are directories present.

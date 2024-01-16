@@ -50,7 +50,7 @@ namespace Frends.Files.LocalBackup
 
             if (input.FilePaths != null)
             {
-                files = (string[])input.FilePaths;
+                files = ConvertObjectToStringArray(input.FilePaths);
                 foreach (string file in files)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -96,22 +96,17 @@ namespace Frends.Files.LocalBackup
                 if (Directory.Exists(backupDirectory))
                 {
                     var directories = Directory.GetDirectories(backupDirectory);
-                    foreach (var dir in directories)
+
+                    foreach (var dir in directories.Where(d => Directory.GetLastWriteTime(d) < DateTime.Now.AddDays(-input.DaysOlder)))
                     {
-                        if (Directory.GetLastWriteTime(dir) < DateTime.Now.AddDays(-input.DaysOlder))
-                        {
-                            Directory.Delete(dir, true);
-                            result.Add($"{dir} deleted.");
-                        }
+                        Directory.Delete(dir, true);
+                        result.Add($"{dir} deleted.");
                     }
                     var files = Directory.GetFiles(backupDirectory);
-                    foreach (var file in files)
+                    foreach (var file in files.Where(f => File.GetLastWriteTime(f) < DateTime.Now.AddDays(-input.DaysOlder)))
                     {
-                        if (File.GetLastWriteTime(file) < DateTime.Now.AddDays(-input.DaysOlder))
-                        {
-                            File.Delete(file);
-                            result.Add($"{file} deleted.");
-                        }
+                        File.Delete(file);
+                        result.Add($"{file} deleted.");
                     }
                 }
             }
@@ -184,6 +179,17 @@ namespace Frends.Files.LocalBackup
                     return true;
                 return false;
             }
+        }
+
+        private static string[] ConvertObjectToStringArray(object objectArray)
+        {
+            if (!objectArray.GetType().IsArray)
+                throw new ArgumentException($"Invalid type for parameter FilePaths. Expected array but was {objectArray.GetType()}");
+
+            var res = objectArray as object[];
+            if (res == null)
+                return null;
+            return res.OfType<string>().ToArray();
         }
     }
 }
