@@ -18,14 +18,6 @@ namespace Frends.Files.Write;
 /// </summary>
 public class Files
 {
-    static Files()
-    {
-        var currentAssembly = Assembly.GetExecutingAssembly();
-        var currentContext = AssemblyLoadContext.GetLoadContext(currentAssembly);
-        if (currentContext != null)
-            currentContext.Unloading += OnPluginUnloadingRequested;
-    }
-
     /// <summary>
     /// Write file.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Write)
@@ -87,9 +79,7 @@ public class Files
 
             case WriteBehaviour.Throw:
                 if (File.Exists(filePath))
-                {
                     throw new IOException($"File already exists: {filePath}.");
-                }
                 return FileMode.Create;
             default:
                 throw new ArgumentException("Unsupported write option: " + givenWriteBehaviour);
@@ -117,10 +107,5 @@ public class Files
             default:
                 throw new ArgumentOutOfRangeException();
         }
-    }
-
-    private static void OnPluginUnloadingRequested(AssemblyLoadContext obj)
-    {
-        obj.Unloading -= OnPluginUnloadingRequested;
     }
 }
