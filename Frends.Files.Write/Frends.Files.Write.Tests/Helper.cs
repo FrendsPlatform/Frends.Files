@@ -18,16 +18,24 @@ internal class Helper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        DirectoryEntry AD = new DirectoryEntry("WinNT://" + domain + ",computer");
-        DirectoryEntry NewUser = AD.Children.Add(name, "user");
-        NewUser.Invoke("SetPassword", new object[] { pwd });
-        NewUser.Invoke("Put", new object[] { "Description", "Test User from .NET" });
-        NewUser.CommitChanges();
-        DirectoryEntry grp;
+        DirectoryEntry AD = null;
+        try
+        {
+            AD = new DirectoryEntry("WinNT://" + domain + ",computer");
+            DirectoryEntry NewUser = AD.Children.Add(name, "user");
+            NewUser.Invoke("SetPassword", new object[] { pwd });
+            NewUser.Invoke("Put", new object[] { "Description", "Test User from .NET" });
+            NewUser.CommitChanges();
+            DirectoryEntry grp;
 
-        grp = AD.Children.Find("Administrators", "group");
-        if (grp != null) { grp.Invoke("Add", new object[] { NewUser.Path.ToString() }); }
-        AD.Dispose();
+            grp = AD.Children.Find("Administrators", "group");
+            if (grp != null) { grp.Invoke("Add", new object[] { NewUser.Path.ToString() }); }
+        }
+        finally
+        {
+            if (AD != null)
+                AD.Dispose();
+        }
     }
 
     public static void DeleteTestUser(string name)
@@ -35,11 +43,19 @@ internal class Helper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        DirectoryEntry localDirectory = new DirectoryEntry("WinNT://" + Environment.MachineName.ToString());
-        DirectoryEntries users = localDirectory.Children;
-        DirectoryEntry user = users.Find(name);
-        users.Remove(user);
-        localDirectory.Dispose();
+        DirectoryEntry localDirectory = null;
+        try
+        {
+            localDirectory = new DirectoryEntry("WinNT://" + Environment.MachineName.ToString());
+            DirectoryEntries users = localDirectory.Children;
+            DirectoryEntry user = users.Find(name);
+            users.Remove(user);
+        }
+        finally
+        {
+            if (localDirectory != null)
+                localDirectory.Dispose();
+        }
     }
 }
 
