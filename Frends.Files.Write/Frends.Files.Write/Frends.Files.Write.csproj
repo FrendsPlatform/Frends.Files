@@ -28,6 +28,7 @@
 	<PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
 	<PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="7.0.0" />
 	<PackageReference Include="System.DirectoryServices" Version="7.0.0" />
+	<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

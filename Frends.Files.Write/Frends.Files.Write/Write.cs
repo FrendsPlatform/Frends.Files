@@ -49,7 +49,7 @@ public class Files
 
         var (domain, user) = GetDomainAndUsername(username);
 
-        UserCredentials credentials = new UserCredentials(domain, user, password);
+        UserCredentials credentials = new(domain, user, password);
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
         return await WindowsIdentity.RunImpersonated(userHandle, async () => await action().ConfigureAwait(false));
@@ -110,6 +110,10 @@ public class Files
                 return optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
             case FileEncoding.Unicode:
                 return Encoding.Unicode;
+            case FileEncoding.Windows1252:
+                EncodingProvider provider = CodePagesEncodingProvider.Instance;
+                Encoding.RegisterProvider(provider);
+                return Encoding.GetEncoding(1252);
             default:
                 throw new ArgumentOutOfRangeException();
         }
