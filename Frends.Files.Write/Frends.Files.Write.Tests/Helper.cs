@@ -27,6 +27,7 @@ internal class Helper
 
         grp = AD.Children.Find("Administrators", "group");
         if (grp != null) { grp.Invoke("Add", new object[] { NewUser.Path.ToString() }); }
+        AD.Dispose();
     }
 
     public static void DeleteTestUser(string name)
@@ -38,6 +39,7 @@ internal class Helper
         DirectoryEntries users = localDirectory.Children;
         DirectoryEntry user = users.Find(name);
         users.Remove(user);
+        localDirectory.Dispose();
     }
 }
 
