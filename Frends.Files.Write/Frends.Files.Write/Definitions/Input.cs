@@ -8,14 +8,14 @@ namespace Frends.Files.Write.Definitions;
 public class Input
 {
     /// <summary>
-    /// Gets or sets source directory.
+    /// Source directory.
     /// </summary>
     /// <example>This is test content</example>
     [DisplayFormat(DataFormatString = "Text")]
     public string Content { get; set; }
 
     /// <summary>
-    /// Gets or sets full path of the target file to be written
+    /// Full path of the target file to be written
     /// </summary>
     /// <example>c:\temp\foo.txt</example>
     [DisplayFormat(DataFormatString = "Text")]
