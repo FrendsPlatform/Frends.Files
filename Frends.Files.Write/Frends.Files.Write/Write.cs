@@ -53,7 +53,7 @@ public class Files
 
         var (domain, user) = GetDomainAndUsername(username);
 
-        UserCredentials credentials = new (domain, user, password);
+        UserCredentials credentials = new(domain, user, password);
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
         return await WindowsIdentity.RunImpersonated(userHandle, async () => await action().ConfigureAwait(false));
