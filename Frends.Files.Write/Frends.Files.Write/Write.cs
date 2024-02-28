@@ -1,42 +1,46 @@
-﻿using Frends.Files.Write.Definitions;
-using Microsoft.Win32.SafeHandles;
-using SimpleImpersonation;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Loader;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using Frends.Files.Write.Definitions;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.Write;
 
-///<summary>
+/// <summary>
 /// Files task.
 /// </summary>
 public class Files
 {
-    static Files()
+    /// <summary>
+    /// Write file.
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Write).
+    /// </summary>
+    /// <param name="input">Input parameters.</param>
+    /// <param name="options">Options parameters.</param>
+    /// <returns>Object {string Path, double SizeInMegaBytes}.</returns>
+    public static async Task<Result> Write([PropertyTab] Input input, [PropertyTab] Options options)
     {
-        var currentAssembly = Assembly.GetExecutingAssembly();
-        var currentContext = AssemblyLoadContext.GetLoadContext(currentAssembly);
-        if (currentContext != null)
-            currentContext.Unloading += OnPluginUnloadingRequested;
+        return await ExecuteActionAsync(
+            () => ExecuteWrite(input, options),
+            options.UseGivenUserCredentialsForRemoteConnections,
+            options.UserName,
+            options.Password).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Write file.
-    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Write)
+    /// Get domain and username.
     /// </summary>
-    /// <param name="input">Input parameters</param>
-    /// <param name="options">Options parameters</param>
-    /// <returns>Object {string Path, double SizeInMegaBytes}</returns>
-    public static async Task<Result> Write([PropertyTab] Input input, [PropertyTab] Options options)
+    internal static Tuple<string, string> GetDomainAndUsername(string username)
     {
-        return await ExecuteActionAsync(() => ExecuteWrite(input, options),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -49,7 +53,7 @@ public class Files
 
         var (domain, user) = GetDomainAndUsername(username);
 
-        UserCredentials credentials = new UserCredentials(domain, user, password);
+        UserCredentials credentials = new(domain, user, password);
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
         return await WindowsIdentity.RunImpersonated(userHandle, async () => await action().ConfigureAwait(false));
@@ -67,14 +71,6 @@ public class Files
         return new Result(new FileInfo(input.Path));
     }
 
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
-    }
-
     private static FileMode GetAndCheckWriteMode(WriteBehaviour givenWriteBehaviour, string filePath)
     {
         switch (givenWriteBehaviour)
@@ -87,9 +83,7 @@ public class Files
 
             case WriteBehaviour.Throw:
                 if (File.Exists(filePath))
-                {
                     throw new IOException($"File already exists: {filePath}.");
-                }
                 return FileMode.Create;
             default:
                 throw new ArgumentException("Unsupported write option: " + givenWriteBehaviour);
@@ -110,13 +104,12 @@ public class Files
                 return optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
             case FileEncoding.Unicode:
                 return Encoding.Unicode;
+            case FileEncoding.Windows1252:
+                EncodingProvider provider = CodePagesEncodingProvider.Instance;
+                Encoding.RegisterProvider(provider);
+                return Encoding.GetEncoding(1252);
             default:
                 throw new ArgumentOutOfRangeException();
         }
-    }
-
-    private static void OnPluginUnloadingRequested(AssemblyLoadContext obj)
-    {
-        obj.Unloading -= OnPluginUnloadingRequested;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+
 namespace Frends.Files.Write.Definitions;
 
 /// <summary>

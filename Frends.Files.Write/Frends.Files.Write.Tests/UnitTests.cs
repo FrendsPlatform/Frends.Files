@@ -11,8 +11,8 @@ namespace Frends.Files.Write.Tests;
 public class UnitTests
 {
     private static readonly string _FullPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/test.txt"));
-    private Input _input = new Input();
-    private Options _options = new Options();
+    private Input _input = new();
+    private Options _options = new();
 
     [SetUp]
     public void Setup()
@@ -75,6 +75,24 @@ public class UnitTests
             UseGivenUserCredentialsForRemoteConnections = false,
             WriteBehaviour = WriteBehaviour.Append,
             FileEncoding = FileEncoding.UTF8,
+            EnableBom = true
+        };
+
+        var result = await Files.Write(_input, options);
+        Assert.IsTrue(File.Exists(result.Path));
+        Assert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
+    }
+
+    [Test]
+    public async Task FilesWriteEncodeWindows1252()
+    {
+        await Files.Write(_input, _options);
+
+        var options = new Options
+        {
+            UseGivenUserCredentialsForRemoteConnections = false,
+            WriteBehaviour = WriteBehaviour.Overwrite,
+            FileEncoding = FileEncoding.Windows1252,
             EnableBom = true
         };
 

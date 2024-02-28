@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Files.Write.Definitions;
 
@@ -9,6 +9,7 @@ namespace Frends.Files.Write.Definitions;
 public class Options
 {
     /// <summary>
+    /// Sets a value indicating whether remote connection is used.
     /// If set, allows you to give the user credentials to use to delete files on remote hosts.
     /// If not set, the agent service user credentials will be used.
     /// Note: This feature is only possible with Windows agents.
@@ -18,7 +19,7 @@ public class Options
     public bool UseGivenUserCredentialsForRemoteConnections { get; set; }
 
     /// <summary>
-    /// This needs to be of format domain\username
+    /// Sets username. This needs to be of format domain\username.
     /// </summary>
     /// <example>domain\username</example>
     [DefaultValue("\"domain\\username\"")]
@@ -26,7 +27,7 @@ public class Options
     public string UserName { get; set; }
 
     /// <summary>
-    /// Password for the used credentials.
+    /// Sets password for the used credentials.
     /// </summary>
     /// <example>testpwd</example>
     [PasswordPropertyText]
@@ -34,14 +35,14 @@ public class Options
     public string Password { get; set; }
 
     /// <summary>
-    /// Encoding for the written content. By selecting 'Other' you can use any encoding.
+    /// Sets encoding for the written content. By selecting 'Other' you can use any encoding.
     /// </summary>
     /// <example>FileEncoding.UTF8</example>
     [DefaultValue(FileEncoding.UTF8)]
     public FileEncoding FileEncoding { get; set; }
 
     /// <summary>
-    /// Enable BOM for UTF-8
+    /// Sets a value indicating whether enablation BOM for UTF-8.
     /// </summary>
     /// <example>true</example>
     [UIHint(nameof(FileEncoding), "", FileEncoding.UTF8)]
@@ -49,17 +50,17 @@ public class Options
     public bool EnableBom { get; set; }
 
     /// <summary>
-    /// File encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List
+    /// Sets file encoding to be used. A partial list of possible encodings: https://en.wikipedia.org/wiki/Windows_code_page#List.
     /// </summary>
     /// <example>ISO-8859-2</example>
     [UIHint(nameof(FileEncoding), "", FileEncoding.Other)]
     public string EncodingInString { get; set; }
 
     /// <summary>
-    /// How the file write should work if a file with the new name already exists
+    /// Sets write behaviour.
+    /// How the file write should work if a file with the new name already exists.
     /// </summary>
     /// <example>WriteBehaviour.Throw</example>
     [DefaultValue(WriteBehaviour.Throw)]
     public WriteBehaviour WriteBehaviour { get; set; }
 }
-
