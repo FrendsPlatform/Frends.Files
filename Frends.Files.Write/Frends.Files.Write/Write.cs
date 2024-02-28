@@ -1,34 +1,46 @@
-﻿using Frends.Files.Write.Definitions;
-using Microsoft.Win32.SafeHandles;
-using SimpleImpersonation;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Loader;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using Frends.Files.Write.Definitions;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.Write;
 
-///<summary>
+/// <summary>
 /// Files task.
 /// </summary>
 public class Files
 {
     /// <summary>
     /// Write file.
-    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Write)
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Write).
     /// </summary>
-    /// <param name="input">Input parameters</param>
-    /// <param name="options">Options parameters</param>
-    /// <returns>Object {string Path, double SizeInMegaBytes}</returns>
+    /// <param name="input">Input parameters.</param>
+    /// <param name="options">Options parameters.</param>
+    /// <returns>Object {string Path, double SizeInMegaBytes}.</returns>
     public static async Task<Result> Write([PropertyTab] Input input, [PropertyTab] Options options)
     {
-        return await ExecuteActionAsync(() => ExecuteWrite(input, options),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
+        return await ExecuteActionAsync(
+            () => ExecuteWrite(input, options),
+            options.UseGivenUserCredentialsForRemoteConnections,
+            options.UserName,
+            options.Password).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Get domain and username.
+    /// </summary>
+    internal static Tuple<string, string> GetDomainAndUsername(string username)
+    {
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -41,7 +53,7 @@ public class Files
 
         var (domain, user) = GetDomainAndUsername(username);
 
-        UserCredentials credentials = new(domain, user, password);
+        UserCredentials credentials = new (domain, user, password);
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
         return await WindowsIdentity.RunImpersonated(userHandle, async () => await action().ConfigureAwait(false));
@@ -57,14 +69,6 @@ public class Files
         await writer.WriteAsync(input.Content).ConfigureAwait(false);
 
         return new Result(new FileInfo(input.Path));
-    }
-
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
     private static FileMode GetAndCheckWriteMode(WriteBehaviour givenWriteBehaviour, string filePath)

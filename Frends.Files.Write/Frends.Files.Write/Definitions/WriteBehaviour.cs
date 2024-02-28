@@ -18,5 +18,5 @@ public enum WriteBehaviour
     /// <summary>
     /// Rename the transferred file by appending a number to the end.
     /// </summary>
-    Throw
+    Throw,
 }

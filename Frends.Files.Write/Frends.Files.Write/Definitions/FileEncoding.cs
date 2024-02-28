@@ -12,5 +12,5 @@ public enum FileEncoding
     ASCII,
     Unicode,
     Windows1252,
-    Other
+    Other,
 }
