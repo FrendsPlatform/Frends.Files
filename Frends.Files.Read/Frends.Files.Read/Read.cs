@@ -69,15 +69,24 @@ public class Files
 
     private static Encoding GetEncoding(FileEncoding optionsFileEncoding, bool optionsEnableBom, string optionsEncodingInString)
     {
-        return optionsFileEncoding switch
+        switch (optionsFileEncoding)
         {
-            FileEncoding.Other => Encoding.GetEncoding(optionsEncodingInString),
-            FileEncoding.ASCII => Encoding.ASCII,
-            FileEncoding.Default => Encoding.Default,
-            FileEncoding.UTF8 => optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false),
-            FileEncoding.Windows1252 => Encoding.GetEncoding("windows-1252"),
-            FileEncoding.Unicode => Encoding.Unicode,
-            _ => throw new ArgumentOutOfRangeException(),
-        };
+            case FileEncoding.Other:
+                return Encoding.GetEncoding(optionsEncodingInString);
+            case FileEncoding.ASCII:
+                return Encoding.ASCII;
+            case FileEncoding.Default:
+                return Encoding.Default;
+            case FileEncoding.UTF8:
+                return optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
+            case FileEncoding.Windows1252: 
+                EncodingProvider provider = CodePagesEncodingProvider.Instance;
+                Encoding.RegisterProvider(provider);
+                return Encoding.GetEncoding(1252);
+            case FileEncoding.Unicode:
+                return Encoding.Unicode;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }
