@@ -17,12 +17,12 @@ namespace Frends.Files.Write;
 public class Files
 {
     /// <summary>
-    /// Write file.
+    /// Write content to a file.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Write).
     /// </summary>
     /// <param name="input">Input parameters.</param>
     /// <param name="options">Options parameters.</param>
-    /// <returns>Object {string Path, double SizeInMegaBytes}.</returns>
+    /// <returns>Object { string Path, double SizeInMegaBytes, double SizeInKiloBytes, double SizeInBytes }.</returns>
     public static async Task<Result> Write([PropertyTab] Input input, [PropertyTab] Options options)
     {
         return await ExecuteActionAsync(
@@ -77,10 +77,8 @@ public class Files
         {
             case WriteBehaviour.Append:
                 return FileMode.Append;
-
             case WriteBehaviour.Overwrite:
                 return FileMode.Create;
-
             case WriteBehaviour.Throw:
                 if (File.Exists(filePath))
                     throw new IOException($"File already exists: {filePath}.");
@@ -98,7 +96,7 @@ public class Files
                 return Encoding.GetEncoding(optionsEncodingInString);
             case FileEncoding.ASCII:
                 return Encoding.ASCII;
-            case FileEncoding.ANSI:
+            case FileEncoding.Default:
                 return Encoding.Default;
             case FileEncoding.UTF8:
                 return optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);

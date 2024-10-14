@@ -8,7 +8,7 @@ namespace Frends.Files.Write.Definitions;
 public enum FileEncoding
 {
     UTF8,
-    ANSI,
+    Default,
     ASCII,
     Unicode,
     Windows1252,

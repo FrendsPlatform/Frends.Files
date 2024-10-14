@@ -15,14 +15,28 @@ public class Result
     public string Path { get; private set; }
 
     /// <summary>
-    /// Size of the written file in mega bytes.
+    /// Size of the written file in bytes.
     /// </summary>
     /// <example>32</example>
     public double SizeInMegaBytes { get; private set; }
+
+    /// <summary>
+    /// Size of the written file in mega bytes.
+    /// </summary>
+    /// <example>32</example>
+    public double SizeInKiloBytes { get; private set; }
+
+    /// <summary>
+    /// Size of the written file in kilo bytes.
+    /// </summary>
+    /// <example>32</example>
+    public double SizeInBytes { get; private set; }
 
     internal Result(FileInfo info)
     {
         Path = info.FullName;
         SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
+        SizeInKiloBytes = Math.Round(info.Length / 1024d, 3);
+        SizeInBytes = info.Length;
     }
 }
