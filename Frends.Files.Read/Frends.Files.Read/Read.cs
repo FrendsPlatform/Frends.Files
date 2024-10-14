@@ -17,7 +17,7 @@ namespace Frends.Files.Read;
 public class Files
 {
     /// <summary>
-    /// Read file.
+    /// Reads a file from directory.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Read)
     /// </summary>
     /// <param name="input">Input parameters</param>
@@ -69,20 +69,15 @@ public class Files
 
     private static Encoding GetEncoding(FileEncoding optionsFileEncoding, bool optionsEnableBom, string optionsEncodingInString)
     {
-        switch (optionsFileEncoding)
+        return optionsFileEncoding switch
         {
-            case FileEncoding.Other:
-                return Encoding.GetEncoding(optionsEncodingInString);
-            case FileEncoding.ASCII:
-                return Encoding.ASCII;
-            case FileEncoding.ANSI:
-                return Encoding.Default;
-            case FileEncoding.UTF8:
-                return optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
-            case FileEncoding.Unicode:
-                return Encoding.Unicode;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            FileEncoding.Other => Encoding.GetEncoding(optionsEncodingInString),
+            FileEncoding.ASCII => Encoding.ASCII,
+            FileEncoding.Default => Encoding.Default,
+            FileEncoding.UTF8 => optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false),
+            FileEncoding.Windows1252 => Encoding.GetEncoding("windows-1252"),
+            FileEncoding.Unicode => Encoding.Unicode,
+            _ => throw new ArgumentOutOfRangeException(),
+        };
     }
 }

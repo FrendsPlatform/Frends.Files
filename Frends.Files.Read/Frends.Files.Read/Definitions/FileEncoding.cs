@@ -8,8 +8,9 @@ namespace Frends.Files.Read.Definitions;
 public enum FileEncoding
 {
     UTF8,
-    ANSI,
+    Default,
     ASCII,
     Unicode,
+    Windows1252,
     Other
 }

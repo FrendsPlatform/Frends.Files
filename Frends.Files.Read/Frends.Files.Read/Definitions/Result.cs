@@ -26,6 +26,18 @@ public class Result
     public double SizeInMegaBytes { get; private set; }
 
     /// <summary>
+    /// Size of the written file in kilo bytes.
+    /// </summary>
+    /// <example>32</example>
+    public double SizeInKiloBytes { get; private set; }
+
+    /// <summary>
+    /// Size of the written file in bytes.
+    /// </summary>
+    /// <example>32</example>
+    public double SizeInBytes { get; private set; }
+
+    /// <summary>
     /// DateTime when file was created.
     /// </summary>
     /// <example>2023-01-31T12:54:17.6431957+02:00</example>
@@ -42,6 +54,8 @@ public class Result
         Content = content;
         Path = info.FullName;
         SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
+        SizeInKiloBytes = Math.Round(info.Length / 1024d, 3);
+        SizeInBytes = info.Length;
         CreationTime = info.CreationTime;
         LastWriteTime = info.LastWriteTime;
     }
