@@ -79,7 +79,7 @@ public class Files
                 return Encoding.Default;
             case FileEncoding.UTF8:
                 return optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
-            case FileEncoding.Windows1252: 
+            case FileEncoding.Windows1252:
                 EncodingProvider provider = CodePagesEncodingProvider.Instance;
                 Encoding.RegisterProvider(provider);
                 return Encoding.GetEncoding(1252);
