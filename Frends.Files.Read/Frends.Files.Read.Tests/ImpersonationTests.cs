@@ -61,7 +61,7 @@ class ImpersonationTests
     }
 
     [Test]
-    public async Task FileMoveTestWithCredentials()
+    public async Task FileReadTestWithCredentials()
     {
         var result = await Files.Read(_input, _options);
 
@@ -70,7 +70,7 @@ class ImpersonationTests
     }
 
     [Test]
-    public void FileMoveTestWithUsernameWithoutDomain()
+    public void FileReadTestWithUsernameWithoutDomain()
     {
         var options = new Options
         {

@@ -17,7 +17,7 @@ namespace Frends.Files.Read;
 public class Files
 {
     /// <summary>
-    /// Read file.
+    /// Reads a file from directory.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Read)
     /// </summary>
     /// <param name="input">Input parameters</param>
@@ -75,10 +75,14 @@ public class Files
                 return Encoding.GetEncoding(optionsEncodingInString);
             case FileEncoding.ASCII:
                 return Encoding.ASCII;
-            case FileEncoding.ANSI:
+            case FileEncoding.Default:
                 return Encoding.Default;
             case FileEncoding.UTF8:
                 return optionsEnableBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
+            case FileEncoding.Windows1252:
+                EncodingProvider provider = CodePagesEncodingProvider.Instance;
+                Encoding.RegisterProvider(provider);
+                return Encoding.GetEncoding(1252);
             case FileEncoding.Unicode:
                 return Encoding.Unicode;
             default:
