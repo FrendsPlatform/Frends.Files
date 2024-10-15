@@ -15,19 +15,19 @@ public class Result
     public string Path { get; private set; }
 
     /// <summary>
-    /// Size of the written file in bytes.
+    /// Size of the written file in mega bytes.
     /// </summary>
     /// <example>32</example>
     public double SizeInMegaBytes { get; private set; }
 
     /// <summary>
-    /// Size of the written file in mega bytes.
+    /// Size of the written file in kilo bytes.
     /// </summary>
     /// <example>32</example>
     public double SizeInKiloBytes { get; private set; }
 
     /// <summary>
-    /// Size of the written file in kilo bytes.
+    /// Size of the written file in bytes.
     /// </summary>
     /// <example>32</example>
     public double SizeInBytes { get; private set; }
