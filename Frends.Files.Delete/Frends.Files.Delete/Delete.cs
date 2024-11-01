@@ -130,7 +130,15 @@ public class Files
             throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
 
         var matcher = new Matcher();
-        matcher.AddInclude(pattern);
+
+        var patterns = pattern.Split('|', StringSplitOptions.RemoveEmptyEntries);
+
+        // Add each pattern separately to the matcher
+        foreach (var individualPattern in patterns)
+        {
+            matcher.AddInclude(individualPattern.Trim());
+        }
+        
         var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
         return results;
     }
