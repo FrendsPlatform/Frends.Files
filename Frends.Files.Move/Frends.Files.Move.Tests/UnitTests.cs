@@ -50,6 +50,7 @@ public class UnitTests
 
         Assert.AreEqual(7, result.Files.Count);
         Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]
@@ -66,6 +67,7 @@ public class UnitTests
 
         Assert.AreEqual(7, result.Files.Count);
         Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]
@@ -85,6 +87,7 @@ public class UnitTests
 
         Assert.AreEqual(7, result.Files.Count);
         Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]
@@ -99,6 +102,8 @@ public class UnitTests
             }, _options, default);
 
         Assert.AreEqual(2, result.Files.Count);
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]
