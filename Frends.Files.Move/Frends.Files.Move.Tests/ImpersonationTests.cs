@@ -70,6 +70,8 @@ class ImpersonationTests
             _options, default);
 
         Assert.AreEqual(7, result.Files.Count);
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]

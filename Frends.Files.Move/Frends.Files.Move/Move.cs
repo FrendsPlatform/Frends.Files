@@ -29,10 +29,8 @@ public class Files
     /// <returns>Result object { List&lt;FileItem&gt; }</returns>
     public static async Task<Result> Move([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var result = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
+        var result = await ExecuteActionAsync(() => ExecuteMoveAsync(input, options, cancellationToken),
             options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
-
-        DeleteExistingFiles(result.Select(x => x.SourcePath));
 
         return new Result(result);
     }
@@ -54,7 +52,7 @@ public class Files
 
     }
 
-    private static async Task<List<FileItem>> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
+    private static async Task<List<FileItem>> ExecuteMoveAsync(Input input, Options options, CancellationToken cancellationToken)
     {
         var results = FindMatchingFiles(input.Directory, input.Pattern);
         var fileTransferEntries = GetFileTransferEntries(results.Files, input.Directory, input.TargetDirectory, options.PreserveDirectoryStructure);
@@ -107,6 +105,7 @@ public class Files
             throw;
         }
 
+        DeleteExistingFiles(fileResults.Select(x => x.SourcePath));
         return fileResults;
     }
 
