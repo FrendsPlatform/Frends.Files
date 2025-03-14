@@ -117,7 +117,7 @@ public class Files
         return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
-internal static PatternMatchingResult FindMatchingFiles(string directoryPath, string pattern)
+    internal static PatternMatchingResult FindMatchingFiles(string directoryPath, string pattern)
     {
         // Check the user can access the folder
         // This will return false if the path does not exist or you do not have read permissions.
