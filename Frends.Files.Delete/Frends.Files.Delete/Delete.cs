@@ -134,7 +134,7 @@ public class Files
         {
             string regexPattern = pattern.Substring(7);
 
-            var matchingFiles = Directory.GetFiles(directoryPath)
+            var matchingFiles = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories)
                 .Where(file => Regex.IsMatch(Path.GetFileName(file), regexPattern))
                 .Select(file => new FilePatternMatch(Path.GetFileName(file), Path.GetFileName(file)))
                 .ToList();
