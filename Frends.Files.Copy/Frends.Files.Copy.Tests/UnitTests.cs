@@ -160,4 +160,21 @@ public class UnitTests
         var ex = Assert.ThrowsAsync<IOException>(() => Files.Copy(input, _options, default));
         Assert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files copied.", ex.Message);
     }
+
+    [Test]
+    public async Task FileCopyWithRegexPattern()
+    {
+        var result = await Files.Copy(
+            new Input
+            {
+                Directory = _SourceDir,
+                Pattern = "<regex>^(?!prof).*_test.txt$",
+                TargetDirectory = _TargetDir
+            },
+            _options,
+            default
+        );
+
+        Assert.AreEqual(3, result.Files.Count);
+    }
 }

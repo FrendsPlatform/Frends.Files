@@ -12,6 +12,7 @@ using System.Security.Principal;
 using Microsoft.Win32.SafeHandles;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Frends.Files.Move;
 ///<summary>
@@ -132,10 +133,25 @@ public class Files
         if (!Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
 
-        var matcher = new Matcher();
-        matcher.AddInclude(pattern);
-        var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
-        return results;
+        if (pattern.StartsWith("<regex>"))
+        {
+            string regexPattern = pattern.Substring(7);
+
+            var matchingFiles = Directory.GetFiles(directoryPath)
+                .Where(file => Regex.IsMatch(Path.GetFileName(file), regexPattern))
+                .Select(file => new FilePatternMatch(Path.GetFileName(file), Path.GetFileName(file)))
+                .ToList();
+
+            return new PatternMatchingResult(matchingFiles);
+        }
+        else
+        {
+
+            var matcher = new Matcher();
+            matcher.AddInclude(pattern);
+            var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
+            return results;
+        }
     }
 
     private static Dictionary<string, string> GetFileTransferEntries(IEnumerable<FilePatternMatch> fileMatches, string sourceDirectory, string targetDirectory, bool preserveDirectoryStructure)
