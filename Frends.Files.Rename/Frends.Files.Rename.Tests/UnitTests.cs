@@ -1,5 +1,6 @@
 using Frends.Files.Rename.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 
@@ -40,7 +41,7 @@ public class UnitTests
     public void FilesRenameSimpleRename()
     {
         var result = Files.Rename(_input, _options);
-        Assert.IsTrue(File.Exists(result.Path));
+        ClassicAssert.IsTrue(File.Exists(result.Path));
     }
 
     [Test]
@@ -50,7 +51,7 @@ public class UnitTests
         File.WriteAllText(path, $"Test {path}");
 
         var ex = Assert.Throws<IOException>(() => Files.Rename(_input, _options));
-        Assert.AreEqual($"File already exists {Path.Combine(_FullPath, _input.NewFileName)}. No file renamed.", ex.Message);
+        ClassicAssert.AreEqual($"File already exists {Path.Combine(_FullPath, _input.NewFileName)}. No file renamed.", ex.Message);
     }
 
     [Test]
@@ -62,7 +63,7 @@ public class UnitTests
         _options.RenameBehaviour = RenameBehaviour.Overwrite;
 
         var result = Files.Rename(_input, _options);
-        Assert.IsTrue(File.Exists(result.Path));
+        ClassicAssert.IsTrue(File.Exists(result.Path));
     }
 
     [Test]
@@ -75,8 +76,8 @@ public class UnitTests
 
         var result = Files.Rename(_input, _options);
         var newFile = Path.GetFileNameWithoutExtension(_input.NewFileName) + "(1)" + Path.GetExtension(_input.NewFileName);
-        Assert.AreEqual(newFile, Path.GetFileName(result.Path));
-        Assert.IsTrue(File.Exists(Path.Combine(_FullPath, newFile)));
+        ClassicAssert.AreEqual(newFile, Path.GetFileName(result.Path));
+        ClassicAssert.IsTrue(File.Exists(Path.Combine(_FullPath, newFile)));
     }
 
     [Test]
@@ -86,6 +87,6 @@ public class UnitTests
         _input.NewFileName = "test.txt";
 
         var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Rename(_input, _options));
-        Assert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{Path.GetDirectoryName(_input.Path)}'.", ex.Message);
+        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{Path.GetDirectoryName(_input.Path)}'.", ex.Message);
     }
 }
