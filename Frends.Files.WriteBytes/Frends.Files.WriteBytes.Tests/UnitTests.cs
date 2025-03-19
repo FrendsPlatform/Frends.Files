@@ -1,5 +1,6 @@
 using Frends.Files.WriteBytes.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Text;
@@ -44,8 +45,8 @@ public class UnitTests
     public async Task FilesWriteSimpleWrite()
     {
         var result = await Files.WriteBytes(_input, _options);
-        Assert.IsTrue(File.Exists(result.Path));
-        Assert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
+        ClassicAssert.IsTrue(File.Exists(result.Path));
+        ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
 
     [Test]
@@ -59,8 +60,8 @@ public class UnitTests
             WriteBehaviour = WriteBehaviour.Overwrite,
         };
         var result = await Files.WriteBytes(_input, options);
-        Assert.IsTrue(File.Exists(result.Path));
-        Assert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
+        ClassicAssert.IsTrue(File.Exists(result.Path));
+        ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
 
     [Test]
@@ -75,8 +76,8 @@ public class UnitTests
         };
 
         var result = await Files.WriteBytes(_input, options);
-        Assert.IsTrue(File.Exists(result.Path));
-        Assert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
+        ClassicAssert.IsTrue(File.Exists(result.Path));
+        ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
 
     [Test]
@@ -85,7 +86,7 @@ public class UnitTests
         await Files.WriteBytes(_input, _options);
 
         var ex = Assert.ThrowsAsync<IOException>(() => Files.WriteBytes(_input, _options));
-        Assert.AreEqual($"File already exists: {_FullPath}.", ex.Message);
+        ClassicAssert.AreEqual($"File already exists: {_FullPath}.", ex.Message);
     }
 
     [Test]
@@ -94,6 +95,6 @@ public class UnitTests
         _input.Path = @"f:\path\not\exist";
 
         var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.WriteBytes(_input, _options));
-        Assert.AreEqual($"Could not find a part of the path '{_input.Path}'.", ex.Message);
+        ClassicAssert.AreEqual($"Could not find a part of the path '{_input.Path}'.", ex.Message);
     }
 }
