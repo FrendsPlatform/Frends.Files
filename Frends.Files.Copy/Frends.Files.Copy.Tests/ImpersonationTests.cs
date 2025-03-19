@@ -1,5 +1,6 @@
 ﻿using Frends.Files.Copy.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -70,8 +71,8 @@ class ImpersonationTests
             _input,
             _options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
     }
 
     [Test]
@@ -85,7 +86,7 @@ class ImpersonationTests
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Copy(_input, options, default));
-        Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
+        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex!.Message);
     }
 }
 
