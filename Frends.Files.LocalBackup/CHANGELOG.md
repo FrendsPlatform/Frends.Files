@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.1.4] - 2025-03-19
+### Changed
+- Update packages:
+  System.ComponentModel.Annotations  4.7.0  -> 5.0.0
+  coverlet.collector                 3.1.0  -> 6.0.4
+  Microsoft.NET.Test.Sdk             16.6.1 -> 17.13.0
+  MSTest.TestAdapter                 2.2.7  -> 3.8.3
+  MSTest.TestFramework               2.2.8  -> 3.8.3
+  nunit                              3.12.0 -> 4.3.2
+  NUnit3TestAdapter                  3.17.0 -> 5.0.0
+
 ## [2.1.3] - 2024-01-16
 ### Fixed
 - Fixed how FilePaths were handled. Changed casting to string[] to convert the object into a string[] by casting it first as a object[].
