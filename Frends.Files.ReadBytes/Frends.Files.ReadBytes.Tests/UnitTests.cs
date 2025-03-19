@@ -1,5 +1,6 @@
 ﻿using Frends.Files.ReadBytes.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ public class UnitTests
 
         var expectedData = File.ReadAllBytes(binaryTestFilePath);
 
-        Assert.AreEqual(expectedData.Length, result.ContentBytes.Length);
-        Assert.AreEqual(expectedData, result.ContentBytes);
+        ClassicAssert.AreEqual(expectedData.Length, result.ContentBytes.Length);
+        ClassicAssert.AreEqual(expectedData, result.ContentBytes);
     }
 }

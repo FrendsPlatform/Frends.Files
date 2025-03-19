@@ -1,5 +1,6 @@
 ﻿using Frends.Files.Rename.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 
@@ -61,7 +62,7 @@ class ImpersonationTests
     public void FileMoveTestWithCredentials()
     {
         var result = Files.Rename(_input, _options);
-        Assert.IsTrue(File.Exists(result.Path));
+        ClassicAssert.IsTrue(File.Exists(result.Path));
     }
 
     [Test]
@@ -75,6 +76,6 @@ class ImpersonationTests
         };
 
         var ex = Assert.Throws<ArgumentException>(() => Files.Rename(_input, options));
-        Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
+        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Frends.Files.Read.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Text;
@@ -32,7 +33,7 @@ public class UnitTests
         Directory.CreateDirectory(Path.Combine(_root, "folder"));
         File.WriteAllText(Path.Combine(_root, "folder", "test.txt"), fileContent);
         var result = await Files.Read(new Input() { Path = Path.Combine(_root, "folder/test.txt") }, _options);
-        Assert.AreEqual(fileContent, result.Content);
+        ClassicAssert.AreEqual(fileContent, result.Content);
 
         Directory.Delete(Path.Combine(_root, "folder"), true);
     }
@@ -48,6 +49,6 @@ public class UnitTests
         };
         var result = await Files.Read(new Input() { Path = Path.Combine(_root, "ansi.txt") }, options);
 
-        Assert.AreEqual(File.ReadAllText(result.Path, Encoding.GetEncoding("Latin1")), result.Content);
+        ClassicAssert.AreEqual(File.ReadAllText(result.Path, Encoding.GetEncoding("Latin1")), result.Content);
     }
 }
