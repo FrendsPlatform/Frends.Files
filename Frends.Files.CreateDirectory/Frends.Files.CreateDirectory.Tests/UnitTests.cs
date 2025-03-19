@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = NUnit.Framework.Assert;
 using Frends.Files.CreateDirectory.Definitions;
+using NUnit.Framework.Legacy;
 
 namespace Frends.Files.CreateDirectory.Tests;
 
@@ -28,7 +29,7 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
-        Assert.AreEqual(result.Path, newPath);
+        ClassicAssert.AreEqual(result.Path, newPath);
     }
 
     [TestMethod]
@@ -37,7 +38,7 @@ public class UnitTests
         _context.CreateFiles("temp/foo/bar/foo.txt");
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
-        Assert.AreEqual(result.Path, newPath);
+        ClassicAssert.AreEqual(result.Path, newPath);
     }
 
     [TestMethod]
@@ -46,7 +47,7 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" });
-        Assert.AreEqual("UserName field must be of format domain\\username was: domain/example", result);
+        ClassicAssert.AreEqual("UserName field must be of format domain\\username was: domain/example", result);
     }
 
     [TestMethod]
@@ -54,7 +55,7 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
-        Assert.AreEqual(result.Path, newPath);
+        ClassicAssert.AreEqual(result.Path, newPath);
     }
 
     [TestMethod]
@@ -62,6 +63,6 @@ public class UnitTests
     public void ThrowInputEmpty()
     {
         var result = Files.CreateDirectory(new Input() { }, new Options() { });
-        Assert.AreEqual("Directory cannot be empty.", result);
+        ClassicAssert.AreEqual("Directory cannot be empty.", result);
     }
 }
