@@ -2,6 +2,7 @@
 using System.IO;
 using Frends.Files.DeleteDirectory.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework.Legacy;
 using Assert = NUnit.Framework.Assert;
 
 namespace Frends.Files.DeleteDirectory.Tests;
@@ -28,7 +29,7 @@ public class UnitTests
     {
         _context.CreateFiles("temp/foo.txt");
         var ex = Assert.Throws<IOException>(() => Files.DeleteDirectory(new Input() { Directory = Path.Combine(_context.RootPath, "temp") }, new Options()));
-        Assert.IsTrue(ex.Message.Contains("The directory is not empty"));
+        ClassicAssert.IsTrue(ex.Message.Contains("The directory is not empty"));
     }
 
     [TestMethod]
@@ -36,8 +37,8 @@ public class UnitTests
     {
         _context.CreateFiles("temp/foo.txt", "temp/foo1.txt", "temp/foo2.txt", "temp/foo3.txt", "temp/foo4.txt", "temp/foo5.txt");
         var result = Files.DeleteDirectory(new Input() { Directory = Path.Combine(_context.RootPath, "temp") }, new Options() { DeleteRecursively = true });
-        Assert.AreEqual(result.Path, Path.Combine(_context.RootPath, "temp"));
-        Assert.IsTrue(result.Success);
+        ClassicAssert.AreEqual(result.Path, Path.Combine(_context.RootPath, "temp"));
+        ClassicAssert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -45,7 +46,7 @@ public class UnitTests
     {
         _context.CreateFiles("temp/foo.txt");
         var result = Files.DeleteDirectory(new Input() { Directory = Path.Combine(_context.RootPath, "temp/whatever") }, new Options());
-        Assert.IsFalse(result.Success, "The error flag should have been set");
+        ClassicAssert.IsFalse(result.Success, "The error flag should have been set");
     }
 
     [TestMethod]
@@ -53,8 +54,8 @@ public class UnitTests
     {
         _context.CreateFolder("temp");
         var result = Files.DeleteDirectory(new Input() { Directory = Path.Combine(_context.RootPath, "temp") }, new Options());
-        Assert.AreEqual(result.Path, Path.Combine(_context.RootPath, "temp"));
-        Assert.IsTrue(result.Success);
+        ClassicAssert.AreEqual(result.Path, Path.Combine(_context.RootPath, "temp"));
+        ClassicAssert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -62,8 +63,8 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.DeleteDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
-        Assert.AreEqual(result.Path, newPath);
-        Assert.IsFalse(result.Success);
+        ClassicAssert.AreEqual(result.Path, newPath);
+        ClassicAssert.IsFalse(result.Success);
     }
 
     [TestMethod]
@@ -72,7 +73,7 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.DeleteDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" });
-        Assert.AreEqual("UserName field must be of format domain\\username was: domain/example", result);
+        ClassicAssert.AreEqual("UserName field must be of format domain\\username was: domain/example", result);
     }
 
     [TestMethod]
@@ -80,8 +81,8 @@ public class UnitTests
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.DeleteDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
-        Assert.AreEqual(result.Path, newPath);
-        Assert.IsFalse(result.Success);
+        ClassicAssert.AreEqual(result.Path, newPath);
+        ClassicAssert.IsFalse(result.Success);
     }
 
     [TestMethod]
@@ -89,6 +90,6 @@ public class UnitTests
     public void ThrowInputEmpty()
     {
         var result = Files.DeleteDirectory(new Input() { }, new Options() { });
-        Assert.AreEqual("Directory cannot be empty.", result);
+        ClassicAssert.AreEqual("Directory cannot be empty.", result);
     }
 }
