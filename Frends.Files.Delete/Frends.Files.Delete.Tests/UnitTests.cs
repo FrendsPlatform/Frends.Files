@@ -2,6 +2,7 @@ using Frends.Files.Delete.Definitions;
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Frends.Files.Delete.Tests;
 
@@ -84,5 +85,21 @@ public class UnitTests
 
         var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Delete(input, _options, default));
         Assert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
+    }
+
+    [Test]
+    public void FileDeleteWithRegexPattern()
+    {
+        var result = Files.Delete(
+            new Input
+            {
+                Directory = _dir,
+                Pattern = "<regex>^(?!prof).*_test.txt$",
+            }, _options, default);
+
+        Assert.AreEqual(3, result.Files.Count);
+        Assert.IsFalse(File.Exists(result.Files[0].Path));
+        Assert.IsFalse(File.Exists(result.Files[1].Path));
+        Assert.IsFalse(File.Exists(result.Files[2].Path));
     }
 }
