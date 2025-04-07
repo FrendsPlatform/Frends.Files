@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.1] - 2025-03-19
+## [1.1.0] - 2025-03-19
 ### Changed
 - Update packages:
   Microsoft.Extensions.FileSystemGlobbing  7.0.0  -> 9.0.3

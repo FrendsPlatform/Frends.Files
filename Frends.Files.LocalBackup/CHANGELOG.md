@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.1.4] - 2025-03-19
+## [2.2.0] - 2025-03-19
 ### Changed
 - Update packages:
   System.ComponentModel.Annotations  4.7.0  -> 5.0.0

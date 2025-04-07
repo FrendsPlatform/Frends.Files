@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net6.0</TargetFrameworks>
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 		<Authors>Frends</Authors>
 		<Copyright>Frends</Copyright>
 		<Company>Frends</Company>
@@ -10,10 +10,10 @@
 		<PackageTags>Frends</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Description>Frends task to create a directory.</Description>
+		<Description>Frends task to delete a directory.</Description>
 		<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 		<RepositoryUrl>
-			https://github.com/FrendsPlatform/Frends.Files/tree/main/Frends.Files.CreateDirectory</RepositoryUrl>
+			https://github.com/FrendsPlatform/Frends.Files/tree/main/Frends.Files.DeleteDirectory</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
