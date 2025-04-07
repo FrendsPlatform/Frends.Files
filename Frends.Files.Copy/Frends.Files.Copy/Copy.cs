@@ -30,10 +30,10 @@ public class Files
     /// <returns>Object { List&lt;Object { string SourcePath, string TargetPath }&gt; Files } ]</returns>
     public static async Task<Result> Copy([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var result = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
+        var (files, failed) = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
             options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
 
-        return new Result(result);
+        return new Result(files, failed);
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -53,7 +53,7 @@ public class Files
 
     }
 
-    private static async Task<List<FileItem>> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
+    private static async Task<(List<FileItem>, List<FailedFileItem>)> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
     {
         var results = FindMatchingFiles(input.Directory, input.Pattern);
         var fileTransferEntries = GetFileTransferEntries(results.Files, input.Directory, input.TargetDirectory, options.PreserveDirectoryStructure);
@@ -64,7 +64,8 @@ public class Files
         if (options.CreateTargetDirectories)
             Directory.CreateDirectory(input.TargetDirectory);
 
-        var fileResults = new List<FileItem>();
+        var files = new List<FileItem>();
+        var failedFiles = new List<FailedFileItem>();
 
         foreach (var entry in fileTransferEntries)
         {
@@ -73,32 +74,40 @@ public class Files
             var sourceFilePath = entry.Key;
             var targetFilePath = entry.Value;
 
-            if (options.CreateTargetDirectories)
-                Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
-
-            switch (options.IfTargetFileExists)
+            try
             {
-                case FileExistsAction.Rename:
-                    targetFilePath = GetNonConflictingDestinationFilePath(sourceFilePath, targetFilePath);
-                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken);
-                    break;
+                if (options.CreateTargetDirectories)
+                    Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
 
-                case FileExistsAction.Overwrite:
-                    if (File.Exists(targetFilePath))
-                        File.Delete(targetFilePath);
-                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
-                    break;
+                switch (options.IfTargetFileExists)
+                {
+                    case FileExistsAction.Rename:
+                        targetFilePath = GetNonConflictingDestinationFilePath(sourceFilePath, targetFilePath);
+                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken);
+                        break;
 
-                case FileExistsAction.Throw:
-                    if (File.Exists(targetFilePath))
-                        throw new IOException($"File '{targetFilePath}' already exists. No files copied.");
-                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
-                    break;
+                    case FileExistsAction.Overwrite:
+                        if (File.Exists(targetFilePath))
+                            File.Delete(targetFilePath);
+                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
+                        break;
+
+                    case FileExistsAction.Throw:
+                        if (File.Exists(targetFilePath))
+                            throw new IOException($"File '{targetFilePath}' already exists. No files copied.");
+                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
+                        break;
+                }
+                files.Add(new FileItem(sourceFilePath, targetFilePath));
             }
-            fileResults.Add(new FileItem(sourceFilePath, targetFilePath));
+            catch (Exception ex)
+            {
+                if (options.ThrowErrorOnFail) throw;
+                failedFiles.Add(new FailedFileItem(sourceFilePath, ex));
+            }
         }
 
-        return fileResults;
+        return (files, failedFiles);
     }
 
     private static async Task CopyFileAsync(string source, string destination, CancellationToken cancellationToken)

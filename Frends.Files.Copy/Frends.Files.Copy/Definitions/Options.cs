@@ -56,5 +56,13 @@ public class Options
     /// </summary>
     /// <example>FileExistsAction.Overwrite</example>
     public FileExistsAction IfTargetFileExists { get; set; }
+
+    /// <summary>
+    /// Whether to throw an error on a failure to copy a file. 
+    /// If set to false, task will continue executing despite files failing to copy, otherwise execution will stop on the first failure.
+    /// </summary>
+    /// <example>false</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFail { get; set; }
 }
 
