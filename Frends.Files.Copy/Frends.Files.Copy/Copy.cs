@@ -169,10 +169,6 @@ public class Files
         var duplicateTargetPaths = GetDuplicateValues(filePaths);
         if (duplicateTargetPaths.Any())
             throw new IOException($"Multiple files written to {string.Join(", ", duplicateTargetPaths)}. The files would get overwritten. No files copied.");
-
-        foreach (var targetFilePath in filePaths)
-            if (File.Exists(targetFilePath))
-                throw new IOException($"File '{targetFilePath}' already exists. No files copied.");
     }
 
     private static IList<string> GetDuplicateValues(IEnumerable<string> values)
