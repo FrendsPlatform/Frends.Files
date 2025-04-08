@@ -58,11 +58,13 @@ public class Options
     public FileExistsAction IfTargetFileExists { get; set; }
 
     /// <summary>
-    /// Whether to throw an error on a failure to copy a file. 
-    /// If set to false, task will continue executing despite files failing to copy, otherwise execution will stop on the first failure.
+    /// Whether to throw an error on a failure to copy a file.
+    /// If set to false, task will continue executing despite files failing to copy, otherwise execution will stop at the first failure.
+    /// Note:
+    /// When set to false and <see cref="IfTargetFileExists"/> is set to <see cref="FileExistsAction.Throw"/>, the task will continue copying other files despite a failure. 
+    /// Behaviour of <see cref="FileExistsAction.Overwrite"/> and <see cref="FileExistsAction.Rename"/> will not be affected by this setting.
     /// </summary>
-    /// <example>false</example>
+    /// <example>true</example>
     [DefaultValue(true)]
     public bool ThrowErrorOnFail { get; set; }
 }
-
