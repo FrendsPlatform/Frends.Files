@@ -33,7 +33,8 @@ public class UnitTests
             UseGivenUserCredentialsForRemoteConnections = false,
             PreserveDirectoryStructure = true,
             CreateTargetDirectories = false,
-            IfTargetFileExists = FileExistsAction.Throw
+            IfTargetFileExists = FileExistsAction.Throw,
+            ThrowErrorOnFail = true,
         };
     }
 
@@ -176,5 +177,28 @@ public class UnitTests
         );
 
         Assert.AreEqual(3, result.Files.Count);
+    }
+
+    [Test]
+    public async Task FileCopyShouldNotThrowIfThrowErrorOnFailIsFalse()
+    {
+        var testFile = "prof_test.txt";
+
+        var options = new Options
+        {
+            UseGivenUserCredentialsForRemoteConnections = false,
+            PreserveDirectoryStructure = true,
+            CreateTargetDirectories = false,
+            IfTargetFileExists = FileExistsAction.Throw,
+            ThrowErrorOnFail = false,
+        };
+
+        File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
+
+        var result = await Files.Copy(_input, options, default);
+
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        Assert.AreEqual(1, result.FailedFiles.Count);
+        Assert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
     }
 }
