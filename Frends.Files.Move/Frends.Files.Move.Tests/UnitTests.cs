@@ -163,8 +163,8 @@ public class UnitTests
                 TargetDirectory = _TargetDir
             }, _options, default);
 
-        Assert.AreEqual(3, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
+        ClassicAssert.AreEqual(3, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 }

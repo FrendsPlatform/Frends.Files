@@ -98,9 +98,9 @@ public class UnitTests
                 Pattern = "<regex>^(?!prof).*_test.txt$",
             }, _options, default);
 
-        Assert.AreEqual(3, result.Files.Count);
-        Assert.IsFalse(File.Exists(result.Files[0].Path));
-        Assert.IsFalse(File.Exists(result.Files[1].Path));
-        Assert.IsFalse(File.Exists(result.Files[2].Path));
+        ClassicAssert.AreEqual(3, result.Files.Count);
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].Path));
+        ClassicAssert.IsFalse(File.Exists(result.Files[1].Path));
+        ClassicAssert.IsFalse(File.Exists(result.Files[2].Path));
     }
 }

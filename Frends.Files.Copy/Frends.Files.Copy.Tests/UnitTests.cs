@@ -177,7 +177,7 @@ public class UnitTests
             default
         );
 
-        Assert.AreEqual(3, result.Files.Count);
+        ClassicAssert.AreEqual(3, result.Files.Count);
     }
 
     [Test]
@@ -198,8 +198,8 @@ public class UnitTests
 
         var result = await Files.Copy(_input, options, default);
 
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        Assert.AreEqual(1, result.FailedFiles.Count);
-        Assert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.AreEqual(1, result.FailedFiles.Count);
+        ClassicAssert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
     }
 }
