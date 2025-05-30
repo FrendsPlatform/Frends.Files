@@ -34,7 +34,8 @@ public class UnitTests
             UseGivenUserCredentialsForRemoteConnections = false,
             PreserveDirectoryStructure = true,
             CreateTargetDirectories = false,
-            IfTargetFileExists = FileExistsAction.Throw
+            IfTargetFileExists = FileExistsAction.Throw,
+            ThrowErrorOnFail = true,
         };
     }
 
@@ -160,5 +161,45 @@ public class UnitTests
         File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
         var ex = Assert.ThrowsAsync<IOException>(() => Files.Copy(input, _options, default));
         ClassicAssert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files copied.", ex!.Message);
+    }
+
+    [Test]
+    public async Task FileCopyWithRegexPattern()
+    {
+        var result = await Files.Copy(
+            new Input
+            {
+                Directory = _SourceDir,
+                Pattern = "<regex>^(?!prof).*_test.txt$",
+                TargetDirectory = _TargetDir
+            },
+            _options,
+            default
+        );
+
+        Assert.AreEqual(3, result.Files.Count);
+    }
+
+    [Test]
+    public async Task FileCopyShouldNotThrowIfThrowErrorOnFailIsFalse()
+    {
+        var testFile = "prof_test.txt";
+
+        var options = new Options
+        {
+            UseGivenUserCredentialsForRemoteConnections = false,
+            PreserveDirectoryStructure = true,
+            CreateTargetDirectories = false,
+            IfTargetFileExists = FileExistsAction.Throw,
+            ThrowErrorOnFail = false,
+        };
+
+        File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
+
+        var result = await Files.Copy(_input, options, default);
+
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        Assert.AreEqual(1, result.FailedFiles.Count);
+        Assert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
     }
 }

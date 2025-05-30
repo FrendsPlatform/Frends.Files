@@ -12,6 +12,7 @@ using System.Security.Principal;
 using Microsoft.Win32.SafeHandles;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Frends.Files.Copy;
 ///<summary>
@@ -26,13 +27,13 @@ public class Files
     /// <param name="input">Input parameters for the Task.</param>
     /// <param name="options">Additional options for the Task.</param>
     /// <param name="cancellationToken">CancellationToken given by Frends.</param>
-    /// <returns>Object { List&lt;Object { string SourcePath, string TargetPath }&gt; Files } ]</returns>
+    /// <returns>Object { List&lt;Object { string SourcePath, string TargetPath }&gt; Files, List&lt;Object { string SourcePath, Exception Exception }&gt; FailedFiles }</returns>
     public static async Task<Result> Copy([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var result = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
+        var (files, failed) = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
             options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
 
-        return new Result(result);
+        return new Result(files, failed);
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -52,7 +53,7 @@ public class Files
 
     }
 
-    private static async Task<List<FileItem>> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
+    private static async Task<(List<FileItem>, List<FailedFileItem>)> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
     {
         var results = FindMatchingFiles(input.Directory, input.Pattern);
         var fileTransferEntries = GetFileTransferEntries(results.Files, input.Directory, input.TargetDirectory, options.PreserveDirectoryStructure);
@@ -63,7 +64,8 @@ public class Files
         if (options.CreateTargetDirectories)
             Directory.CreateDirectory(input.TargetDirectory);
 
-        var fileResults = new List<FileItem>();
+        var files = new List<FileItem>();
+        var failedFiles = new List<FailedFileItem>();
 
         foreach (var entry in fileTransferEntries)
         {
@@ -72,32 +74,40 @@ public class Files
             var sourceFilePath = entry.Key;
             var targetFilePath = entry.Value;
 
-            if (options.CreateTargetDirectories)
-                Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
-
-            switch (options.IfTargetFileExists)
+            try
             {
-                case FileExistsAction.Rename:
-                    targetFilePath = GetNonConflictingDestinationFilePath(sourceFilePath, targetFilePath);
-                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken);
-                    break;
+                if (options.CreateTargetDirectories)
+                    Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
 
-                case FileExistsAction.Overwrite:
-                    if (File.Exists(targetFilePath))
-                        File.Delete(targetFilePath);
-                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
-                    break;
+                switch (options.IfTargetFileExists)
+                {
+                    case FileExistsAction.Rename:
+                        targetFilePath = GetNonConflictingDestinationFilePath(sourceFilePath, targetFilePath);
+                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken);
+                        break;
 
-                case FileExistsAction.Throw:
-                    if (File.Exists(targetFilePath))
-                        throw new IOException($"File '{targetFilePath}' already exists. No files copied.");
-                    await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
-                    break;
+                    case FileExistsAction.Overwrite:
+                        if (File.Exists(targetFilePath))
+                            File.Delete(targetFilePath);
+                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
+                        break;
+
+                    case FileExistsAction.Throw:
+                        if (File.Exists(targetFilePath))
+                            throw new IOException($"File '{targetFilePath}' already exists. No files copied.");
+                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
+                        break;
+                }
+                files.Add(new FileItem(sourceFilePath, targetFilePath));
             }
-            fileResults.Add(new FileItem(sourceFilePath, targetFilePath));
+            catch (Exception ex)
+            {
+                if (options.ThrowErrorOnFail) throw;
+                failedFiles.Add(new FailedFileItem(sourceFilePath, ex));
+            }
         }
 
-        return fileResults;
+        return (files, failedFiles);
     }
 
     private static async Task CopyFileAsync(string source, string destination, CancellationToken cancellationToken)
@@ -123,10 +133,24 @@ public class Files
         if (!Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
 
-        var matcher = new Matcher();
-        matcher.AddInclude(pattern);
-        var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
-        return results;
+        if (pattern.StartsWith("<regex>"))
+        {
+            string regexPattern = pattern.Substring(7);
+
+            var matchingFiles = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories)
+                .Where(file => Regex.IsMatch(Path.GetFileName(file), regexPattern))
+                .Select(file => new FilePatternMatch(Path.GetFileName(file), Path.GetFileName(file)))
+                .ToList();
+
+            return new PatternMatchingResult(matchingFiles);
+        }
+        else
+        {
+            var matcher = new Matcher();
+            matcher.AddInclude(pattern);
+            var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
+            return results;
+        }
     }
 
     private static Dictionary<string, string> GetFileTransferEntries(IEnumerable<FilePatternMatch> fileMatches, string sourceDirectory, string targetDirectory, bool preserveDirectoryStructure)
@@ -145,10 +169,6 @@ public class Files
         var duplicateTargetPaths = GetDuplicateValues(filePaths);
         if (duplicateTargetPaths.Any())
             throw new IOException($"Multiple files written to {string.Join(", ", duplicateTargetPaths)}. The files would get overwritten. No files copied.");
-
-        foreach (var targetFilePath in filePaths)
-            if (File.Exists(targetFilePath))
-                throw new IOException($"File '{targetFilePath}' already exists. No files copied.");
     }
 
     private static IList<string> GetDuplicateValues(IEnumerable<string> values)

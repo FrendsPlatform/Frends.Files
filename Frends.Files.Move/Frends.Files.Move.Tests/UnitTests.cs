@@ -151,4 +151,20 @@ public class UnitTests
         var ex = Assert.ThrowsAsync<IOException>(() => Files.Move(input, _options, default));
         ClassicAssert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files moved.", ex.Message);
     }
+
+    [Test]
+    public async Task FileMoveWithRegexPattern()
+    {
+        var result = await Files.Move(
+            new Input
+            {
+                Directory = _SourceDir,
+                Pattern = "<regex>^(?!prof).*_test.txt$",
+                TargetDirectory = _TargetDir
+            }, _options, default);
+
+        Assert.AreEqual(3, result.Files.Count);
+        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
+    }
 }
