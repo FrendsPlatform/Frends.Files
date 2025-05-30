@@ -1,5 +1,6 @@
 using Frends.Files.Delete.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -41,8 +42,8 @@ public class UnitTests
     {
         var result = Files.Delete(_input, _options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsFalse(File.Exists(result.Files[0].Path));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].Path));
     }
 
     [Test]
@@ -55,8 +56,8 @@ public class UnitTests
                 Pattern = "Test1*"
             }, _options, default);
 
-        Assert.AreEqual(2, result.Files.Count);
-        Assert.IsFalse(File.Exists(result.Files[0].Path));
+        ClassicAssert.AreEqual(2, result.Files.Count);
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].Path));
     }
 
     [Test]
@@ -71,7 +72,7 @@ public class UnitTests
             _options,
             default);
 
-        Assert.IsEmpty(result.Files);
+        ClassicAssert.IsEmpty(result.Files);
     }
 
     [Test]
@@ -84,7 +85,7 @@ public class UnitTests
         };
 
         var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Delete(input, _options, default));
-        Assert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
+        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
     }
 
     [Test]
@@ -97,9 +98,9 @@ public class UnitTests
                 Pattern = "<regex>^(?!prof).*_test.txt$",
             }, _options, default);
 
-        Assert.AreEqual(3, result.Files.Count);
-        Assert.IsFalse(File.Exists(result.Files[0].Path));
-        Assert.IsFalse(File.Exists(result.Files[1].Path));
-        Assert.IsFalse(File.Exists(result.Files[2].Path));
+        ClassicAssert.AreEqual(3, result.Files.Count);
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].Path));
+        ClassicAssert.IsFalse(File.Exists(result.Files[1].Path));
+        ClassicAssert.IsFalse(File.Exists(result.Files[2].Path));
     }
 }

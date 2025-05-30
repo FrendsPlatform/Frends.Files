@@ -1,5 +1,6 @@
 ﻿using Frends.Files.Delete.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 
@@ -64,8 +65,8 @@ class ImpersonationTests
             _input,
             _options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsFalse(File.Exists(result.Files[0].Path));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].Path));
     }
 
     [Test]
@@ -79,6 +80,6 @@ class ImpersonationTests
         };
 
         var ex = Assert.Throws<ArgumentException>(() => Files.Delete(_input, options, default));
-        Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
+        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Frends.Files.Write.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -64,8 +65,8 @@ class ImpersonationTests
     {
         var result = await Files.Write(_input, _options);
 
-        Assert.IsTrue(File.Exists(_FullPath));
-        Assert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
+        ClassicAssert.IsTrue(File.Exists(_FullPath));
+        ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
 
     [Test]
@@ -79,6 +80,6 @@ class ImpersonationTests
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Write(_input, options));
-        Assert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
+        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
     }
 }

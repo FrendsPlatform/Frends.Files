@@ -1,5 +1,6 @@
 using Frends.Files.Copy.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -49,8 +50,8 @@ public class UnitTests
     {
         var result = await Files.Copy(_input, _options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
     }
 
     [Test]
@@ -65,8 +66,8 @@ public class UnitTests
         };
         var result = await Files.Copy(_input, options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
     }
 
     [Test]
@@ -84,8 +85,8 @@ public class UnitTests
 
         var result = await Files.Copy(_input, options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
     }
 
     [Test]
@@ -99,7 +100,7 @@ public class UnitTests
                 TargetDirectory = _TargetDir
             }, _options, default);
 
-        Assert.AreEqual(2, result.Files.Count);
+        ClassicAssert.AreEqual(2, result.Files.Count);
     }
 
     [Test]
@@ -115,7 +116,7 @@ public class UnitTests
             _options,
             default);
 
-        Assert.IsEmpty(result.Files);
+        ClassicAssert.IsEmpty(result.Files);
     }
 
     [Test]
@@ -129,7 +130,7 @@ public class UnitTests
         };
 
         var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Copy(input, _options, default));
-        Assert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
+        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex!.Message);
     }
 
     [Test]
@@ -144,7 +145,7 @@ public class UnitTests
         };
         File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
         var ex = Assert.ThrowsAsync<IOException>(() => Files.Copy(input, _options, default));
-        Assert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files copied.", ex.Message);
+        ClassicAssert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files copied.", ex!.Message);
     }
 
     [Test]
@@ -159,7 +160,7 @@ public class UnitTests
         };
         File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
         var ex = Assert.ThrowsAsync<IOException>(() => Files.Copy(input, _options, default));
-        Assert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files copied.", ex.Message);
+        ClassicAssert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files copied.", ex!.Message);
     }
 
     [Test]
@@ -176,7 +177,7 @@ public class UnitTests
             default
         );
 
-        Assert.AreEqual(3, result.Files.Count);
+        ClassicAssert.AreEqual(3, result.Files.Count);
     }
 
     [Test]
@@ -197,8 +198,8 @@ public class UnitTests
 
         var result = await Files.Copy(_input, options, default);
 
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        Assert.AreEqual(1, result.FailedFiles.Count);
-        Assert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.AreEqual(1, result.FailedFiles.Count);
+        ClassicAssert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
     }
 }

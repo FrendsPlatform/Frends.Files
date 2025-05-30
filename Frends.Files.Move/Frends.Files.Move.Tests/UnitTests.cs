@@ -1,5 +1,6 @@
 using Frends.Files.Move.Definitions;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -48,9 +49,9 @@ public class UnitTests
     {
         var result = await Files.Move(_input, _options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]
@@ -65,9 +66,9 @@ public class UnitTests
         };
         var result = await Files.Move(_input, options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]
@@ -85,9 +86,9 @@ public class UnitTests
 
         var result = await Files.Move(_input, options, default);
 
-        Assert.AreEqual(7, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
+        ClassicAssert.AreEqual(7, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]
@@ -101,9 +102,9 @@ public class UnitTests
                 TargetDirectory = _TargetDir
             }, _options, default);
 
-        Assert.AreEqual(2, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
+        ClassicAssert.AreEqual(2, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 
     [Test]
@@ -119,7 +120,7 @@ public class UnitTests
             _options,
             default);
 
-        Assert.IsEmpty(result.Files);
+        ClassicAssert.IsEmpty(result.Files);
     }
 
     [Test]
@@ -133,7 +134,7 @@ public class UnitTests
         };
 
         var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Move(input, _options, default));
-        Assert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
+        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
     }
 
     [Test]
@@ -148,7 +149,7 @@ public class UnitTests
         };
         File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
         var ex = Assert.ThrowsAsync<IOException>(() => Files.Move(input, _options, default));
-        Assert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files moved.", ex.Message);
+        ClassicAssert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files moved.", ex.Message);
     }
 
     [Test]
@@ -162,8 +163,8 @@ public class UnitTests
                 TargetDirectory = _TargetDir
             }, _options, default);
 
-        Assert.AreEqual(3, result.Files.Count);
-        Assert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        Assert.IsFalse(File.Exists(result.Files[0].SourcePath));
+        ClassicAssert.AreEqual(3, result.Files.Count);
+        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
+        ClassicAssert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
 }
