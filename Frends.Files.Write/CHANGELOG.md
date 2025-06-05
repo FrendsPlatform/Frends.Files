@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0] - 2025-06-05
+### Fixed
+- Resolve issue with an unsupported library in .net 6.
+### Changed
+- Downgrade package System.Text.Encoding.CodePages from 9.0.3 to 8.0.0
+- Remove unused package Microsoft.Extensions.FileSystemGlobbing
+
 ## [1.2.0] - 2025-03-19
 ### Changed
 - Update packages:
