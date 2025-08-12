@@ -30,16 +30,16 @@ public class Files
     /// <returns>Result object { List&lt;FileItem&gt; }</returns>
     public static async Task<Result> Move([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var result = await ExecuteActionAsync(() => ExecuteMoveAsync(input, options, cancellationToken),
+        var result = await ExecuteAction(() => ExecuteMoveAsync(input, options, cancellationToken),
             options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
 
         return new Result(result);
     }
 
-    private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
+    private static Result ExecuteAction<Result>(Func<Result> action, bool useGivenCredentials, string username, string password)
     {
         if (!useGivenCredentials)
-            return await action().ConfigureAwait(false);
+            return action();
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
@@ -49,7 +49,7 @@ public class Files
         UserCredentials credentials = new UserCredentials(domain, user, password);
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
-        return await WindowsIdentity.RunImpersonated(userHandle, async () => await action().ConfigureAwait(false));
+        return WindowsIdentity.RunImpersonated(userHandle, () => action());
 
     }
 
