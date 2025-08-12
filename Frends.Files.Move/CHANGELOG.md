@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.0] - 2025-08-12
+### Changed
+- Refactor ExecuteAction to run synchronously for impersonated calls.
+
 ## [1.3.0] - 2025-03-19
 ### Changed
 - Update packages:
