@@ -36,7 +36,7 @@ public class Files
         return new Result(result);
     }
 
-    private static Result ExecuteAction<Result>(Func<Result> action, bool useGivenCredentials, string username, string password)
+    private static TResult ExecuteAction<TResult>(Func<TResult> action, bool useGivenCredentials, string username, string password)
     {
         if (!useGivenCredentials)
             return action();
