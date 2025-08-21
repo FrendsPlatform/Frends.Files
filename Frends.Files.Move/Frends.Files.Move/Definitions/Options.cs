@@ -9,20 +9,21 @@ namespace Frends.Files.Move.Definitions;
 public class Options
 {
     /// <summary>
-    /// If set, allows you to give the user credentials to use to delete files on remote hosts.
-    /// If not set, the agent service user credentials will be used.
-    /// Note: This feature is only possible with Windows agents.
+    /// Specifies which path (source or target) is remote to determine when to use 
+    /// remote credentials and Windows impersonation for file operations.
+    /// This allows the method to handle local-to-remote, remote-to-local, 
+    /// or local-to-local file copy operations appropriately.
     /// </summary>
-    /// <example>true</example>
-    [DefaultValue(false)]
-    public bool UseGivenUserCredentialsForRemoteConnections { get; set; }
+    /// <example>RemotePathType.Source</example>
+    [DefaultValue(RemotePathType.None)]
+    public RemotePathType RemotePath { get; set; }
 
     /// <summary>
     /// This needs to be of format domain\username
     /// </summary>
     /// <example>domain\username</example>
     [DefaultValue("\"domain\\username\"")]
-    [UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
+    [UIHint(nameof(RemotePath), "", RemotePathType.Source, RemotePathType.Target)]
     public string UserName { get; set; }
 
     /// <summary>
@@ -30,7 +31,7 @@ public class Options
     /// </summary>
     /// <example>testpwd</example>
     [PasswordPropertyText]
-    [UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
+    [UIHint(nameof(RemotePath), "", RemotePathType.Source, RemotePathType.Target)]
     public string Password { get; set; }
 
     /// <summary>

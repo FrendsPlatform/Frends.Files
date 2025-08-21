@@ -31,7 +31,7 @@ public class UnitTests
 
         _options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = false,
+            RemotePath = RemotePathType.None,
             CreateTargetDirectories = false,
             IfTargetFileExists = FileExistsAction.Throw,
             PreserveDirectoryStructure = true,
@@ -59,7 +59,7 @@ public class UnitTests
     {
         var options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = false,
+            RemotePath = RemotePathType.None,
             CreateTargetDirectories = false,
             IfTargetFileExists = FileExistsAction.Throw,
             PreserveDirectoryStructure = true
@@ -76,7 +76,7 @@ public class UnitTests
     {
         var options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = false,
+            RemotePath = RemotePathType.None,
             CreateTargetDirectories = true,
             IfTargetFileExists = FileExistsAction.Throw,
             PreserveDirectoryStructure = true
