@@ -1,0 +1,60 @@
+# docker-compose-windows.yml
+version: '3.8'
+services:
+  windows-fileserver:
+    image: mcr.microsoft.com/windows/servercore:ltsc2022
+    container_name: windows_fileserver
+    hostname: fileserver
+    volumes:
+      - fileserver_data:C:\SharedData
+    networks:
+      - test-net
+    command: 
+      - powershell
+      - -Command
+      - |
+        Write-Host 'Starting Windows file server setup...'
+        
+        # Create test user
+        net user testfileuser Password123 /add
+        net localgroup Administrators testfileuser /add
+        
+        # Create shared folder
+        New-Item -Path 'C:\TestShare' -ItemType Directory -Force
+        
+        # Use net share instead of New-SmbShare - this works without Server service!
+        net share testshare=C:\TestShare /GRANT:testfileuser,FULL /GRANT:Administrator,FULL
+        
+        # Set NTFS permissions
+        icacls 'C:\TestShare' /grant 'testfileuser:(OI)(CI)F' /T
+        
+        # Create test files
+        'Test content 1' | Out-File 'C:\TestShare\test1.txt' -Encoding UTF8
+        'Test content 2' | Out-File 'C:\TestShare\test2.txt' -Encoding UTF8
+        'Test content 3' | Out-File 'C:\TestShare\test3.txt' -Encoding UTF8
+        
+        Write-Host 'Setup complete - container ready'
+        
+        # Show share status
+        net share
+        
+        # Keep container running
+        while ($$true) { 
+          Start-Sleep 60
+        }
+    healthcheck:
+      test: ["CMD", "powershell", "-Command", "net share testshare"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
+    ports:
+      - "1445:445"
+
+volumes:
+  fileserver_data:
+    driver: local
+
+networks:
+  test-net:
+    driver: nat

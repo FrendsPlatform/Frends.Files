@@ -30,39 +30,49 @@ public class Files
     /// <returns>Result object { List&lt;FileItem&gt; }</returns>
     public static async Task<Result> Move([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var result = await ExecuteAction(() => ExecuteMoveAsync(input, options, cancellationToken),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
-
+        var result = await ExecuteMoveAsync(input, options, cancellationToken);
         return new Result(result);
-    }
-
-    private static TResult ExecuteAction<TResult>(Func<TResult> action, bool useGivenCredentials, string username, string password)
-    {
-        if (!useGivenCredentials)
-            return action();
-
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
-
-        var (domain, user) = GetDomainAndUsername(username);
-
-        UserCredentials credentials = new UserCredentials(domain, user, password);
-        using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
-
-        return WindowsIdentity.RunImpersonated(userHandle, () => action());
-
     }
 
     private static async Task<List<FileItem>> ExecuteMoveAsync(Input input, Options options, CancellationToken cancellationToken)
     {
-        var results = FindMatchingFiles(input.Directory, input.Pattern);
+        bool needsImpersonationForDiscovery = options.RemotePath == RemotePathType.Source;
+
+        PatternMatchingResult results;
+
+        if (needsImpersonationForDiscovery)
+        {
+            // Find files with impersonation (remote source)
+            results = await FindMatchingFilesWithImpersonation(input.Directory, input.Pattern, options);
+        }
+        else
+        {
+            // Find files with local credentials (local source)
+            results = FindMatchingFiles(input.Directory, input.Pattern);
+        }
+
         var fileTransferEntries = GetFileTransferEntries(results.Files, input.Directory, input.TargetDirectory, options.PreserveDirectoryStructure);
 
         if (options.IfTargetFileExists == FileExistsAction.Throw)
             AssertNoTargetFileConflicts(fileTransferEntries.Values);
 
         if (options.CreateTargetDirectories)
-            Directory.CreateDirectory(input.TargetDirectory);
+        {
+            bool needsImpersonationForTargetDir = options.RemotePath == RemotePathType.Target;
+
+            if (needsImpersonationForTargetDir && !string.IsNullOrEmpty(options.UserName))
+            {
+                await ExecuteWithImpersonation(options, async () =>
+                {
+                    Directory.CreateDirectory(input.TargetDirectory);
+                    await Task.CompletedTask;
+                });
+            }
+            else
+            {
+                Directory.CreateDirectory(input.TargetDirectory);
+            }
+        }
 
         var fileResults = new List<FileItem>();
         try
@@ -75,40 +85,122 @@ public class Files
                 var targetFilePath = entry.Value;
 
                 if (options.CreateTargetDirectories)
-                    Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
+                {
+                    var targetDir = Path.GetDirectoryName(targetFilePath);
+                    bool needsImpersonationForFileDir = options.RemotePath == RemotePathType.Target;
+
+                    if (needsImpersonationForFileDir && !string.IsNullOrEmpty(options.UserName))
+                    {
+                        await ExecuteWithImpersonation(options, async () =>
+                        {
+                            Directory.CreateDirectory(targetDir);
+                            await Task.CompletedTask;
+                        });
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(targetDir);
+                    }
+                }
 
                 switch (options.IfTargetFileExists)
                 {
                     case FileExistsAction.Rename:
                         targetFilePath = GetNonConflictingDestinationFilePath(sourceFilePath, targetFilePath);
-                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken);
                         break;
-
                     case FileExistsAction.Overwrite:
-                        if (File.Exists(targetFilePath))
-                            File.Delete(targetFilePath);
-                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
-                        break;
+                        bool needsImpersonationForDelete = options.RemotePath == RemotePathType.Target;
 
-                    case FileExistsAction.Throw:
                         if (File.Exists(targetFilePath))
+                        {
+                            if (needsImpersonationForDelete && !string.IsNullOrEmpty(options.UserName))
+                            {
+                                await ExecuteWithImpersonation(options, async () =>
+                                {
+                                    File.Delete(targetFilePath);
+                                    await Task.CompletedTask;
+                                });
+                            }
+                            else
+                            {
+                                File.Delete(targetFilePath);
+                            }
+                        }
+                        break;
+                    case FileExistsAction.Throw:
+
+                        bool needsImpersonationForCheck = options.RemotePath == RemotePathType.Target;
+
+                        bool fileExists;
+                        if (needsImpersonationForCheck && !string.IsNullOrEmpty(options.UserName))
+                        {
+                            fileExists = false;
+                            await ExecuteWithImpersonation(options, async () =>
+                            {
+                                fileExists = File.Exists(targetFilePath);
+                                await Task.CompletedTask;
+                            });
+                        }
+                        else
+                        {
+                            fileExists = File.Exists(targetFilePath);
+                        }
+
+                        if (fileExists)
                             throw new IOException($"File '{targetFilePath}' already exists. No files moved.");
-                        await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
                         break;
                 }
+
+                // Copy according to remote mode
+                await ExecuteCopyAsync(sourceFilePath, targetFilePath, options, cancellationToken);
+
                 fileResults.Add(new FileItem(sourceFilePath, targetFilePath));
             }
         }
         catch (Exception)
         {
-            //Delete the target files that were already moved before a file that exists breaks the move command
-            DeleteExistingFiles(fileResults.Select(x => x.TargetPath));
+            // Clean up target files - also needs proper credentials
+            await DeleteExistingFilesWithCredentials(fileResults.Select(x => x.TargetPath), options, isTarget: true);
             throw;
         }
 
-        DeleteExistingFiles(fileResults.Select(x => x.SourcePath));
+        // Delete source files - also needs proper credentials  
+        await DeleteExistingFilesWithCredentials(fileResults.Select(x => x.SourcePath), options, isTarget: false);
         return fileResults;
     }
+
+    private static async Task<PatternMatchingResult> FindMatchingFilesWithImpersonation(string directoryPath, string pattern, Options options)
+    {
+        PatternMatchingResult results = null;
+
+        await ExecuteWithImpersonation(options, async () =>
+        {
+            results = FindMatchingFiles(directoryPath, pattern);
+            await Task.CompletedTask;
+        });
+
+        return results;
+    }
+
+    private static async Task DeleteExistingFilesWithCredentials(IEnumerable<string> filePaths, Options options, bool isTarget)
+    {
+        bool needsImpersonation = (isTarget && options.RemotePath == RemotePathType.Target) ||
+                                 (!isTarget && (options.RemotePath == RemotePathType.Source));
+
+        if (needsImpersonation && !string.IsNullOrEmpty(options.UserName))
+        {
+            await ExecuteWithImpersonation(options, async () =>
+            {
+                DeleteExistingFiles(filePaths);
+                await Task.CompletedTask;
+            });
+        }
+        else
+        {
+            DeleteExistingFiles(filePaths);
+        }
+    }
+
 
     private static async Task CopyFileAsync(string source, string destination, CancellationToken cancellationToken)
     {
@@ -131,7 +223,19 @@ public class Files
         // Check the user can access the folder
         // This will return false if the path does not exist or you do not have read permissions.
         if (!Directory.Exists(directoryPath))
+        {
+            try
+            {
+                var entries = Directory.GetFileSystemEntries(directoryPath);
+                Console.WriteLine($"[DEBUG] GetFileSystemEntries succeeded, found {entries.Length} items");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DEBUG] GetFileSystemEntries failed: {ex.Message}");
+            }
+
             throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
+        }
 
         if (pattern.StartsWith("<regex>"))
         {
@@ -198,5 +302,57 @@ public class Files
         }
 
         return destFilePath;
+    }
+
+    private static async Task ExecuteCopyAsync(string source, string target, Options options, CancellationToken cancellationToken)
+    {
+        switch (options.RemotePath)
+        {
+            case RemotePathType.None:
+                // Local → Local
+                await CopyFileAsync(source, target, cancellationToken);
+                break;
+
+            case RemotePathType.Target:
+                // Local → Remote
+                {
+                    await using var sourceStream = File.Open(source, FileMode.Open, FileAccess.Read);
+                    await ExecuteWithImpersonation(options, async () =>
+                    {
+                        await using var targetStream = File.Open(target, FileMode.CreateNew, FileAccess.Write);
+                        await sourceStream.CopyToAsync(targetStream, 81920, cancellationToken);
+                    });
+                    break;
+                }
+
+            case RemotePathType.Source:
+                {
+                    // Remote → Local
+                    await using var localTargetStream = File.Open(target, FileMode.CreateNew, FileAccess.Write);
+
+                    await ExecuteWithImpersonation(options, async () =>
+                    {
+                        await using var remoteSourceStream = File.Open(source, FileMode.Open, FileAccess.Read);
+                        await remoteSourceStream.CopyToAsync(localTargetStream, 81920, cancellationToken);
+                    });
+
+                    break;
+                }
+
+            default:
+                throw new NotSupportedException($"RemotePathType {options.RemotePath} not supported.");
+        }
+    }
+
+    public static async Task ExecuteWithImpersonation(Options options, Func<Task> action)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            throw new PlatformNotSupportedException("Impersonation is only supported on Windows.");
+
+        var (domain, user) = GetDomainAndUsername(options.UserName);
+        UserCredentials credentials = new UserCredentials(domain, user, options.Password);
+
+        using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
+        await WindowsIdentity.RunImpersonated(userHandle, action);
     }
 }

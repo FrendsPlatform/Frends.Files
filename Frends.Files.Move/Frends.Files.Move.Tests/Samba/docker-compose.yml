@@ -1,0 +1,41 @@
+# docker-compose.yml
+version: '3.8'
+services:
+  samba:
+    image: dperson/samba:latest
+    container_name: impersonation_test_samba
+    hostname: samba-test
+    ports:
+      - "1445:445"  # Map to port 1445 to avoid conflicts
+    volumes:
+      - samba_data:/mount/testshare  # Use named volume instead of tmpfs
+    environment:
+      - USER=testuser;password123!
+      - SHARE=testshare;/mount/testshare;yes;no;no;testuser;testuser;testuser
+      - SMB=true
+      - NMBD=true
+      - WORKGROUP=WORKGROUP
+    command: >
+      sh -c "
+      /usr/bin/samba.sh -u 'testuser;password123!' -s 'testshare;/mount/testshare;yes;no;no;testuser' -p &&
+      chmod 777 /mount/testshare &&
+      chown testuser:testuser /mount/testshare &&
+      tail -f /dev/null
+      "
+    restart: unless-stopped
+    networks:
+      - test-net
+    healthcheck:
+      test: ["CMD", "smbclient", "-L", "//localhost/", "-U", "testuser%password123!", "--option=client min protocol=SMB2"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  samba_data:
+    driver: local
+
+networks:
+  test-net:
+    driver: bridge

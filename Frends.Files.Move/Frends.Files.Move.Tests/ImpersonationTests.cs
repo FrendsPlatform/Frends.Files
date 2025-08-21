@@ -38,7 +38,7 @@ class ImpersonationTests
 
         _options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = true,
+            //UseGivenUserCredentialsForRemoteConnections = true,
             UserName = $"{_domain}\\{_name}",
             Password = _pwd
         };
@@ -80,7 +80,7 @@ class ImpersonationTests
     {
         var options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = true,
+            //UseGivenUserCredentialsForRemoteConnections = true,
             UserName = "test",
             Password = _pwd
         };
