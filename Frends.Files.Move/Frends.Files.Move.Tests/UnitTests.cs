@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -11,27 +12,28 @@ namespace Frends.Files.Move.Tests;
 [TestFixture]
 public class UnitTests
 {
-    private static readonly string _SourceDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"));
-    private static readonly string _TargetDir = Path.Combine(_SourceDir, "destination");
-    private Input _input = new Input();
-    private Options _options = new Options();
+    private static readonly string SourceDir =
+        Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/"));
+
+    private static readonly string TargetDir = Path.Combine(SourceDir, "destination");
+    private Input _input = new();
+    private Options _options = new();
 
     [SetUp]
     public void Setup()
     {
-        Helper.CreateTestFiles(_SourceDir);
-        Directory.CreateDirectory(_TargetDir);
+        Helper.CreateTestFiles(SourceDir);
+        Directory.CreateDirectory(TargetDir);
 
         _input = new Input
         {
-            Directory = _SourceDir,
+            SourceDirectory = SourceDir,
             Pattern = "*",
-            TargetDirectory = _TargetDir
+            TargetDirectory = TargetDir
         };
 
         _options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = false,
             CreateTargetDirectories = false,
             IfTargetFileExists = FileExistsAction.Throw,
             PreserveDirectoryStructure = true,
@@ -41,13 +43,13 @@ public class UnitTests
     [TearDown]
     public void TearDown()
     {
-        Helper.DeleteTestFolder(_SourceDir);
+        Helper.DeleteTestFolder(SourceDir);
     }
 
     [Test]
     public async Task FileMoveAll()
     {
-        var result = await Files.Move(_input, _options, default);
+        var result = await Files.Move(_input, new Connection(), _options, CancellationToken.None);
 
         ClassicAssert.AreEqual(7, result.Files.Count);
         ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
@@ -59,12 +61,11 @@ public class UnitTests
     {
         var options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = false,
             CreateTargetDirectories = false,
             IfTargetFileExists = FileExistsAction.Throw,
             PreserveDirectoryStructure = true
         };
-        var result = await Files.Move(_input, options, default);
+        var result = await Files.Move(_input, new Connection(), options, CancellationToken.None);
 
         ClassicAssert.AreEqual(7, result.Files.Count);
         ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
@@ -76,15 +77,14 @@ public class UnitTests
     {
         var options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = false,
             CreateTargetDirectories = true,
             IfTargetFileExists = FileExistsAction.Throw,
             PreserveDirectoryStructure = true
         };
 
-        Directory.Delete(_TargetDir, true);
+        Directory.Delete(TargetDir, true);
 
-        var result = await Files.Move(_input, options, default);
+        var result = await Files.Move(_input, new Connection(), options, CancellationToken.None);
 
         ClassicAssert.AreEqual(7, result.Files.Count);
         ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
@@ -97,10 +97,10 @@ public class UnitTests
         var result = await Files.Move(
             new Input
             {
-                Directory = _SourceDir,
+                SourceDirectory = SourceDir,
                 Pattern = "Test1*",
-                TargetDirectory = _TargetDir
-            }, _options, default);
+                TargetDirectory = TargetDir
+            }, new Connection(), _options, CancellationToken.None);
 
         ClassicAssert.AreEqual(2, result.Files.Count);
         ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
@@ -111,14 +111,14 @@ public class UnitTests
     public async Task FileMoveShouldNotThrowIfNoFilesFound()
     {
         var result = await Files.Move(
-            new Input()
+            new Input
             {
-                Directory = _SourceDir,
+                SourceDirectory = SourceDir,
                 Pattern = "**/*.unknown",
-                TargetDirectory = _TargetDir
-            },
+                TargetDirectory = TargetDir
+            }, new Connection(),
             _options,
-            default);
+            CancellationToken.None);
 
         ClassicAssert.IsEmpty(result.Files);
     }
@@ -126,30 +126,45 @@ public class UnitTests
     [Test]
     public void FileMoveShouldThrowIfDirectoryIsNotFound()
     {
-        var input = new Input()
+        var input = new Input
         {
-            Directory = @"F:\directory\that\dont\exists",
+            SourceDirectory = @"F:\directory\that\dont\exists",
             Pattern = "**/*.unknown",
-            TargetDirectory = _TargetDir
+            TargetDirectory = TargetDir
         };
 
-        var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Move(input, _options, default));
-        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
+        var options = new Options
+        {
+            ThrowErrorOnFailure = true,
+        };
+
+        var ex = Assert.ThrowsAsync<Exception>(() =>
+            Files.Move(input, new Connection(), options, CancellationToken.None));
+        ClassicAssert.AreEqual(
+            $"Directory does not exist or you do not have read access. Tried to access directory '{input.SourceDirectory}'",
+            ex?.Message);
     }
 
     [Test]
     public void FileMoveShouldThrowIfFileExists()
     {
-        var testFile = "Test1.txt";
-        var input = new Input()
+        const string testFile = "Test1.txt";
+        var input = new Input
         {
-            Directory = _SourceDir,
+            SourceDirectory = SourceDir,
             Pattern = testFile,
-            TargetDirectory = _TargetDir
+            TargetDirectory = TargetDir
         };
-        File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
-        var ex = Assert.ThrowsAsync<IOException>(() => Files.Move(input, _options, default));
-        ClassicAssert.AreEqual($"File '{Path.Combine(_TargetDir, testFile)}' already exists. No files moved.", ex.Message);
+        var options = new Options
+        {
+            ThrowErrorOnFailure = true,
+        };
+
+        File.Copy(Path.Combine(SourceDir, testFile), Path.Combine(TargetDir, testFile));
+        var ex = Assert.ThrowsAsync<Exception>(() =>
+            Files.Move(input, new Connection(), options, CancellationToken.None));
+        ClassicAssert.AreEqual($"File '{Path.Combine(TargetDir, testFile)}' already exists. No files moved.",
+            ex?.Message);
     }
 
     [Test]
@@ -158,10 +173,10 @@ public class UnitTests
         var result = await Files.Move(
             new Input
             {
-                Directory = _SourceDir,
+                SourceDirectory = SourceDir,
                 Pattern = "<regex>^(?!prof).*_test.txt$",
-                TargetDirectory = _TargetDir
-            }, _options, default);
+                TargetDirectory = TargetDir
+            }, new Connection(), _options, CancellationToken.None);
 
         ClassicAssert.AreEqual(3, result.Files.Count);
         ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
