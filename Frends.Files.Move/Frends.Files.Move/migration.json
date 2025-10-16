@@ -1,0 +1,58 @@
+[
+  {
+    "Task": "Frends.Files.Move",
+    "Migrations": [
+      {
+        "Version": "2.0.0",
+        "Description": "Major refactoring: reorganized connection parameters, standardized error handling, and updated result structure",
+        "Migration": [
+          {
+            "Type": "Copy",
+            "Source": "Input.Directory",
+            "Target": "Input.SourceDirectory"
+          },
+          {
+            "Type": "Set",
+            "Target": "Options.ErrorMessageOnFailure",
+            "Value": "\"\""
+          },
+          {
+            "Type": "Set",
+            "Target": "Options.ThrowErrorOnFailure",
+            "Value": true
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.UseGivenUserCredentialsForRemoteConnections",
+            "Target": "Connection.SourceIsRemote"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.UserName",
+            "Target": "Connection.SourceUserName"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.Password",
+            "Target": "Connection.SourcePassword",
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.UseGivenUserCredentialsForRemoteConnections",
+            "Target": "Connection.TargetIsRemote"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.UserName",
+            "Target": "Connection.TargetUserName"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.Password",
+            "Target": "Connection.TargetPassword"
+          }
+        ]
+      }
+    ]
+  }
+]

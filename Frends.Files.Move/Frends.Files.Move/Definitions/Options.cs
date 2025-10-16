@@ -9,32 +9,22 @@ namespace Frends.Files.Move.Definitions;
 public class Options
 {
     /// <summary>
-    /// If set, allows you to give the user credentials to use to delete files on remote hosts.
-    /// If not set, the agent service user credentials will be used.
-    /// Note: This feature is only possible with Windows agents.
+    /// Whether to throw an error on failure.
     /// </summary>
     /// <example>true</example>
-    [DefaultValue(false)]
-    public bool UseGivenUserCredentialsForRemoteConnections { get; set; }
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; }
 
     /// <summary>
-    /// This needs to be of format domain\username
+    /// Overrides the error message on failure.
     /// </summary>
-    /// <example>domain\username</example>
-    [DefaultValue("\"domain\\username\"")]
-    [UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
-    public string UserName { get; set; }
+    /// <example>Custom error message</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; }
 
     /// <summary>
-    /// Password for the used credentials.
-    /// </summary>
-    /// <example>testpwd</example>
-    [PasswordPropertyText]
-    [UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
-    public string Password { get; set; }
-
-    /// <summary>
-    /// If set, will recreate the directory structure from the SourceDirectory under the TargetDirectory for copied files
+    /// If set, will recreate the directory structure from the SourceDirectory under the DestinationDirectory for copied files
     /// </summary>
     /// <example>true</example>
     [DefaultValue(false)]
@@ -42,7 +32,7 @@ public class Options
 
     /// <summary>
     /// If set, will create the target directory if it does not exist,
-    /// as well as any sub directories if <see cref="PreserveDirectoryStructure"/> is set.
+    /// as well as any subdirectories if PreserveDirectoryStructure is set.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
@@ -55,6 +45,6 @@ public class Options
     /// * Rename - Renames the transferred file by appending a number to the end
     /// </summary>
     /// <example>FileExistsAction.Overwrite</example>
+    [DefaultValue(FileExistsAction.Throw)]
     public FileExistsAction IfTargetFileExists { get; set; }
 }
-

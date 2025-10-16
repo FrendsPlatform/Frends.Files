@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Frends.Files.Move.Tests;
 
-internal class Helper
+internal static class Helper
 {
     public static void CreateTestFiles(string directory)
     {
@@ -41,16 +41,14 @@ internal class Helper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        DirectoryEntry AD = new DirectoryEntry("WinNT://" + domain + ",computer");
-        DirectoryEntry NewUser = AD.Children.Add(name, "user");
-        NewUser.Invoke("SetPassword", new object[] { pwd });
-        NewUser.Invoke("Put", new object[] { "Description", "Test User from .NET" });
-        NewUser.CommitChanges();
-        DirectoryEntry grp;
+        var ad = new DirectoryEntry("WinNT://" + domain + ",computer");
+        using var newUser = ad.Children.Add(name, "user");
+        newUser.Invoke("SetPassword", pwd);
+        newUser.Invoke("Put", "Description", "Test User from .NET");
+        newUser.CommitChanges();
 
-        grp = AD.Children.Find("Administrators", "group");
-        if (grp != null)
-            grp.Invoke("Add", new object[] { NewUser.Path.ToString() });
+        var grp = ad.Children.Find("Administrators", "group");
+        grp.Invoke("Add", newUser.Path);
     }
 
     public static void DeleteTestUser(string name)
@@ -58,10 +56,9 @@ internal class Helper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        DirectoryEntry localDirectory = new DirectoryEntry("WinNT://" + Environment.MachineName.ToString());
-        DirectoryEntries users = localDirectory.Children;
-        DirectoryEntry user = users.Find(name);
+        using var localDirectory = new DirectoryEntry("WinNT://" + Environment.MachineName);
+        var users = localDirectory.Children;
+        using var user = users.Find(name);
         users.Remove(user);
     }
 }
-

@@ -13,7 +13,7 @@ public class Input
     /// </summary>
     /// <example>c:\temp</example>
     [DisplayFormat(DataFormatString = "Text")]
-    public string Directory { get; set; }
+    public string SourceDirectory { get; set; }
 
     /// <summary>
     /// Pattern to match for files. The file mask uses regular expressions, but for convenience, it has special handling for * and ? wildcards.
@@ -26,7 +26,7 @@ public class Input
     /// <summary>
     /// Target directory where the found files should be copied to
     /// </summary>
-    /// <example>d:\backup\</example>
+    /// <example>\\183.169.59.122\Shared\dst</example>
     [DefaultValue("\"d:\\backup\"")]
     public string TargetDirectory { get; set; }
 }

@@ -2,7 +2,7 @@ name: Move_build_test
 
 on:
   push:
-    branches-ignore: 
+    branches-ignore:
       - main
     paths:
       - 'Frends.Files.Move/**'
@@ -13,6 +13,18 @@ jobs:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/build_test.yml@main
     with:
       workdir: Frends.Files.Move
+      env_var_name_1: SRC_USER
+      env_var_name_2: SRC_PASSWORD
+      env_var_name_3: DST_USER
+      env_var_name_4: DST_PASSWORD
+      env_var_name_5: ADMIN_USER
+      env_var_name_6: ADMIN_PASSWORD
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
       test_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}
+      env_var_value_1: ${{ secrets.SRC_USER }}
+      env_var_value_2: ${{ secrets.SRC_PASSWORD }}
+      env_var_value_3: ${{ secrets.DST_USER }}
+      env_var_value_4: ${{ secrets.DST_PASSWORD }}
+      env_var_value_5: ${{ secrets.ADMIN_USER }}
+      env_var_value_6: ${{ secrets.ADMIN_PASSWORD }}

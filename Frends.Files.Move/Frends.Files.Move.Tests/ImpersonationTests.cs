@@ -3,64 +3,70 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 
 namespace Frends.Files.Move.Tests;
 
 [TestFixture]
-class ImpersonationTests
+internal class ImpersonationTests
 {
     /// <summary>
     /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
     /// </summary>
-    private static readonly string _SourceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
-    private static readonly string _TargetDir = Path.Combine(_SourceDir, "destination");
-    Input? _input;
-    Options? _options;
+    private static readonly string
+        SourceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
+
+    private static readonly string TargetDir = Path.Combine(SourceDir, "destination");
+    private Input? _input;
+    private Connection? _connection;
 
     private readonly string _domain = Environment.MachineName;
-    private readonly string _name = "test";
-    private readonly string _pwd = "pas5woRd!";
+    private const string Name = "test";
+    private const string Pwd = "pas5woRd!";
 
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        Helper.CreateTestUser(_domain, _name, _pwd);
+        Helper.CreateTestUser(_domain, Name, Pwd);
 
         _input = new Input
         {
-            Directory = _SourceDir,
+            SourceDirectory = SourceDir,
             Pattern = "*",
-            TargetDirectory = _TargetDir,
+            TargetDirectory = TargetDir,
         };
 
-        _options = new Options
+        _connection = new Connection
         {
-            UseGivenUserCredentialsForRemoteConnections = true,
-            UserName = $"{_domain}\\{_name}",
-            Password = _pwd
+            SourceIsRemote = true,
+            SourceUserName = $"{_domain}\\{Name}",
+            SourcePassword = Pwd,
+            TargetIsRemote = true,
+            TargetUserName = $"{_domain}\\{Name}",
+            TargetPassword = Pwd
         };
     }
 
     [OneTimeTearDown]
     public void OneTimeTearDown()
     {
-        Helper.DeleteTestUser(_name);
+        Helper.DeleteTestUser(Name);
     }
 
     [SetUp]
     public void Setup()
     {
-        Helper.CreateTestFiles(_SourceDir);
-        Directory.CreateDirectory(_TargetDir);
+        Helper.CreateTestFiles(SourceDir);
+        Directory.CreateDirectory(TargetDir);
     }
 
     [TearDown]
     public void TearDown()
     {
-        Helper.DeleteTestFolder(_SourceDir);
+        Helper.DeleteTestFolder(SourceDir);
     }
 
     [Test]
@@ -68,7 +74,7 @@ class ImpersonationTests
     {
         var result = await Files.Move(
             _input,
-            _options, default);
+            _connection, new Options(), CancellationToken.None);
 
         ClassicAssert.AreEqual(7, result.Files.Count);
         ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
@@ -78,14 +84,22 @@ class ImpersonationTests
     [Test]
     public void FileMoveTestWithUsernameWithoutDomain()
     {
+        var connection = new Connection
+        {
+            SourceIsRemote = true,
+            SourceUserName = "test",
+            SourcePassword = Pwd,
+            TargetIsRemote = true,
+            TargetUserName = "test",
+            TargetPassword = Pwd,
+        };
         var options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = true,
-            UserName = "test",
-            Password = _pwd
+            ThrowErrorOnFailure = true
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Move(_input, options, default));
-        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
+        var ex = Assert.ThrowsAsync<Exception>(() => Files.Move(_input, connection, options, CancellationToken.None));
+        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {connection.SourceUserName}",
+            ex?.Message);
     }
 }
