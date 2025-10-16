@@ -22,46 +22,34 @@
             "Value": true
           },
           {
-            "Type": "Delete",
-            "Source": "Options.UseGivenUserCredentialsForRemoteConnections"
+            "Type": "Copy",
+            "Source": "Options.UseGivenUserCredentialsForRemoteConnections",
+            "Target": "Connection.SourceIsRemote"
           },
           {
-            "Type": "Delete",
-            "Source": "Options.UserName"
+            "Type": "Copy",
+            "Source": "Options.UserName",
+            "Target": "Connection.SourceUserName"
           },
           {
-            "Type": "Delete",
-            "Source": "Options.Password"
-          },
-          {
-            "Type": "Set",
-            "Target": "Connection.SourceIsRemote",
-            "Value": false
-          },
-          {
-            "Type": "Set",
-            "Target": "Connection.SourceUserName",
-            "Value": ""
-          },
-          {
-            "Type": "Set",
+            "Type": "Copy",
+            "Source": "Options.Password",
             "Target": "Connection.SourcePassword",
-            "Value": ""
           },
           {
-            "Type": "Set",
-            "Target": "Connection.TargetIsRemote",
-            "Value": false
+            "Type": "Copy",
+            "Source": "Options.UseGivenUserCredentialsForRemoteConnections",
+            "Target": "Connection.TargetIsRemote"
           },
           {
-            "Type": "Set",
-            "Target": "Connection.TargetUserName",
-            "Value": ""
+            "Type": "Copy",
+            "Source": "Options.UserName",
+            "Target": "Connection.TargetUserName"
           },
           {
-            "Type": "Set",
-            "Target": "Connection.TargetPassword",
-            "Value": ""
+            "Type": "Copy",
+            "Source": "Options.Password",
+            "Target": "Connection.TargetPassword"
           }
         ]
       }
