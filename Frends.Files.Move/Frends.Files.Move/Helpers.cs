@@ -34,7 +34,11 @@ internal static class Helpers
 
             var matchingFiles = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories)
                 .Where(file => Regex.IsMatch(Path.GetFileName(file), regexPattern))
-                .Select(file => new FilePatternMatch(Path.GetFileName(file), Path.GetFileName(file)))
+                .Select(file =>
+                {
+                    var relativePath = Path.GetRelativePath(directoryPath, file);
+                    return new FilePatternMatch(relativePath, relativePath);
+                })
                 .ToList();
 
             return new PatternMatchingResult(matchingFiles);

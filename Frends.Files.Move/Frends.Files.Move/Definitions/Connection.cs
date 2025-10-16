@@ -17,7 +17,8 @@ public class Connection
     public bool SourceIsRemote { get; set; }
 
     /// <summary>
-    /// This needs to be of format domain\username
+    /// Username used to connect with remote source
+    /// NOTE: This needs to be of format domain\username
     /// </summary>
     /// <example>WORKGROUP\John</example>
     [DefaultValue("\"domain\\username\"")]
@@ -41,9 +42,10 @@ public class Connection
     public bool TargetIsRemote { get; set; }
 
     /// <summary>
-    /// This needs to be of format domain\username
+    /// Username used to connect with remote target
+    /// NOTE: This needs to be of format domain\username
     /// </summary>
-    /// <example>domain\username</example>
+    /// <example>WORKGROUP\John</example>
     [DefaultValue("\"domain\\username\"")]
     [UIHint(nameof(TargetIsRemote), "", true)]
     public string TargetUserName { get; set; }

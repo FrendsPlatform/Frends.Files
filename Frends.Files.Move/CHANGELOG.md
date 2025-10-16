@@ -3,12 +3,14 @@
 ## [2.0.0] - 2025-10-14
 ### Fixed
 - Fixed issue with impersonation when moving files between remote places.
+- Fixed issue with PreserveDirectoryStructure when regex patterns were used.
 ### Changed
 - Added options to handle errors
-- Moved parameters related to impersonation to new Connection tab
 - Add Success and Error parameters to Result object
 - Upgrade target framework to net8.0
-- Renamed input Directory to SourceDirectory
+    #### Breaking Changes
+  - Moved parameters related to impersonation to new Connection tab
+  - Renamed input Directory to SourceDirectory
 
 ## [1.4.0] - 2025-08-12
 ### Changed

@@ -72,11 +72,12 @@ public static class Files
 
                 var hasAccessToValidFile = ImpersonatedAction.Execute(() => File.Exists(targetFilePath), connection,
                     ImpersonatedPart.Target);
+                var validName = targetFilePath;
 
                 switch (options.IfTargetFileExists)
                 {
                     case FileExistsAction.Rename:
-                        var validName = ImpersonatedAction.Execute(
+                        validName = ImpersonatedAction.Execute(
                             () => Helpers.GetNonConflictingTargetFilePath(sourceFilePath, targetFilePath),
                             connection, ImpersonatedPart.Target);
                         await Helpers.CopyFileImpersonated(sourceFilePath, validName, connection,
@@ -107,7 +108,7 @@ public static class Files
                 fileResults.Add(new FileItem
                 {
                     SourcePath = sourceFilePath,
-                    TargetPath = targetFilePath
+                    TargetPath = validName
                 });
             }
         }
@@ -116,7 +117,7 @@ public static class Files
             //Delete the target files that were already moved before a file that exists breaks the move command
             ImpersonatedAction.Execute(
                 () => Helpers.DeleteExistingFiles(fileResults.Select(x => x.TargetPath)),
-                connection, ImpersonatedPart.Source);
+                connection, ImpersonatedPart.Target);
             throw;
         }
 

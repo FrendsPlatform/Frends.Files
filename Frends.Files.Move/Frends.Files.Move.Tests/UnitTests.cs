@@ -182,4 +182,35 @@ public class UnitTests
         ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
         ClassicAssert.IsFalse(File.Exists(result.Files[0].SourcePath));
     }
+
+    [Test]
+    public async Task FileMoveTest_RegexPattern_WithNestedDirectories_PreserveStructure()
+    {
+        var nestedSourceDir = Path.Combine(SourceDir, "SubDir1", "SubDir2");
+        Directory.CreateDirectory(nestedSourceDir);
+        await File.WriteAllTextAsync(Path.Combine(SourceDir, "lvl0_test_leveled_regex.txt"), "root level");
+        await File.WriteAllTextAsync(Path.Combine(SourceDir, "SubDir1", "lvl1_test_leveled_regex.txt"), "level 1");
+        await File.WriteAllTextAsync(Path.Combine(nestedSourceDir, "lvl2_test_leveled_regex.txt"), "level 2");
+
+        var input = new Input
+        {
+            SourceDirectory = SourceDir,
+            Pattern = "<regex>.*_test_leveled_regex\\.txt$",
+            TargetDirectory = TargetDir
+        };
+        var options = new Options
+        {
+            PreserveDirectoryStructure = true,
+            CreateTargetDirectories = true,
+            IfTargetFileExists = FileExistsAction.Throw
+        };
+
+        var result = await Files.Move(input, new Connection(), options, CancellationToken.None);
+
+        Assert.That(result.Success, Is.True);
+        Assert.That(result.Files.Count, Is.EqualTo(3));
+        Assert.That(File.Exists(Path.Combine(TargetDir, "lvl0_test_leveled_regex.txt")), Is.True);
+        Assert.That(File.Exists(Path.Combine(TargetDir, "SubDir1", "lvl1_test_leveled_regex.txt")), Is.True);
+        Assert.That(File.Exists(Path.Combine(TargetDir, "SubDir1", "SubDir2", "lvl2_test_leveled_regex.txt")), Is.True);
+    }
 }
