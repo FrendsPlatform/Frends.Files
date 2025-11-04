@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.0] - 2025-11-04
+### Fixed
+- Returning correct file size
+
 ## [1.3.0] - 2025-06-05
 ### Fixed
 - Resolve issue with an unsupported library in .net 6.
