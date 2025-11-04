@@ -122,4 +122,22 @@ public class UnitTests
         var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Write(input, _options));
         ClassicAssert.AreEqual($"Could not find a part of the path '{input.Path}'.", ex.Message);
     }
+
+    [Test]
+    public async Task FilesWrite_ReturnsCorrectFileSizes()
+    {
+        var result = await Files.Write(_input, _options);
+
+        ClassicAssert.IsTrue(File.Exists(result.Path), "File should exist after write.");
+
+        var info = new FileInfo(_FullPath);
+
+        var expectedBytes = info.Length;
+        var expectedKb = Math.Round(expectedBytes / 1024d, 3);
+        var expectedMb = Math.Round(expectedBytes / 1024d / 1024d, 3);
+
+        ClassicAssert.AreEqual(expectedBytes, result.SizeInBytes);
+        ClassicAssert.AreEqual(expectedKb, result.SizeInKiloBytes);
+        ClassicAssert.AreEqual(expectedMb, result.SizeInMegaBytes);
+    }
 }
