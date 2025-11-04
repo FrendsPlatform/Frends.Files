@@ -64,8 +64,9 @@ public class Files
         var encoding = GetEncoding(options.FileEncoding, options.EnableBom, options.EncodingInString);
         var fileMode = GetAndCheckWriteMode(options.WriteBehaviour, input.Path);
 
-        using (var fileStream = new FileStream(input.Path, fileMode, FileAccess.Write, FileShare.Write, 4096, useAsync: true))
-        using (var writer = new StreamWriter(fileStream, encoding))
+        await using var fileStream =
+            new FileStream(input.Path, fileMode, FileAccess.Write, FileShare.Write, 4096, useAsync: true);
+        await using (var writer = new StreamWriter(fileStream, encoding))
         {
             await writer.WriteAsync(input.Content).ConfigureAwait(false);
         }
