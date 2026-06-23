@@ -64,12 +64,17 @@ public class Files
         var encoding = GetEncoding(options.FileEncoding, options.EnableBom, options.EncodingInString);
         var fileMode = GetAndCheckWriteMode(options.WriteBehaviour, input.Path);
 
-        await using var fileStream =
-            new FileStream(input.Path, fileMode, FileAccess.Write, FileShare.Write, 4096, useAsync: true);
-        await using (var writer = new StreamWriter(fileStream, encoding))
+        await using var fileStream = new FileStream(
+        input.Path, fileMode, FileAccess.Write, FileShare.Write, 4096, FileOptions.Asynchronous | FileOptions.WriteThrough);
+
+        await using (var writer = new StreamWriter(fileStream, encoding, leaveOpen: true))
         {
             await writer.WriteAsync(input.Content).ConfigureAwait(false);
+            await writer.FlushAsync().ConfigureAwait(false);
         }
+
+        // Explicitly flush OS-level buffers
+        fileStream.Flush(true);
 
         return new Result(new FileInfo(input.Path));
     }
