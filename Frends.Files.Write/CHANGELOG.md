@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.0] - 2026-06-23
+### Fixed
+- Fix stale reads on network storage writes.
+
 ## [1.4.0] - 2025-11-04
 ### Fixed
 - Returning correct file size
