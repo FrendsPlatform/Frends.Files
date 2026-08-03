@@ -16,9 +16,14 @@ namespace Frends.Files.LocalBackup.Definitions
         public string SourceDirectory { get; set; }
 
         /// <summary>
-        /// Source file. The file mask uses regular expressions, but for convenience, it has special handling for * and ? wildcards.
+        /// Source file. Supports wildcards (* and ?) and regular expressions.
+        /// Use &lt;regex&gt; prefix for advanced regex patterns. Without the prefix, 
+        /// the mask is treated literally (safe for file names with brackets etc.).
         /// </summary>
-        /// <example>test.txt, test*.txt, test?.txt, test.(txt|xml), test.[^t][^x][^t], &lt;regex&gt;^(?!prof).*_test.txt</example>
+        /// <example>
+        /// Literal/wildcard: test.txt, test*.txt, test?.txt, invoice(2024).pdf
+        /// Regex: &lt;regex&gt;test.(txt|xml), &lt;regex&gt;test.[^t][^x][^t], &lt;regex&gt;^(?!prof).*_test.txt
+        /// </example>
         [DisplayFormat(DataFormatString = "Text")]
         public string SourceFile { get; set; }
 

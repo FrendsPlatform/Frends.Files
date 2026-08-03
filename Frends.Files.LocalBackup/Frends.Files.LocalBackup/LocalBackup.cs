@@ -159,10 +159,9 @@ namespace Frends.Files.LocalBackup
                 pattern = mask.Substring(regexEscape.Length);
             else
             {
-                pattern = mask.Replace(".", "\\.");
-                pattern = pattern.Replace("*", ".*");
-                pattern = pattern.Replace("?", ".+");
-                pattern = string.Concat("^", pattern, "$");
+                pattern = "^" + Regex.Escape(mask)
+                    .Replace("\\*", ".*")
+                    .Replace("\\?", ".+") + "$";
             }
 
             try
