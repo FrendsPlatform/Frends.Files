@@ -4,6 +4,7 @@
 ### Fixed
 - File names with round and square brackets are now backed up correctly.
 
+### Changed
 BREAKING CHANGE: File masks containing regex special characters (like brackets, parentheses, pipes etc.) are now treated as literal file names by default.
 To use regex syntax, add the <regex> prefix to your mask.
 

@@ -161,7 +161,7 @@ namespace Frends.Files.LocalBackup
             {
                 pattern = "^" + Regex.Escape(mask)
                     .Replace("\\*", ".*")
-                    .Replace("\\?", ".+") + "$";
+                    .Replace("\\?", ".") + "$";
             }
 
             try
