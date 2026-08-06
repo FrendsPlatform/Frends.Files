@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.0] - 2026-08-03
+### Fixed
+- File names with round and square brackets are now backed up correctly.
+
+### Changed
+BREAKING CHANGE: File masks containing regex special characters (like brackets, parentheses, pipes etc.) are now treated as literal file names by default.
+To use regex syntax, add the <regex> prefix to your mask.
+
+Before:
+  test.(txt|xml)        regex (matches test.txt or test.xml)
+  invoice[2024].pdf     regex (matches invoice2.pdf etc.)
+
+After:
+  test.(txt|xml)        literal (matches file named "test.(txt|xml)")
+  <regex>test.(txt|xml) regex (matches test.txt or test.xml)
+  invoice[2024].pdf     literal (matches file named "invoice[2024].pdf")
+
 ## [2.2.0] - 2025-03-19
 ### Changed
 - Update packages:

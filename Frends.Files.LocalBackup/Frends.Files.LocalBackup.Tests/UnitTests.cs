@@ -164,7 +164,7 @@ public class UnitTests
         input = new Input()
         {
             SourceDirectory = _dir,
-            SourceFile = "Test1.(txt|xml)",
+            SourceFile = "<regex>Test1.(txt|xml)",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
@@ -196,7 +196,7 @@ public class UnitTests
         input = new Input()
         {
             SourceDirectory = _dir,
-            SourceFile = "Test1.[^t][^x][^t]",
+            SourceFile = "<regex>Test1.[^t][^x][^t]",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
@@ -588,6 +588,50 @@ public class UnitTests
 
         var result = Files.LocalBackup(input, default);
         Assert.AreEqual(1, result.Backups.Count);
+    }
+
+    [TestMethod]
+    public void TestBackup_ExactFileNameContainsRoundBrackets()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+        var fileName = "invoice(2024).pdf";
+        File.WriteAllText(Path.Combine(_dir, fileName), "test content");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = fileName,
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+        var result = Files.LocalBackup(input, default);
+
+        Assert.AreEqual(1, result.Backups.Count);
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, fileName)));
+    }
+
+    [TestMethod]
+    public void TestBackup_ExactFileNameContainsSquareBrackets()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+        var fileName = "invoice[2024].pdf";
+        File.WriteAllText(Path.Combine(_dir, fileName), "test content");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = fileName,
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+        var result = Files.LocalBackup(input, default);
+
+        Assert.AreEqual(1, result.Backups.Count);
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, fileName)));
     }
 
     public void CreateTestFiles()
