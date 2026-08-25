@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.0] - 2026-08-25
+### Fixed
+- Fixed XML documentation: corrected `<returns>` tag to match actual `Result` class properties.
+
 ## [2.0.0] - 2025-10-14
 ### Fixed
 - Fixed issue with impersonation when moving files between remote places.
