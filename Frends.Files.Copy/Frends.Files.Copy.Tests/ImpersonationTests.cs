@@ -27,6 +27,7 @@ class ImpersonationTests
     private readonly string _pwd = "pas5woRd!";
 
 
+    [SupportedOSPlatform("windows")]
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
