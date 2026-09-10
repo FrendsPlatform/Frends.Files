@@ -6,8 +6,8 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
+using Frends.Files.LocalBackup.Helpers;
 
 namespace Frends.Files.LocalBackup
 {
@@ -69,7 +69,7 @@ namespace Frends.Files.LocalBackup
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    if (FileMatchesMask(Path.GetFileName(file), input.SourceFile))
+                    if (FilesHandler.FileMatchesMask(Path.GetFileName(file), input.SourceFile))
                     {
                         var backupFile = Path.Combine(backupDirectory, Path.GetFileName(file));
                         File.Copy(file, backupFile, true);
@@ -148,37 +148,6 @@ namespace Frends.Files.LocalBackup
             return File.GetCreationTimeUtc(dirPath) < DateTime.UtcNow.AddDays(-input.DaysOlder);
         }
 
-        private static bool FileMatchesMask(string filename, string mask)
-        {
-            const string regexEscape = "<regex>";
-            string pattern;
-
-            //check is pure regex wished to be used for matching
-            if (mask.StartsWith(regexEscape))
-                //use substring instead of string.replace just in case some has regex like '<regex>//File<regex>' or something else like that
-                pattern = mask.Substring(regexEscape.Length);
-            else
-            {
-                pattern = "^" + Regex.Escape(mask)
-                    .Replace("\\*", ".*")
-                    .Replace("\\?", ".") + "$";
-            }
-
-            try
-            {
-                return Regex.IsMatch(filename, pattern, RegexOptions.IgnoreCase);
-            }
-            catch
-            {
-                if (filename.Equals(mask, StringComparison.OrdinalIgnoreCase))
-                    return true;
-                if (mask.StartsWith("*") && filename.EndsWith(mask.Replace("*", "")))
-                    return true;
-                if (mask.EndsWith("*") && filename.StartsWith(mask.Replace("*", "")))
-                    return true;
-                return false;
-            }
-        }
 
         private static string[] ConvertObjectToStringArray(object objectArray)
         {
