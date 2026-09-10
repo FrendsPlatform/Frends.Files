@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
 
@@ -14,8 +15,9 @@ class ImpersonationTests
     /// <summary>
     /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
     /// </summary>
+    private static readonly string _SourceDir =
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
 
-    private static readonly string _SourceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
     private static readonly string _TargetDir = Path.Combine(_SourceDir, "destination");
     Input? _input;
     Options? _options;
@@ -65,6 +67,7 @@ class ImpersonationTests
     }
 
     [Test]
+    [SupportedOSPlatform("windows")]
     public async Task FileCopyTestWithCredentials()
     {
         var result = await Files.Copy(
@@ -76,6 +79,7 @@ class ImpersonationTests
     }
 
     [Test]
+    [SupportedOSPlatform("windows")]
     public void FileCopyTestWithUsernameWithoutDomain()
     {
         var options = new Options
@@ -86,7 +90,7 @@ class ImpersonationTests
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Copy(_input, options, default));
-        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex!.Message);
+        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}",
+            ex!.Message);
     }
 }
-
