@@ -13,6 +13,7 @@ using Microsoft.Win32.SafeHandles;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using Frends.Files.Copy.Helpers;
 
 namespace Frends.Files.Copy;
 ///<summary>
@@ -55,8 +56,8 @@ public class Files
 
     private static async Task<(List<FileItem>, List<FailedFileItem>)> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
     {
-        var results = FindMatchingFiles(input.Directory, input.Pattern);
-        var fileTransferEntries = GetFileTransferEntries(results.Files, input.Directory, input.TargetDirectory, options.PreserveDirectoryStructure);
+        var results = FilesHandler.FindMatchingFiles(input.Directory, input.Pattern);
+        var fileTransferEntries = GetFileTransferEntries(results, input.Directory, input.TargetDirectory, options.PreserveDirectoryStructure);
 
         if (options.IfTargetFileExists == FileExistsAction.Throw)
             AssertNoTargetFileConflicts(fileTransferEntries.Values);
@@ -126,41 +127,14 @@ public class Files
         return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
-    internal static PatternMatchingResult FindMatchingFiles(string directoryPath, string pattern)
-    {
-        // Check the user can access the folder
-        // This will return false if the path does not exist or you do not have read permissions.
-        if (!Directory.Exists(directoryPath))
-            throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
-
-        if (pattern.StartsWith("<regex>"))
-        {
-            string regexPattern = pattern.Substring(7);
-
-            var matchingFiles = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories)
-                .Where(file => Regex.IsMatch(Path.GetFileName(file), regexPattern))
-                .Select(file => new FilePatternMatch(Path.GetFileName(file), Path.GetFileName(file)))
-                .ToList();
-
-            return new PatternMatchingResult(matchingFiles);
-        }
-        else
-        {
-            var matcher = new Matcher();
-            matcher.AddInclude(pattern);
-            var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
-            return results;
-        }
-    }
-
-    private static Dictionary<string, string> GetFileTransferEntries(IEnumerable<FilePatternMatch> fileMatches, string sourceDirectory, string targetDirectory, bool preserveDirectoryStructure)
+    private static Dictionary<string, string> GetFileTransferEntries(IEnumerable<string> fileMatches, string sourceDirectory, string targetDirectory, bool preserveDirectoryStructure)
     {
         return fileMatches
             .ToDictionary(
-                f => Path.Combine(sourceDirectory, f.Path),
+                f => Path.Combine(sourceDirectory, f),
                 f => preserveDirectoryStructure
-                 ? Path.GetFullPath(Path.Combine(targetDirectory, f.Path))
-                 : Path.GetFullPath(Path.Combine(targetDirectory, Path.GetFileName(f.Path))));
+                 ? Path.GetFullPath(Path.Combine(targetDirectory, f))
+                 : Path.GetFullPath(Path.Combine(targetDirectory, Path.GetFileName(f))));
     }
 
     private static void AssertNoTargetFileConflicts(IEnumerable<string> filePaths)
