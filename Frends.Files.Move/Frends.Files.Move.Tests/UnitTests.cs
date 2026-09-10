@@ -6,7 +6,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace Frends.Files.Move.Tests;
 
 [TestFixture]
@@ -141,7 +140,7 @@ public class UnitTests
         var ex = Assert.ThrowsAsync<Exception>(() =>
             Files.Move(input, new Connection(), options, CancellationToken.None));
         ClassicAssert.AreEqual(
-            $"Directory does not exist or you do not have read access. Tried to access directory '{input.SourceDirectory}'",
+            $"Directory does not exist or you do not have read access: '{input.SourceDirectory}'",
             ex?.Message);
     }
 
@@ -149,22 +148,34 @@ public class UnitTests
     public void FileMoveShouldThrowIfFileExists()
     {
         const string testFile = "Test1.txt";
-        var input = new Input
-        {
-            SourceDirectory = SourceDir,
-            Pattern = testFile,
-            TargetDirectory = TargetDir
-        };
-        var options = new Options
-        {
-            ThrowErrorOnFailure = true,
-        };
+        var targetDir = Path.Combine(Path.GetTempPath(), $"Frends.Files.Move.Tests.{Guid.NewGuid():N}");
+        Directory.CreateDirectory(targetDir);
 
-        File.Copy(Path.Combine(SourceDir, testFile), Path.Combine(TargetDir, testFile));
-        var ex = Assert.ThrowsAsync<Exception>(() =>
-            Files.Move(input, new Connection(), options, CancellationToken.None));
-        ClassicAssert.AreEqual($"File '{Path.Combine(TargetDir, testFile)}' already exists. No files moved.",
-            ex?.Message);
+        try
+        {
+            var input = new Input
+            {
+                SourceDirectory = SourceDir,
+                Pattern = testFile,
+                TargetDirectory = targetDir
+            };
+            var options = new Options
+            {
+                ThrowErrorOnFailure = true,
+                IfTargetFileExists = FileExistsAction.Throw,
+            };
+
+            File.Copy(Path.Combine(SourceDir, testFile), Path.Combine(targetDir, testFile));
+            var ex = Assert.ThrowsAsync<Exception>(() =>
+                Files.Move(input, new Connection(), options, CancellationToken.None));
+            ClassicAssert.AreEqual($"File '{Path.Combine(targetDir, testFile)}' already exists. No files moved.",
+                ex?.Message);
+        }
+        finally
+        {
+            if (Directory.Exists(targetDir))
+                Directory.Delete(targetDir, true);
+        }
     }
 
     [Test]

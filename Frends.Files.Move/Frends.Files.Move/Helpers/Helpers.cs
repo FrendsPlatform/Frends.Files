@@ -9,7 +9,7 @@ using Frends.Files.Move.Definitions;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
-namespace Frends.Files.Move;
+namespace Frends.Files.Move.Helpers;
 
 internal static class Helpers
 {
@@ -19,35 +19,6 @@ internal static class Helpers
         return domainAndUserName.Length != 2
             ? throw new ArgumentException($@"UserName field must be of format domain\username was: {username}")
             : new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
-    }
-
-    internal static PatternMatchingResult FindMatchingFiles(string directoryPath, string pattern)
-    {
-        // This will return false if the path does not exist, or you do not have read permissions.
-        if (!Directory.Exists(directoryPath))
-            throw new DirectoryNotFoundException(
-                $"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
-
-        if (pattern.StartsWith("<regex>"))
-        {
-            var regexPattern = pattern[7..];
-
-            var matchingFiles = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories)
-                .Where(file => Regex.IsMatch(Path.GetFileName(file), regexPattern))
-                .Select(file =>
-                {
-                    var relativePath = Path.GetRelativePath(directoryPath, file);
-                    return new FilePatternMatch(relativePath, relativePath);
-                })
-                .ToList();
-
-            return new PatternMatchingResult(matchingFiles);
-        }
-
-        var matcher = new Matcher();
-        matcher.AddInclude(pattern);
-        var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
-        return results;
     }
 
     internal static async Task CopyFileImpersonated(string sourceFilePath, string targetFilePath, Connection connection,

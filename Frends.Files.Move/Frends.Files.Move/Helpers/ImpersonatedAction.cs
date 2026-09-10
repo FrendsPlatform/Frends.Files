@@ -4,7 +4,7 @@ using System.Security.Principal;
 using Frends.Files.Move.Definitions;
 using SimpleImpersonation;
 
-namespace Frends.Files.Move;
+namespace Frends.Files.Move.Helpers;
 
 /// <summary>
 /// Handles logic of running actions under impersonated user context.
