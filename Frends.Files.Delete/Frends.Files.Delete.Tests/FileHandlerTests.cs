@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using Frends.Files.Copy.Helpers;
+using Frends.Files.Delete.Helpers;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
