@@ -10,6 +10,7 @@ using SimpleImpersonation;
 namespace Frends.Files.Move.Tests;
 
 [TestFixture]
+[Platform("Win")]
 internal class RemoteTests
 {
     private static readonly string LocalWorkdir =
