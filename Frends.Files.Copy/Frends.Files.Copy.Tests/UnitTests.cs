@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -130,7 +131,7 @@ public class UnitTests
         };
 
         var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Copy(input, _options, default));
-        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex!.Message);
+        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access: '{input.Directory}'", ex!.Message);
     }
 
     [Test]
@@ -184,6 +185,7 @@ public class UnitTests
     public async Task FileCopyShouldNotThrowIfThrowErrorOnFailIsFalse()
     {
         var testFile = "prof_test.txt";
+        var targetDir = Path.Combine(Path.GetTempPath(), $"Frends.Files.Copy.Tests.{Guid.NewGuid():N}");
 
         var options = new Options
         {
@@ -194,12 +196,29 @@ public class UnitTests
             ThrowErrorOnFail = false,
         };
 
-        File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
+        var input = new Input
+        {
+            Directory = _SourceDir,
+            Pattern = testFile,
+            TargetDirectory = targetDir
+        };
 
-        var result = await Files.Copy(_input, options, default);
+        Directory.CreateDirectory(targetDir);
 
-        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        ClassicAssert.AreEqual(1, result.FailedFiles.Count);
-        ClassicAssert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
+        try
+        {
+            File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(targetDir, testFile));
+
+            var result = await Files.Copy(input, options, CancellationToken.None);
+
+            ClassicAssert.AreEqual(0, result.Files.Count);
+            ClassicAssert.AreEqual(1, result.FailedFiles.Count);
+            ClassicAssert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
+        }
+        finally
+        {
+            if (Directory.Exists(targetDir))
+                Directory.Delete(targetDir, true);
+        }
     }
 }

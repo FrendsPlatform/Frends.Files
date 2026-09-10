@@ -15,9 +15,12 @@ public class Input
     public string Directory { get; set; }
 
     /// <summary>
-    /// Pattern to match for files. The file mask uses regular expressions, but for convenience, it has special handling for * and ? wildcards.
+    /// Pattern used to select files under Directory.
+    /// Use glob syntax by default (for example <c>*.txt</c>, <c>**\*.xml</c>, <c>Folder\*.csv</c>).
+    /// If the value starts with <c>&lt;regex&gt;</c>, the remaining text is treated as a regular expression
+    /// and matched against the file name only (not the full path).
     /// </summary>
-    /// <example>test.txt, test*.txt, test?.txt, test.(txt|xml), test.[^t][^x][^t], &lt;regex&gt;^(?!prof).*_test.txt</example>
+    /// <example>*.txt, **\*.xml, Folder\*.csv, &lt;regex&gt;^(?!prof).*_test\.txt$</example>
     [DisplayFormat(DataFormatString = "Text")]
     [DefaultValue("\"**\\Folder\\*.xml\"")]
     public string Pattern { get; set; }

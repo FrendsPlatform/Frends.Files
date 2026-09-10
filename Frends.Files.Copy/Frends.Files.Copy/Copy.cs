@@ -13,6 +13,7 @@ using Microsoft.Win32.SafeHandles;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using Frends.Files.Copy.Helpers;
 
 namespace Frends.Files.Copy;
 ///<summary>
@@ -55,7 +56,7 @@ public class Files
 
     private static async Task<(List<FileItem>, List<FailedFileItem>)> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
     {
-        var results = FindMatchingFiles(input.Directory, input.Pattern);
+        var results = FilesHandler.FindMatchingFiles(input.Directory, input.Pattern);
         var fileTransferEntries = GetFileTransferEntries(results.Files, input.Directory, input.TargetDirectory, options.PreserveDirectoryStructure);
 
         if (options.IfTargetFileExists == FileExistsAction.Throw)

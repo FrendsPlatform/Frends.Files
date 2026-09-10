@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0] - 2026-09-10
+### Changed
+- Updated to .NET 8.0
+- [Breaking Change] Standardize file matching mechanism between tasks.
+- Use forward slash `/` as the directory separator in masks.
+- Use `*` to match wildcards in file and directory names.
+- Use `**` to match arbitrary directory depth.
+- Use `..` to match a parent directory.
+- `?` is not treated as a glob wildcard here. If you need a single-character match, use `<regex>` instead, for example `foo?.txt` becomes `<regex>^foo.\.txt$`.
+- `<regex>` prefixes the value as a regular expression and matches case-insensitively.
+
 ## [1.3.0] - 2025-03-19
 ### Changed
 - Update packages:
