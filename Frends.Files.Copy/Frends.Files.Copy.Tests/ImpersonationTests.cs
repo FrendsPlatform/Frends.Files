@@ -3,13 +3,13 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
 
 namespace Frends.Files.Copy.Tests;
 
 [TestFixture]
+[Platform("Win")]
 class ImpersonationTests
 {
     /// <summary>
@@ -26,8 +26,6 @@ class ImpersonationTests
     private readonly string _name = "test";
     private readonly string _pwd = "pas5woRd!";
 
-
-    [SupportedOSPlatform("windows")]
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
@@ -68,7 +66,6 @@ class ImpersonationTests
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
     public async Task FileCopyTestWithCredentials()
     {
         var result = await Files.Copy(
@@ -80,7 +77,6 @@ class ImpersonationTests
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
     public void FileCopyTestWithUsernameWithoutDomain()
     {
         var options = new Options
