@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.0.0] - 2026-09-10
+### Changed
+- Upgraded the task to .NET 8.
+- [Breaking Change] Standardize pattern matching logic between tasks.
+- Clarified relative input matching rules: patterns are evaluated relative to Directory, separators are normalized to /, matching is case-insensitive, glob mode supports * and **, and &lt;regex&gt; enables regex evaluation against the relative path and file name.
+
 ## [3.0.0] - 2026-08-03
 ### Fixed
 - File names with round and square brackets are now backed up correctly.

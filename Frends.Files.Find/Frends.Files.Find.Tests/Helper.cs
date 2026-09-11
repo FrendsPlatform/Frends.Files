@@ -42,11 +42,20 @@ internal class Helper
 
         var AD = new DirectoryEntry("WinNT://" + domain + ",computer");
         var NewUser = AD.Children.Add(name, "user");
-        NewUser.Invoke("SetPassword", new object[] { pwd });
-        NewUser.Invoke("Put", new object[] { "Description", "Test User from .NET" });
+        NewUser.Invoke("SetPassword", new object[]
+        {
+            pwd
+        });
+        NewUser.Invoke("Put", new object[]
+        {
+            "Description", "Test User from .NET"
+        });
         NewUser.CommitChanges();
         var grp = AD.Children.Find("Administrators", "group");
-        grp?.Invoke("Add", new object[] { NewUser.Path.ToString() });
+        grp?.Invoke("Add", new object[]
+        {
+            NewUser.Path.ToString()
+        });
     }
 
     public static void DeleteTestUser(string name)
@@ -60,4 +69,3 @@ internal class Helper
         users.Remove(user);
     }
 }
-

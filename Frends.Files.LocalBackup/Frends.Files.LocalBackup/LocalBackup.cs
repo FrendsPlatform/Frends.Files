@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Frends.Files.LocalBackup.Helpers;
 
 namespace Frends.Files.LocalBackup
 {
@@ -69,7 +70,7 @@ namespace Frends.Files.LocalBackup
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    if (FileMatchesMask(Path.GetFileName(file), input.SourceFile))
+                    if (FilesHandler.FileMatchesMask(Path.GetFileName(file), input.SourceFile))
                     {
                         var backupFile = Path.Combine(backupDirectory, Path.GetFileName(file));
                         File.Copy(file, backupFile, true);
