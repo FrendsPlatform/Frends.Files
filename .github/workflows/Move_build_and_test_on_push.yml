@@ -19,6 +19,7 @@ jobs:
       env_var_name_4: DST_PASSWORD
       env_var_name_5: ADMIN_USER
       env_var_name_6: ADMIN_PASSWORD
+      env_var_name_7: REMOTE_IP
     secrets:
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
       test_feed_api_key: ${{ secrets.TASKS_TEST_FEED_API_KEY }}
@@ -28,3 +29,4 @@ jobs:
       env_var_value_4: ${{ secrets.DST_PASSWORD }}
       env_var_value_5: ${{ secrets.ADMIN_USER }}
       env_var_value_6: ${{ secrets.ADMIN_PASSWORD }}
+      env_var_value_7: ${{ secrets.REMOTE_IP }}

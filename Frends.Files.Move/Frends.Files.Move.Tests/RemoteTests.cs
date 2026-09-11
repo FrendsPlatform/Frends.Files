@@ -32,6 +32,8 @@ internal class RemoteTests
     private static readonly string
         AdminUserPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD")!;
 
+    private static readonly string RemoteIp = Environment.GetEnvironmentVariable("REMOTE_IP")!;
+
     [Test]
     public async Task MoveFileFromLocalToRemoteWithImpersonation()
     {
@@ -39,7 +41,7 @@ internal class RemoteTests
         {
             SourceDirectory = LocalWorkdir,
             Pattern = "*",
-            TargetDirectory = @"\\20.67.234.98\Shared\dst",
+            TargetDirectory = $@"\\{RemoteIp}\Shared\dst",
         };
         var options = new Options
         {
@@ -62,7 +64,7 @@ internal class RemoteTests
     {
         var input = new Input
         {
-            SourceDirectory = @"\\20.67.234.98\Shared\src",
+            SourceDirectory = $@"\\{RemoteIp}\Shared\src",
             Pattern = "*",
             TargetDirectory = LocalWorkdir,
         };
@@ -87,9 +89,9 @@ internal class RemoteTests
     {
         var input = new Input
         {
-            SourceDirectory = @"\\20.67.234.98\Shared\src",
+            SourceDirectory = $@"\\{RemoteIp}\Shared\src",
             Pattern = "*",
-            TargetDirectory = @"\\20.67.234.98\Shared\dst",
+            TargetDirectory = $@"\\{RemoteIp}\Shared\dst",
         };
         var options = new Options
         {
@@ -148,6 +150,7 @@ internal class RemoteTests
     private static Tuple<string, string> GetDomainAndUsername(string username)
     {
         var domainAndUserName = username.Split('\\');
+
         return domainAndUserName.Length != 2
             ? throw new ArgumentException($@"UserName field must be of format domain\username was: {username}")
             : new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
