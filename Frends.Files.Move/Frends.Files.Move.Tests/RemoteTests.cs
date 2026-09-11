@@ -17,7 +17,7 @@ internal class RemoteTests
     private static readonly string LocalWorkdir =
         Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData"));
 
-    internal required string  SrcUser { get; set; }
+    internal required string SrcUser { get; set; }
     internal required string SrcUserPassword { get; set; }
     internal required string DstUser { get; set; }
     internal required string DstUserPassword { get; set; }
@@ -87,7 +87,7 @@ internal class RemoteTests
         var connection = new Connection
         {
             SourceIsRemote = true,
-            SourceUserName =  $@"{Domain}\{SrcUser}",
+            SourceUserName = $@"{Domain}\{SrcUser}",
             SourcePassword = SrcUserPassword,
         };
         PrepareSourceAndTarget(input, connection);
