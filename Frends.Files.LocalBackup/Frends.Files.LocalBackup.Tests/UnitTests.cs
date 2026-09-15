@@ -608,7 +608,33 @@ public class UnitTests
         var result = Files.LocalBackup(input, default);
 
         Assert.AreEqual(1, result.Backups.Count);
-        Assert.IsTrue(File.Exists(Path.Combine(buDir, "Overwrite.txt")));
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, "Sub", "Overwrite.txt")));
+    }
+
+    [TestMethod]
+    public void TestBackup_SourceFilePatternPreservesSubdirectoriesForDuplicateFileNames()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+        Directory.CreateDirectory(Path.Combine(_dir, "FolderA"));
+        Directory.CreateDirectory(Path.Combine(_dir, "FolderB"));
+        File.WriteAllText(Path.Combine(_dir, "FolderA", "shared.txt"), "first");
+        File.WriteAllText(Path.Combine(_dir, "FolderB", "shared.txt"), "second");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "**/shared.txt",
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+
+        var result = Files.LocalBackup(input, default);
+
+        Assert.AreEqual(2, result.Backups.Count);
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, "FolderA", "shared.txt")));
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, "FolderB", "shared.txt")));
     }
 
     [TestMethod]

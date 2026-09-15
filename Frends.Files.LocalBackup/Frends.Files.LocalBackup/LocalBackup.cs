@@ -64,13 +64,19 @@ namespace Frends.Files.LocalBackup
             }
             else
             {
-                files = FilesHandler.FindMatchingFiles(input.SourceDirectory, input.SourceFile)
+                var relativeFiles = FilesHandler.FindMatchingFiles(input.SourceDirectory, input.SourceFile).ToArray();
+                files = relativeFiles
                     .Select(relativePath => Path.Combine(input.SourceDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar)))
                     .ToArray();
-                foreach (string file in files)
+
+                for (var i = 0; i < files.Length; i++)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    var backupFile = Path.Combine(backupDirectory, Path.GetFileName(file));
+
+                    string file = files[i];
+                    string relativePath = relativeFiles[i].Replace('/', Path.DirectorySeparatorChar);
+                    var backupFile = Path.Combine(backupDirectory, relativePath);
+                    Directory.CreateDirectory(Path.GetDirectoryName(backupFile) ?? backupDirectory);
                     File.Copy(file, backupFile, true);
                     result.Add($"Backup complete: {file} to {backupFile}");
                 }
