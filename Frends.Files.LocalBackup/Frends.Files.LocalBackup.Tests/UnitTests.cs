@@ -591,6 +591,27 @@ public class UnitTests
     }
 
     [TestMethod]
+    public void TestBackup_SourceFilePatternCanMatchRelativeSubdirectoryPath()
+    {
+        var buDir = Path.Combine(_dir, "Backup");
+
+        input = new Input()
+        {
+            SourceDirectory = _dir,
+            SourceFile = "Sub/*.txt",
+            BackupDirectory = buDir,
+            TaskExecutionId = Guid.NewGuid().ToString(),
+            DaysOlder = 5,
+            Cleanup = false,
+        };
+
+        var result = Files.LocalBackup(input, default);
+
+        Assert.AreEqual(1, result.Backups.Count);
+        Assert.IsTrue(File.Exists(Path.Combine(buDir, "Overwrite.txt")));
+    }
+
+    [TestMethod]
     public void TestBackup_ExactFileNameContainsRoundBrackets()
     {
         var buDir = Path.Combine(_dir, "Backup");

@@ -7,6 +7,7 @@ namespace Frends.Files.LocalBackup.Helpers;
 internal static class FilesHandler
 {
     private const string RegexPrefix = "<regex>";
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(5);
 
     internal static bool FileMatchesMask(string filePath, string mask)
     {
@@ -20,8 +21,9 @@ internal static class FilesHandler
         if (mask.StartsWith(RegexPrefix, StringComparison.OrdinalIgnoreCase))
         {
             string pattern = mask[RegexPrefix.Length..];
+            var regex = new Regex(pattern, RegexOptions.IgnoreCase, RegexTimeout);
 
-            return Regex.IsMatch(normalizedPath, pattern, RegexOptions.IgnoreCase);
+            return regex.IsMatch(normalizedPath);
         }
 
         var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);

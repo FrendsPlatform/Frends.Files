@@ -11,6 +11,7 @@ namespace Frends.Files.Copy.Helpers;
 internal static class FilesHandler
 {
     private const string RegexPrefix = "<regex>";
+    private static readonly TimeSpan RegexTimeout = TimeSpan.FromSeconds(5);
 
     internal static IEnumerable<string> FindMatchingFiles(string directoryPath, string mask)
     {
@@ -29,7 +30,7 @@ internal static class FilesHandler
         if (mask.StartsWith(RegexPrefix, StringComparison.OrdinalIgnoreCase))
         {
             string pattern = mask.Substring(RegexPrefix.Length);
-            var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+            var regex = new Regex(pattern, RegexOptions.IgnoreCase, RegexTimeout);
 
             foreach (string file in Directory.EnumerateFiles(normalizedDir, "*", SearchOption.AllDirectories))
             {

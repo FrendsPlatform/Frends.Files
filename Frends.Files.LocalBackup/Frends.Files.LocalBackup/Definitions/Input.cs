@@ -16,11 +16,11 @@ namespace Frends.Files.LocalBackup.Definitions
         public string SourceDirectory { get; set; }
 
         /// <summary>
-        /// Source file. Matching is case-insensitive and uses the normalized full file path. Use &lt;regex&gt; for regex matching; without the prefix, wildcard globbing is used and regex special characters are treated literally. This keeps file names containing brackets or parentheses safe unless regex mode is explicitly requested.
+        /// Source file pattern to match relative to SourceDirectory. Matching is case-insensitive and separators are normalized to /. For regex mode, prefix the pattern with &lt;regex&gt; and the matcher checks the full relative path and filename. For wildcard mode, * and ** work as glob operators and regex special characters are treated literally.
         /// </summary>
         /// <example>
-        /// Literal/wildcard: test.txt, test*.txt, report-*.csv, invoice(2024).pdf
-        /// Regex: &lt;regex&gt;test.(txt|xml), &lt;regex&gt;test.[^t][^x][^t], &lt;regex&gt;^(?!prof).*_test.txt
+        /// Literal/wildcard: test.txt, Sub/*.txt, **/*.csv, invoice(2024).pdf
+        /// Regex: &lt;regex&gt;test.(txt|xml), &lt;regex&gt;^Sub/.+\.txt$, &lt;regex&gt;^(?!prof).*_test.txt
         /// </example>
         [DisplayFormat(DataFormatString = "Text")]
         public string SourceFile { get; set; }
