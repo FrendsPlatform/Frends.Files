@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.FileSystemGlobbing;
 
@@ -11,29 +12,28 @@ internal static class FilesHandler
 
     internal static bool FileMatchesMask(string filePath, string mask)
     {
-        if (string.IsNullOrEmpty(filePath) || string.IsNullOrEmpty(mask))
+        if (string.IsNullOrWhiteSpace(filePath) || string.IsNullOrWhiteSpace(mask))
         {
             return false;
         }
 
-        string normalizedPath = NormalizePath(filePath);
+        var fileName = Path.GetFileName(filePath);
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return false;
+        }
 
         if (mask.StartsWith(RegexPrefix, StringComparison.OrdinalIgnoreCase))
         {
-            string pattern = mask[RegexPrefix.Length..];
+            var pattern = mask[RegexPrefix.Length..];
             var regex = new Regex(pattern, RegexOptions.IgnoreCase, RegexTimeout);
 
-            return regex.IsMatch(normalizedPath);
+            return regex.IsMatch(fileName);
         }
 
         var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
-        matcher.AddInclude(NormalizePath(mask));
+        matcher.AddInclude(mask);
 
-        return matcher.Match(normalizedPath).HasMatches;
-    }
-
-    private static string NormalizePath(string path)
-    {
-        return path.Replace('\\', '/');
+        return matcher.Match(fileName).HasMatches;
     }
 }

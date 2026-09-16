@@ -64,24 +64,22 @@ namespace Frends.Files.LocalBackup
             }
             else
             {
-                files = [];
-
-                foreach (string relativeFile in FilesHandler.FindMatchingFiles(input.SourceDirectory, input.SourceFile))
+                files = Directory.GetFiles(input.SourceDirectory);
+                foreach (string file in files)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    string relativePath = relativeFile.Replace('/', Path.DirectorySeparatorChar);
-                    var file = Path.Combine(input.SourceDirectory, relativePath);
-                    var backupFile = Path.Combine(backupDirectory, relativePath);
-                    Directory.CreateDirectory(Path.GetDirectoryName(backupFile) ?? backupDirectory);
+
+                    if (!FilesHandler.FileMatchesMask(Path.GetFileName(file), input.SourceFile)) continue;
+                    var backupFile = Path.Combine(backupDirectory, Path.GetFileName(file));
                     File.Copy(file, backupFile, true);
                     result.Add($"Backup complete: {file} to {backupFile}");
                 }
             }
 
-            if (!Directory.GetFiles(backupDirectory).Any() && !Directory.GetDirectories(backupDirectory).Any())
+            if (Directory.GetFiles(backupDirectory).Length == 0 && Directory.GetDirectories(backupDirectory).Length == 0)
             {
                 Directory.Delete(backupDirectory, false);
-                return new Tuple<string, List<string>>("No source files present to backup.", new List<string>());
+                return new Tuple<string, List<string>>("No source files present to backup.", []);
             }
 
             return new Tuple<string, List<string>>(backupDirectory, result);

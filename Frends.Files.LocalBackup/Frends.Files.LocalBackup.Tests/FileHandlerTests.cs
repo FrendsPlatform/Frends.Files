@@ -17,26 +17,26 @@ public class FileHandlerTests
     }
 
     [Test]
-    public void FileMatchesMaskShouldMatchGlobPatternsCaseInsensitively()
+    public void FileMatchesMaskShouldMatchFilenameGlobPatternsCaseInsensitively()
     {
-        ClassicAssert.IsTrue(FilesHandler.FileMatchesMask("Folder\\Item.TXT", @"folder/*.txt"));
+        ClassicAssert.IsTrue(FilesHandler.FileMatchesMask("Folder\\Item.TXT", @"*.txt"));
     }
 
     [Test]
-    public void FileMatchesMaskShouldNormalizeBackslashesInBothPathAndMask()
+    public void FileMatchesMaskShouldIgnoreParentDirectoriesWhenMatchingFilename()
     {
-        ClassicAssert.IsTrue(FilesHandler.FileMatchesMask(@"Folder\Sub\Item.txt", @"Folder\Sub\*.txt"));
+        ClassicAssert.IsTrue(FilesHandler.FileMatchesMask(@"Folder\Sub\Item.txt", @"*.txt"));
     }
 
     [Test]
-    public void FileMatchesMaskShouldUseRegexModeForRegexMasks()
+    public void FileMatchesMaskShouldUseRegexModeForFilenameRegexMasks()
     {
-        ClassicAssert.IsTrue(FilesHandler.FileMatchesMask(@"Folder\match_test.txt", "<regex>^Folder/.+_test\\.txt$"));
+        ClassicAssert.IsTrue(FilesHandler.FileMatchesMask(@"Folder\match_test.txt", "<regex>^.+_test\\.txt$"));
     }
 
     [Test]
-    public void FileMatchesMaskShouldReturnFalseForNonMatchingRegexMasks()
+    public void FileMatchesMaskShouldReturnFalseForNonMatchingFilenameRegexMasks()
     {
-        ClassicAssert.IsFalse(FilesHandler.FileMatchesMask("Folder/item.txt", "<regex>^Other/.+\\.txt$"));
+        ClassicAssert.IsFalse(FilesHandler.FileMatchesMask("Folder/item.txt", "<regex>^other_.+\\.txt$"));
     }
 }

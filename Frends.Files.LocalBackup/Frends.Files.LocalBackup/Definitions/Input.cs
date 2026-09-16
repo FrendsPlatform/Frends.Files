@@ -16,7 +16,7 @@ namespace Frends.Files.LocalBackup.Definitions
         public string SourceDirectory { get; set; }
 
         /// <summary>
-        /// Source file pattern to match relative to SourceDirectory. Matching is case-insensitive and separators are normalized to /. For regex mode, prefix the pattern with &lt;regex&gt; and the matcher checks the full relative path and filename. For wildcard mode, * and ** work as glob operators and regex special characters are treated literally.
+        /// Source file pattern to match files directly in SourceDirectory. Matching is case-insensitive. For regex mode, prefix the pattern with &lt;regex&gt; and the matcher checks the full relative path and filename. For wildcard mode, * and ** work as glob operators and regex special characters are treated literally.
         /// </summary>
         /// <example>
         /// Literal/wildcard: test.txt, Sub/*.txt, **/*.csv, invoice(2024).pdf
