@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Sockets;
 using System.Runtime.Versioning;
 using System.Security.Principal;
 using Frends.Files.Move.Definitions;
@@ -38,11 +39,35 @@ internal class RemoteTests
         AdminUserPassword = GetEnvVar("ADMIN_PASSWORD");
         RemoteIp = GetEnvVar("REMOTE_IP");
         Domain = GetEnvVar("DOMAIN");
+        EnsureRemoteShareIsReachable();
     }
 
     private static string GetEnvVar(string name) =>
         Environment.GetEnvironmentVariable(name) ??
         throw new InvalidOperationException($"Missing required env var: {name}");
+
+    private void EnsureRemoteShareIsReachable()
+    {
+        var endpoint = GetRemoteSharePath("src");
+        using var socket = new TcpClient();
+
+        try
+        {
+            var connected = socket.ConnectAsync(RemoteIp, 445);
+            if (!connected.Wait(TimeSpan.FromSeconds(5)))
+                Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445.");
+        }
+        catch (SocketException ex)
+        {
+            Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445. {ex.Message}");
+        }
+
+        if (!Directory.Exists(endpoint))
+            Assert.Fail($"Remote SMB connection unavailable: UNC share '{endpoint}' is not available.");
+    }
+
+    private string GetRemoteSharePath(string folderName) =>
+        $@"\\{RemoteIp}\Shared\{folderName}";
 
     [Test]
     [SupportedOSPlatform("windows")]
@@ -52,7 +77,7 @@ internal class RemoteTests
         {
             SourceDirectory = LocalWorkdir,
             Pattern = "*",
-            TargetDirectory = $@"{RemoteIp}\Shared\dst",
+            TargetDirectory = GetRemoteSharePath("dst"),
         };
         var options = new Options
         {
@@ -76,7 +101,7 @@ internal class RemoteTests
     {
         var input = new Input
         {
-            SourceDirectory = $@"{RemoteIp}\Shared\src",
+            SourceDirectory = GetRemoteSharePath("src"),
             Pattern = "*",
             TargetDirectory = LocalWorkdir,
         };
@@ -102,9 +127,9 @@ internal class RemoteTests
     {
         var input = new Input
         {
-            SourceDirectory = $@"{RemoteIp}\Shared\src",
+            SourceDirectory = GetRemoteSharePath("src"),
             Pattern = "*",
-            TargetDirectory = $@"{RemoteIp}\Shared\dst",
+            TargetDirectory = GetRemoteSharePath("dst"),
         };
         var options = new Options
         {

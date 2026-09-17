@@ -4,7 +4,7 @@
 ### Changed
 - Upgraded the task to .NET 8.
 - [Breaking Change] Standardize pattern matching logic between tasks.
-- Clarified relative input matching rules: patterns are evaluated relative to Directory, separators are normalized to /, matching is case-insensitive, glob mode supports * and **, and &lt;regex&gt; enables regex evaluation against the relative path and file name.
+- Clarified relative input matching rules: patterns are evaluated relative to SourceDirectory, separators are normalized to /, matching is case-insensitive, glob mode supports * and **, and &lt;regex&gt; enables regex evaluation against the relative path and file name.
 
 ## [2.0.0] - 2025-10-14
 ### Fixed
