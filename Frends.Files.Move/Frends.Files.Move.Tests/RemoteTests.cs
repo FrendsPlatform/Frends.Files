@@ -29,7 +29,7 @@ internal class RemoteTests
     internal required string Domain { get; set; }
 
     [OneTimeSetUp]
-    public void Setup()
+    public async Task Setup()
     {
         DotEnv.Load();
         SrcUser = GetEnvVar("SRC_USER");
@@ -38,14 +38,14 @@ internal class RemoteTests
         DstUserPassword = GetEnvVar("DST_PASSWORD");
         RemoteIp = GetEnvVar("REMOTE_IP");
         Domain = GetEnvVar("DOMAIN");
-        EnsureRemoteShareIsReachable();
+        await EnsureRemoteShareIsReachable();
     }
 
     private static string GetEnvVar(string name) =>
         Environment.GetEnvironmentVariable(name) ??
         throw new InvalidOperationException($"Missing required env var: {name}");
 
-    private void EnsureRemoteShareIsReachable()
+    private async Task EnsureRemoteShareIsReachable()
     {
         var endpoint = GetRemoteSharePath();
         using var socket = new TcpClient();
@@ -53,7 +53,7 @@ internal class RemoteTests
 
         try
         {
-            socket.ConnectAsync(RemoteIp, 445, cancellationTokenSource.Token).GetAwaiter().GetResult();
+            await socket.ConnectAsync(RemoteIp, 445, cancellationTokenSource.Token);
         }
         catch (SocketException ex)
         {
@@ -190,7 +190,9 @@ internal class RemoteTests
         else
             PrepareSource(input.SourceDirectory);
 
-        if (!connection.TargetIsRemote)
+        if (connection.TargetIsRemote)
+            RunAs(connection.TargetUserName, connection.TargetPassword, () => PrepareTarget(input.TargetDirectory));
+        else
             PrepareTarget(input.TargetDirectory);
     }
 
