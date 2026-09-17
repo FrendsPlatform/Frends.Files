@@ -1,54 +1,102 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net.Sockets;
+using System.Runtime.Versioning;
 using System.Security.Principal;
 using Frends.Files.Move.Definitions;
 using NUnit.Framework;
 using System.Threading;
 using System.Threading.Tasks;
+using dotenv.net;
 using SimpleImpersonation;
 
 namespace Frends.Files.Move.Tests;
 
 [TestFixture]
+[SupportedOSPlatform("windows")]
 internal class RemoteTests
 {
     private static readonly string LocalWorkdir =
         Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData"));
 
-    private static readonly string SrcUser = Environment.GetEnvironmentVariable("SRC_USER")!;
+    internal required string SrcUser { get; set; }
+    internal required string SrcUserPassword { get; set; }
+    internal required string DstUser { get; set; }
+    internal required string DstUserPassword { get; set; }
+    internal required string AdminUser { get; set; }
+    internal required string AdminPassword { get; set; }
+    internal required string RemoteIp { get; set; }
+    internal required string Domain { get; set; }
 
-    private static readonly string
-        SrcUserPassword = Environment.GetEnvironmentVariable("SRC_PASSWORD")!;
+    [OneTimeSetUp]
+    public async Task Setup()
+    {
+        DotEnv.Load();
+        SrcUser = GetEnvVar("SRC_USER");
+        SrcUserPassword = GetEnvVar("SRC_PASSWORD");
+        DstUser = GetEnvVar("DST_USER");
+        DstUserPassword = GetEnvVar("DST_PASSWORD");
+        AdminUser = GetEnvVar("ADMIN_USER");
+        AdminPassword = GetEnvVar("ADMIN_PASSWORD");
+        RemoteIp = GetEnvVar("REMOTE_IP");
+        Domain = GetEnvVar("DOMAIN");
+        await EnsureRemoteShareIsReachable();
+    }
 
-    private static readonly string
-        DstUser = Environment.GetEnvironmentVariable("DST_USER")!;
+    private static string GetEnvVar(string name) =>
+        Environment.GetEnvironmentVariable(name) ??
+        throw new InvalidOperationException($"Missing required env var: {name}");
 
-    private static readonly string
-        DstUserPassword = Environment.GetEnvironmentVariable("DST_PASSWORD")!;
+    private async Task EnsureRemoteShareIsReachable()
+    {
+        var endpoint = GetRemoteSharePath();
+        using var socket = new TcpClient();
+        using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-    private static readonly string
-        AdminUser = Environment.GetEnvironmentVariable("ADMIN_USER")!;
+        try
+        {
+            await socket.ConnectAsync(RemoteIp, 445, cancellationTokenSource.Token);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445. {ex.Message}");
+        }
 
-    private static readonly string
-        AdminUserPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD")!;
+        Assert.That(
+            socket.Connected,
+            Is.True,
+            $"Remote SMB connection unavailable: could not establish a TCP connection to '{endpoint}' on port 445.");
+    }
+
+    private string GetRemoteSharePath(string folderName = "")
+    {
+        List<string> elements = [$@"\\{RemoteIp}\Shared", folderName];
+
+        return string.Join(@"\", elements.Where(s => !string.IsNullOrWhiteSpace(s)));
+    }
 
     [Test]
     public async Task MoveFileFromLocalToRemoteWithImpersonation()
     {
+        var targetDirectory = GetRemoteSharePath($@"dst\{Guid.NewGuid():N}");
         var input = new Input
         {
             SourceDirectory = LocalWorkdir,
             Pattern = "*",
-            TargetDirectory = @"\\20.67.234.98\Shared\dst",
+            TargetDirectory = targetDirectory,
         };
         var options = new Options
         {
-            IfTargetFileExists = FileExistsAction.Rename
+            IfTargetFileExists = FileExistsAction.Rename,
+            CreateTargetDirectories = true,
+            ThrowErrorOnFailure = true
         };
         var connection = new Connection
         {
             TargetIsRemote = true,
-            TargetUserName = DstUser,
+            TargetUserName = $@"{Domain}\{DstUser}",
             TargetPassword = DstUserPassword,
         };
         PrepareSourceAndTarget(input, connection);
@@ -60,20 +108,22 @@ internal class RemoteTests
     [Test]
     public async Task MoveFileFromRemoteToLocalWithImpersonation()
     {
+        var sourceDirectory = GetRemoteSharePath($@"src\{Guid.NewGuid():N}");
         var input = new Input
         {
-            SourceDirectory = @"\\20.67.234.98\Shared\src",
+            SourceDirectory = sourceDirectory,
             Pattern = "*",
             TargetDirectory = LocalWorkdir,
         };
         var options = new Options
         {
-            IfTargetFileExists = FileExistsAction.Rename
+            IfTargetFileExists = FileExistsAction.Rename,
+            ThrowErrorOnFailure = true
         };
         var connection = new Connection
         {
             SourceIsRemote = true,
-            SourceUserName = SrcUser,
+            SourceUserName = $@"{Domain}\{SrcUser}",
             SourcePassword = SrcUserPassword,
         };
         PrepareSourceAndTarget(input, connection);
@@ -85,23 +135,27 @@ internal class RemoteTests
     [Test]
     public async Task MoveFileFromRemoteToRemoteWithImpersonation()
     {
+        var sourceDirectory = GetRemoteSharePath($@"src\{Guid.NewGuid():N}");
+        var targetDirectory = GetRemoteSharePath($@"dst\{Guid.NewGuid():N}");
         var input = new Input
         {
-            SourceDirectory = @"\\20.67.234.98\Shared\src",
+            SourceDirectory = sourceDirectory,
             Pattern = "*",
-            TargetDirectory = @"\\20.67.234.98\Shared\dst",
+            TargetDirectory = targetDirectory,
         };
         var options = new Options
         {
-            IfTargetFileExists = FileExistsAction.Rename
+            IfTargetFileExists = FileExistsAction.Rename,
+            CreateTargetDirectories = true,
+            ThrowErrorOnFailure = true
         };
         var connection = new Connection
         {
             SourceIsRemote = true,
-            SourceUserName = SrcUser,
+            SourceUserName = $@"{Domain}\{SrcUser}",
             SourcePassword = SrcUserPassword,
             TargetIsRemote = true,
-            TargetUserName = DstUser,
+            TargetUserName = $@"{Domain}\{DstUser}",
             TargetPassword = DstUserPassword,
         };
         PrepareSourceAndTarget(input, connection);
@@ -129,27 +183,23 @@ internal class RemoteTests
             File.Delete(targetFilePath);
     }
 
-    private static void PrepareSourceAndTarget(Input input, Connection connection)
+    private void PrepareSourceAndTarget(Input input, Connection connection)
     {
-        var (domain, user) = GetDomainAndUsername(AdminUser);
-        var credentials = new UserCredentials(domain, user, AdminUserPassword);
-        using var userHandle = credentials.LogonUser(LogonType.NewCredentials);
         if (connection.SourceIsRemote)
-            WindowsIdentity.RunImpersonated(userHandle, () => PrepareSource(input.SourceDirectory));
+            RunAs(Domain, AdminUser, AdminPassword, () => PrepareSource(input.SourceDirectory));
         else
             PrepareSource(input.SourceDirectory);
 
         if (connection.TargetIsRemote)
-            WindowsIdentity.RunImpersonated(userHandle, () => PrepareTarget(input.TargetDirectory));
+            RunAs(Domain, AdminUser, AdminPassword, () => PrepareTarget(input.TargetDirectory));
         else
             PrepareTarget(input.TargetDirectory);
     }
 
-    private static Tuple<string, string> GetDomainAndUsername(string username)
+    private static void RunAs(string domain, string username, string password, Action action)
     {
-        var domainAndUserName = username.Split('\\');
-        return domainAndUserName.Length != 2
-            ? throw new ArgumentException($@"UserName field must be of format domain\username was: {username}")
-            : new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
+        var credentials = new UserCredentials(domain, username, password);
+        using var userHandle = credentials.LogonUser(LogonType.NewCredentials);
+        WindowsIdentity.RunImpersonated(userHandle, action);
     }
 }
