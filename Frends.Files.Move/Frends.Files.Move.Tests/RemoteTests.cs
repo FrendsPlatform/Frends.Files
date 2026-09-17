@@ -25,6 +25,8 @@ internal class RemoteTests
     internal required string SrcUserPassword { get; set; }
     internal required string DstUser { get; set; }
     internal required string DstUserPassword { get; set; }
+    internal required string AdminUser { get; set; }
+    internal required string AdminPassword { get; set; }
     internal required string RemoteIp { get; set; }
     internal required string Domain { get; set; }
 
@@ -36,6 +38,8 @@ internal class RemoteTests
         SrcUserPassword = GetEnvVar("SRC_PASSWORD");
         DstUser = GetEnvVar("DST_USER");
         DstUserPassword = GetEnvVar("DST_PASSWORD");
+        AdminUser = GetEnvVar("ADMIN_USER");
+        AdminPassword = GetEnvVar("ADMIN_PASSWORD");
         RemoteIp = GetEnvVar("REMOTE_IP");
         Domain = GetEnvVar("DOMAIN");
         await EnsureRemoteShareIsReachable();
@@ -55,13 +59,9 @@ internal class RemoteTests
         {
             await socket.ConnectAsync(RemoteIp, 445, cancellationTokenSource.Token);
         }
-        catch (SocketException ex)
+        catch (Exception ex)
         {
             Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445. {ex.Message}");
-        }
-        catch (OperationCanceledException)
-        {
-            Assert.Fail($"Remote SMB connection unavailable: timed out connecting to '{endpoint}' on port 445.");
         }
 
         Assert.That(
@@ -186,30 +186,20 @@ internal class RemoteTests
     private void PrepareSourceAndTarget(Input input, Connection connection)
     {
         if (connection.SourceIsRemote)
-            RunAs(connection.SourceUserName, connection.SourcePassword, () => PrepareSource(input.SourceDirectory));
+            RunAs(Domain, AdminUser, AdminPassword, () => PrepareSource(input.SourceDirectory));
         else
             PrepareSource(input.SourceDirectory);
 
         if (connection.TargetIsRemote)
-            RunAs(connection.TargetUserName, connection.TargetPassword, () => PrepareTarget(input.TargetDirectory));
+            RunAs(Domain, AdminUser, AdminPassword, () => PrepareTarget(input.TargetDirectory));
         else
             PrepareTarget(input.TargetDirectory);
     }
 
-    private static void RunAs(string username, string password, Action action)
+    private static void RunAs(string domain, string username, string password, Action action)
     {
-        var (domain, user) = GetDomainAndUsername(username);
-        var credentials = new UserCredentials(domain, user, password);
+        var credentials = new UserCredentials(domain, username, password);
         using var userHandle = credentials.LogonUser(LogonType.NewCredentials);
         WindowsIdentity.RunImpersonated(userHandle, action);
-    }
-
-    private static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-
-        return domainAndUserName.Length != 2
-            ? throw new ArgumentException($@"UserName field must be of format domain\username was: {username}")
-            : new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 }
