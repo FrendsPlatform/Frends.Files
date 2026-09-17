@@ -49,16 +49,19 @@ internal class RemoteTests
     {
         var endpoint = GetRemoteSharePath();
         using var socket = new TcpClient();
+        using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         try
         {
-            var connected = socket.ConnectAsync(RemoteIp, 445);
-            if (!connected.Wait(TimeSpan.FromSeconds(10)))
-                Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445.");
+            socket.ConnectAsync(RemoteIp, 445, cancellationTokenSource.Token).GetAwaiter().GetResult();
         }
         catch (SocketException ex)
         {
             Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445. {ex.Message}");
+        }
+        catch (OperationCanceledException)
+        {
+            Assert.Fail($"Remote SMB connection unavailable: timed out connecting to '{endpoint}' on port 445.");
         }
 
         Assert.That(
@@ -77,15 +80,17 @@ internal class RemoteTests
     [Test]
     public async Task MoveFileFromLocalToRemoteWithImpersonation()
     {
+        var targetDirectory = GetRemoteSharePath($@"dst\{Guid.NewGuid():N}");
         var input = new Input
         {
             SourceDirectory = LocalWorkdir,
             Pattern = "*",
-            TargetDirectory = GetRemoteSharePath("dst"),
+            TargetDirectory = targetDirectory,
         };
         var options = new Options
         {
             IfTargetFileExists = FileExistsAction.Rename,
+            CreateTargetDirectories = true,
             ThrowErrorOnFailure = true
         };
         var connection = new Connection
@@ -103,9 +108,10 @@ internal class RemoteTests
     [Test]
     public async Task MoveFileFromRemoteToLocalWithImpersonation()
     {
+        var sourceDirectory = GetRemoteSharePath($@"src\{Guid.NewGuid():N}");
         var input = new Input
         {
-            SourceDirectory = GetRemoteSharePath("src"),
+            SourceDirectory = sourceDirectory,
             Pattern = "*",
             TargetDirectory = LocalWorkdir,
         };
@@ -129,15 +135,18 @@ internal class RemoteTests
     [Test]
     public async Task MoveFileFromRemoteToRemoteWithImpersonation()
     {
+        var sourceDirectory = GetRemoteSharePath($@"src\{Guid.NewGuid():N}");
+        var targetDirectory = GetRemoteSharePath($@"dst\{Guid.NewGuid():N}");
         var input = new Input
         {
-            SourceDirectory = GetRemoteSharePath("src"),
+            SourceDirectory = sourceDirectory,
             Pattern = "*",
-            TargetDirectory = GetRemoteSharePath("dst"),
+            TargetDirectory = targetDirectory,
         };
         var options = new Options
         {
             IfTargetFileExists = FileExistsAction.Rename,
+            CreateTargetDirectories = true,
             ThrowErrorOnFailure = true
         };
         var connection = new Connection
@@ -181,9 +190,7 @@ internal class RemoteTests
         else
             PrepareSource(input.SourceDirectory);
 
-        if (connection.TargetIsRemote)
-            RunAs(connection.TargetUserName, connection.TargetPassword, () => PrepareTarget(input.TargetDirectory));
-        else
+        if (!connection.TargetIsRemote)
             PrepareTarget(input.TargetDirectory);
     }
 
