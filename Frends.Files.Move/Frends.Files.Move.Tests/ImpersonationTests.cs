@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,10 +11,11 @@ using System.Threading.Tasks;
 namespace Frends.Files.Move.Tests;
 
 [TestFixture]
+[SupportedOSPlatform("windows")]
 internal class ImpersonationTests
 {
     /// <summary>
-    /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user. Impersonation tests can only be run in Windows OS.
+    /// Impersonation tests needs to be run as administrator so that the OneTimeSetup can create a local test user.
     /// </summary>
     private static readonly string
         SourceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");

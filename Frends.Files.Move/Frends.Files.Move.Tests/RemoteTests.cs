@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Versioning;
 using System.Security.Principal;
@@ -13,6 +15,7 @@ using SimpleImpersonation;
 namespace Frends.Files.Move.Tests;
 
 [TestFixture]
+[SupportedOSPlatform("windows")]
 internal class RemoteTests
 {
     private static readonly string LocalWorkdir =
@@ -48,13 +51,13 @@ internal class RemoteTests
 
     private void EnsureRemoteShareIsReachable()
     {
-        var endpoint = GetRemoteSharePath("src");
+        var endpoint = GetRemoteSharePath();
         using var socket = new TcpClient();
 
         try
         {
             var connected = socket.ConnectAsync(RemoteIp, 445);
-            if (!connected.Wait(TimeSpan.FromSeconds(5)))
+            if (!connected.Wait(TimeSpan.FromSeconds(10)))
                 Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445.");
         }
         catch (SocketException ex)
@@ -62,15 +65,24 @@ internal class RemoteTests
             Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445. {ex.Message}");
         }
 
-        if (!Directory.Exists(endpoint))
-            Assert.Fail($"Remote SMB connection unavailable: UNC share '{endpoint}' is not available.");
+        var (domain, user) = GetDomainAndUsername($@"{Domain}\{AdminUser}");
+        var credentials = new UserCredentials(domain, user, AdminUserPassword);
+        using var userHandle = credentials.LogonUser(LogonType.NewCredentials);
+
+        var shareExists = WindowsIdentity.RunImpersonated(userHandle, () => Directory.Exists(endpoint));
+        if (!shareExists)
+            Assert.Fail(
+                $"Remote SMB connection unavailable: UNC share '{endpoint}' is not available with admin credentials '{Domain}\\{AdminUser}'.");
     }
 
-    private string GetRemoteSharePath(string folderName) =>
-        $@"\\{RemoteIp}\Shared\{folderName}";
+    private string GetRemoteSharePath(string folderName = "")
+    {
+        List<string> elements = [$@"\\{RemoteIp}\Shared", folderName];
+
+        return string.Join(@"\", elements.Where(s => !string.IsNullOrWhiteSpace(s)));
+    }
 
     [Test]
-    [SupportedOSPlatform("windows")]
     public async Task MoveFileFromLocalToRemoteWithImpersonation()
     {
         var input = new Input
@@ -96,7 +108,6 @@ internal class RemoteTests
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
     public async Task MoveFileFromRemoteToLocalWithImpersonation()
     {
         var input = new Input
@@ -122,7 +133,6 @@ internal class RemoteTests
     }
 
     [Test]
-    [SupportedOSPlatform("windows")]
     public async Task MoveFileFromRemoteToRemoteWithImpersonation()
     {
         var input = new Input
@@ -169,7 +179,6 @@ internal class RemoteTests
             File.Delete(targetFilePath);
     }
 
-    [SupportedOSPlatform("Windows")]
     private void PrepareSourceAndTarget(Input input, Connection connection)
     {
         var (domain, user) = GetDomainAndUsername($@"{Domain}\{AdminUser}");
