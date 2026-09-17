@@ -25,8 +25,6 @@ internal class RemoteTests
     internal required string SrcUserPassword { get; set; }
     internal required string DstUser { get; set; }
     internal required string DstUserPassword { get; set; }
-    internal required string AdminUser { get; set; }
-    internal required string AdminUserPassword { get; set; }
     internal required string RemoteIp { get; set; }
     internal required string Domain { get; set; }
 
@@ -38,8 +36,6 @@ internal class RemoteTests
         SrcUserPassword = GetEnvVar("SRC_PASSWORD");
         DstUser = GetEnvVar("DST_USER");
         DstUserPassword = GetEnvVar("DST_PASSWORD");
-        AdminUser = GetEnvVar("ADMIN_USER");
-        AdminUserPassword = GetEnvVar("ADMIN_PASSWORD");
         RemoteIp = GetEnvVar("REMOTE_IP");
         Domain = GetEnvVar("DOMAIN");
         EnsureRemoteShareIsReachable();
@@ -65,14 +61,10 @@ internal class RemoteTests
             Assert.Fail($"Remote SMB connection unavailable: could not reach '{endpoint}' on port 445. {ex.Message}");
         }
 
-        var (domain, user) = GetDomainAndUsername($@"{Domain}\{AdminUser}");
-        var credentials = new UserCredentials(domain, user, AdminUserPassword);
-        using var userHandle = credentials.LogonUser(LogonType.NewCredentials);
-
-        var shareExists = WindowsIdentity.RunImpersonated(userHandle, () => Directory.Exists(endpoint));
-        if (!shareExists)
-            Assert.Fail(
-                $"Remote SMB connection unavailable: UNC share '{endpoint}' is not available with admin credentials '{Domain}\\{AdminUser}'.");
+        Assert.That(
+            socket.Connected,
+            Is.True,
+            $"Remote SMB connection unavailable: could not establish a TCP connection to '{endpoint}' on port 445.");
     }
 
     private string GetRemoteSharePath(string folderName = "")
@@ -93,7 +85,8 @@ internal class RemoteTests
         };
         var options = new Options
         {
-            IfTargetFileExists = FileExistsAction.Rename
+            IfTargetFileExists = FileExistsAction.Rename,
+            ThrowErrorOnFailure = true
         };
         var connection = new Connection
         {
@@ -118,7 +111,8 @@ internal class RemoteTests
         };
         var options = new Options
         {
-            IfTargetFileExists = FileExistsAction.Rename
+            IfTargetFileExists = FileExistsAction.Rename,
+            ThrowErrorOnFailure = true
         };
         var connection = new Connection
         {
@@ -143,7 +137,8 @@ internal class RemoteTests
         };
         var options = new Options
         {
-            IfTargetFileExists = FileExistsAction.Rename
+            IfTargetFileExists = FileExistsAction.Rename,
+            ThrowErrorOnFailure = true
         };
         var connection = new Connection
         {
@@ -181,18 +176,23 @@ internal class RemoteTests
 
     private void PrepareSourceAndTarget(Input input, Connection connection)
     {
-        var (domain, user) = GetDomainAndUsername($@"{Domain}\{AdminUser}");
-        var credentials = new UserCredentials(domain, user, AdminUserPassword);
-        using var userHandle = credentials.LogonUser(LogonType.NewCredentials);
         if (connection.SourceIsRemote)
-            WindowsIdentity.RunImpersonated(userHandle, () => PrepareSource(input.SourceDirectory));
+            RunAs(connection.SourceUserName, connection.SourcePassword, () => PrepareSource(input.SourceDirectory));
         else
             PrepareSource(input.SourceDirectory);
 
         if (connection.TargetIsRemote)
-            WindowsIdentity.RunImpersonated(userHandle, () => PrepareTarget(input.TargetDirectory));
+            RunAs(connection.TargetUserName, connection.TargetPassword, () => PrepareTarget(input.TargetDirectory));
         else
             PrepareTarget(input.TargetDirectory);
+    }
+
+    private static void RunAs(string username, string password, Action action)
+    {
+        var (domain, user) = GetDomainAndUsername(username);
+        var credentials = new UserCredentials(domain, user, password);
+        using var userHandle = credentials.LogonUser(LogonType.NewCredentials);
+        WindowsIdentity.RunImpersonated(userHandle, action);
     }
 
     private static Tuple<string, string> GetDomainAndUsername(string username)
