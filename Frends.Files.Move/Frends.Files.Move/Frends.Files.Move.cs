@@ -10,8 +10,9 @@ using Frends.Files.Move.Helpers;
 
 namespace Frends.Files.Move;
 
-///<summary>
+/// <summary>
 /// Files task.
+/// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Move)
 /// </summary>
 public static class Files
 {
@@ -42,7 +43,6 @@ public static class Files
             return ErrorHandler.Handle(e, options.ThrowErrorOnFailure, options.ErrorMessageOnFailure);
         }
     }
-
 
     private static async Task<List<FileItem>> ExecuteMoveAsync(Input input, Connection connection, Options options,
         CancellationToken cancellationToken)
