@@ -1,26 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
 
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
 
-  <ItemGroup>
-	<PackageReference Include="MSTest.TestFramework" Version="3.8.3" />
-	<PackageReference Include="nunit" Version="4.3.2" />
-	<PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
-	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.8.3" />
-    <PackageReference Include="coverlet.collector" Version="6.0.4">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="dotenv.net" Version="4.2.0"/>
+        <PackageReference Include="MSTest.TestFramework" Version="3.8.3"/>
+        <PackageReference Include="nunit" Version="4.3.2"/>
+        <PackageReference Include="NUnit3TestAdapter" Version="5.0.0"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/>
+        <PackageReference Include="MSTest.TestAdapter" Version="3.8.3"/>
+        <PackageReference Include="coverlet.collector" Version="6.0.4">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Frends.Files.Move\Frends.Files.Move.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Frends.Files.Move\Frends.Files.Move.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include=".env" CopyToOutputDirectory="PreserveNewest" Condition="Exists('.env')"/>
+    </ItemGroup>
 
 </Project>

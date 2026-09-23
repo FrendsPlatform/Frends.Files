@@ -9,6 +9,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Linq;
+using Frends.Files.Find.Helpers;
 
 namespace Frends.Files.Find;
 
@@ -48,9 +49,8 @@ public class Files
 
     private static Result ExecuteFind(Input input)
     {
-        var results = FindMatchingFiles(input.Directory, input.Pattern);
-        var foundFiles = results.Files.Select(match => Path.Combine(input.Directory, match.Path)).ToArray();
-        var files = foundFiles.Select(fullPath => new FileItem(new FileInfo(fullPath))).ToList();
+        var results = FilesHandler.FindMatchingFiles(input.Directory, input.Pattern);
+        var files = results.Select(path => new FileItem(new FileInfo(Path.Combine(input.Directory, path)))).ToList();
         return new Result(files);
     }
 
@@ -60,18 +60,5 @@ public class Files
         if (domainAndUserName.Length != 2)
             throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
         return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
-    }
-
-    internal static PatternMatchingResult FindMatchingFiles(string directoryPath, string pattern)
-    {
-        // Check the user can access the folder
-        // This will return false if the path does not exist or you do not have read permissions.
-        if (!Directory.Exists(directoryPath))
-            throw new DirectoryNotFoundException($"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'.");
-
-        var matcher = new Matcher();
-        matcher.AddInclude(pattern);
-        var results = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directoryPath)));
-        return results;
     }
 }

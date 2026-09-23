@@ -52,7 +52,7 @@ internal static class ImpersonatedAction
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        var (domain, user) = Helpers.GetDomainAndUsername(username);
+        var (domain, user) = Utils.GetDomainAndUsername(username);
         var credentials = new UserCredentials(domain, user, password);
         using var userHandle = credentials.LogonUser(LogonType.NewCredentials);
 

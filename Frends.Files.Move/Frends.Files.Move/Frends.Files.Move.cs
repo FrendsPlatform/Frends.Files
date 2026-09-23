@@ -6,11 +6,13 @@ using System.Linq;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Frends.Files.Move.Helpers;
 
 namespace Frends.Files.Move;
 
-///<summary>
+/// <summary>
 /// Files task.
+/// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.Files.Move)
 /// </summary>
 public static class Files
 {
@@ -42,17 +44,16 @@ public static class Files
         }
     }
 
-
     private static async Task<List<FileItem>> ExecuteMoveAsync(Input input, Connection connection, Options options,
         CancellationToken cancellationToken)
     {
         var results =
-            ImpersonatedAction.Execute(() => Helpers.FindMatchingFiles(input.SourceDirectory, input.Pattern),
+            ImpersonatedAction.Execute(() => FilesHandler.FindMatchingFiles(input.SourceDirectory, input.Pattern),
                 connection, ImpersonatedPart.Source);
-        var fileTransferEntries = Helpers.GetFileTransferEntries(results.Files, input.SourceDirectory,
+        var fileTransferEntries = Utils.GetFileTransferEntries(results, input.SourceDirectory,
             input.TargetDirectory, options.PreserveDirectoryStructure);
         if (options.IfTargetFileExists == FileExistsAction.Throw)
-            ImpersonatedAction.Execute(() => Helpers.AssertNoTargetFileConflicts(fileTransferEntries.Values.ToArray()),
+            ImpersonatedAction.Execute(() => Utils.AssertNoTargetFileConflicts(fileTransferEntries.Values.ToArray()),
                 connection, ImpersonatedPart.Target);
         if (options.CreateTargetDirectories)
             ImpersonatedAction.Execute(
@@ -78,9 +79,9 @@ public static class Files
                 {
                     case FileExistsAction.Rename:
                         validName = ImpersonatedAction.Execute(
-                            () => Helpers.GetNonConflictingTargetFilePath(sourceFilePath, targetFilePath),
+                            () => Utils.GetNonConflictingTargetFilePath(sourceFilePath, targetFilePath),
                             connection, ImpersonatedPart.Target);
-                        await Helpers.CopyFileImpersonated(sourceFilePath, validName, connection,
+                        await Utils.CopyFileImpersonated(sourceFilePath, validName, connection,
                             cancellationToken);
                         break;
 
@@ -89,7 +90,7 @@ public static class Files
                             ImpersonatedAction.Execute(() => File.Delete(targetFilePath),
                                 connection, ImpersonatedPart.Target);
 
-                        await Helpers
+                        await Utils
                             .CopyFileImpersonated(sourceFilePath, targetFilePath, connection, cancellationToken)
                             .ConfigureAwait(false);
                         break;
@@ -97,7 +98,7 @@ public static class Files
                     case FileExistsAction.Throw:
                         if (hasAccessToValidFile)
                             throw new IOException($"File '{targetFilePath}' already exists. No files moved.");
-                        await Helpers
+                        await Utils
                             .CopyFileImpersonated(sourceFilePath, targetFilePath, connection, cancellationToken)
                             .ConfigureAwait(false);
                         break;
@@ -116,13 +117,13 @@ public static class Files
         {
             //Delete the target files that were already moved before a file that exists breaks the move command
             ImpersonatedAction.Execute(
-                () => Helpers.DeleteExistingFiles(fileResults.Select(x => x.TargetPath)),
+                () => Utils.DeleteExistingFiles(fileResults.Select(x => x.TargetPath)),
                 connection, ImpersonatedPart.Target);
             throw;
         }
 
         ImpersonatedAction.Execute(
-            () => Helpers.DeleteExistingFiles(fileResults.Select(x => x.SourcePath)),
+            () => Utils.DeleteExistingFiles(fileResults.Select(x => x.SourcePath)),
             connection, ImpersonatedPart.Source);
         return fileResults;
     }
