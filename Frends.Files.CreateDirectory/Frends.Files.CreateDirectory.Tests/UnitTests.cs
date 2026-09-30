@@ -30,6 +30,7 @@ public class UnitTests
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
         ClassicAssert.AreEqual(result.Path, newPath);
+        ClassicAssert.IsTrue(result.Success);
     }
 
     [TestMethod]

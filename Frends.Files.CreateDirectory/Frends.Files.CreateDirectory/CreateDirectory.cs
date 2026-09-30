@@ -1,8 +1,10 @@
-﻿using Frends.Files.CreateDirectory.Definitions;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Threading;
+using Frends.Files.CreateDirectory.Definitions;
+using Frends.Files.CreateDirectory.Helpers;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
 
@@ -11,25 +13,36 @@ namespace Frends.Files.CreateDirectory;
 /// <summary>
 /// Task class.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Creates all directories and subdirectories in the specified path unless they already exist. Will not do anything if the directory exists.
     /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Files.CreateDirectory)
     /// </summary>
+    /// <param name="input">Directory path to create.</param>
+    /// <param name="options">Additional task options.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation before directory creation.</param>
     /// <returns>Object { string Path } </returns>
-    public static Result CreateDirectory([PropertyTab] Input input, [PropertyTab] Options options)
+    public static Result CreateDirectory([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(input.Directory))
-            throw new ArgumentNullException("Directory cannot be empty.");
-
-        if (!options.UseGivenUserCredentialsForRemoteConnections)
+        try
         {
-            return ExecuteCreate(input);
-        }
+            if (input == null || string.IsNullOrEmpty(input.Directory))
+                throw new ArgumentNullException("Directory cannot be empty.");
 
-        var domainAndUserName = GetDomainAndUserName(options.UserName);
-        return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () => ExecuteCreate(input));
+            ValidationHandler.Run(input, options);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!options.UseGivenUserCredentialsForRemoteConnections)
+                return ExecuteCreate(input);
+
+            var domainAndUserName = GetDomainAndUserName(options.UserName);
+            return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () => ExecuteCreate(input));
+        }
+        catch (Exception exception)
+        {
+            return exception.Handle(options);
+        }
     }
 
     private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
@@ -48,7 +61,7 @@ public class Files
     private static Result ExecuteCreate(Input input)
     {
         var newFolder = System.IO.Directory.CreateDirectory(input.Directory);
-        return new Result(newFolder.FullName);
+        return new Result(true, path: newFolder.FullName);
     }
 
     private static string[] GetDomainAndUserName(string username)
@@ -61,4 +74,3 @@ public class Files
         return domainAndUserName;
     }
 }
-

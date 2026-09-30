@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.0] - 2026-09-30
+### Changed
+- Added failure handling options and a success indicator to directory creation results.
+- Updated the task to target .NET 8.
+
 ## [1.1.0] - 2025-03-19
 ### Changed
 - Update packages:
