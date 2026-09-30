@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Frends.Files.DeleteDirectory.Tests;
 
 [TestClass]
-internal class ErrorHandlerTest
+public class ErrorHandlerTest
 {
     private const string CustomErrorMessage = "CustomErrorMessage";
 
@@ -36,5 +36,16 @@ internal class ErrorHandlerTest
             Files.DeleteDirectory(new Input(), options, CancellationToken.None));
 
         Assert.IsTrue(exception.Message.Contains(CustomErrorMessage, StringComparison.Ordinal));
+    }
+
+    [TestMethod]
+    public void Should_Throw_When_CancellationToken_Is_Cancelled()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+        cancellationTokenSource.Cancel();
+        var options = new Options { ThrowErrorOnFailure = false };
+
+        Assert.ThrowsException<OperationCanceledException>(() =>
+            Files.DeleteDirectory(new Input(), options, cancellationTokenSource.Token));
     }
 }

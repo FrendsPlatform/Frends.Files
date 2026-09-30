@@ -20,6 +20,9 @@ public static class Files
     /// Deletes all directories and subdirectories in the specified path. Will not do anything if the directory do not exist.
     /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Files.DeleteDirectory)
     /// </summary>
+    /// <param name="input">Input parameters.</param>
+    /// <param name="options">Additional task options.</param>
+    /// <param name="cancellationToken">Token to stop task execution.</param>
     /// <returns>Object { string Path, bool Success } </returns>
     public static Result DeleteDirectory([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken = default)
     {
