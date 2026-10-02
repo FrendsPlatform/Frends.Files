@@ -1,9 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using Frends.Files.CreateDirectory.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Assert = NUnit.Framework.Assert;
-using Frends.Files.CreateDirectory.Definitions;
 using NUnit.Framework.Legacy;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Threading;
+using Assert = NUnit.Framework.Assert;
 
 namespace Frends.Files.CreateDirectory.Tests;
 
@@ -28,8 +30,9 @@ public class UnitTests
     public void CreateFolderShouldCreateWholePath()
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
+        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false }, CancellationToken.None);
         ClassicAssert.AreEqual(result.Path, newPath);
+        ClassicAssert.IsTrue(result.Success);
     }
 
     [TestMethod]
@@ -37,7 +40,7 @@ public class UnitTests
     {
         _context.CreateFiles("temp/foo/bar/foo.txt");
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false });
+        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = false }, CancellationToken.None);
         ClassicAssert.AreEqual(result.Path, newPath);
     }
 
@@ -46,7 +49,7 @@ public class UnitTests
     public void ThrowUsernameInvalidError()
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" });
+        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" }, CancellationToken.None);
         ClassicAssert.AreEqual("UserName field must be of format domain\\username was: domain/example", result);
     }
 
@@ -54,15 +57,15 @@ public class UnitTests
     public void ThrowRemoteConnectionError()
     {
         var newPath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
-        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
+        var result = Files.CreateDirectory(new Input() { Directory = newPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" }, CancellationToken.None);
         ClassicAssert.AreEqual(result.Path, newPath);
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(ValidationException))]
     public void ThrowInputEmpty()
     {
-        var result = Files.CreateDirectory(new Input() { }, new Options() { });
-        ClassicAssert.AreEqual("Directory cannot be empty.", result);
+        var result = Files.CreateDirectory(new Input() { }, new Options() { }, CancellationToken.None);
+        ClassicAssert.AreEqual("The Directory field is required", result);
     }
 }
