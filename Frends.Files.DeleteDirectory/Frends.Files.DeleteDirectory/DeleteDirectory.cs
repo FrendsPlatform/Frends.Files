@@ -3,32 +3,47 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Threading;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
 using System.IO;
+using Frends.Files.DeleteDirectory.Helpers;
 
 namespace Frends.Files.DeleteDirectory;
 
 /// <summary>
 /// Task class.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Deletes all directories and subdirectories in the specified path. Will not do anything if the directory do not exist.
     /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Files.DeleteDirectory)
     /// </summary>
+    /// <param name="input">Input parameters.</param>
+    /// <param name="options">Additional task options.</param>
+    /// <param name="cancellationToken">Token to stop task execution.</param>
     /// <returns>Object { string Path, bool Success } </returns>
-    public static Result DeleteDirectory([PropertyTab] Input input, [PropertyTab] Options options)
+    public static Result DeleteDirectory([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(input.Directory))
-            throw new ArgumentNullException("Directory cannot be empty.");
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ValidationHandler.Run(input, options);
 
-        if (!options.UseGivenUserCredentialsForRemoteConnections)
-            return ExecuteDelete(input, options.DeleteRecursively);
+            if (string.IsNullOrEmpty(input.Directory))
+                throw new ArgumentNullException("Directory cannot be empty.");
 
-        var domainAndUserName = GetDomainAndUserName(options.UserName);
-        return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () => ExecuteDelete(input, options.DeleteRecursively));
+            if (!options.UseGivenUserCredentialsForRemoteConnections)
+                return ExecuteDelete(input, options.DeleteRecursively);
+
+            var domainAndUserName = GetDomainAndUserName(options.UserName);
+            return RunAsUser(domainAndUserName[0], domainAndUserName[1], options.Password, () => ExecuteDelete(input, options.DeleteRecursively));
+        }
+        catch (Exception exception)
+        {
+            return exception.Handle(options);
+        }
     }
 
     private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
@@ -62,4 +77,3 @@ public class Files
         return domainAndUserName;
     }
 }
-

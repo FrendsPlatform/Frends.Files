@@ -6,6 +6,12 @@
 public class Result
 {
     /// <summary>
+    /// Error that occurred during task execution.
+    /// </summary>
+    /// <example>object { string Message, Exception AdditionalInfo }</example>
+    public Error Error { get; private set; }
+
+    /// <summary>
     /// Path of directory
     /// </summary>
     /// <example>C:/User/NewDirectory</example>
@@ -17,9 +23,10 @@ public class Result
     /// <example>C:/User/NewDirectory</example>
     public bool Success { get; private set; }
 
-    internal Result(string path, bool success)
+    internal Result(string path, bool success, Error error = null)
     {
         Path = path;
         Success = success;
+        Error = error;
     }
 }
