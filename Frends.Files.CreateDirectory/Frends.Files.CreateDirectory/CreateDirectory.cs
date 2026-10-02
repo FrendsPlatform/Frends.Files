@@ -23,13 +23,10 @@ public static class Files
     /// <param name="options">Additional task options.</param>
     /// <param name="cancellationToken">Token used to cancel the operation before directory creation.</param>
     /// <returns>Object { string Path } </returns>
-    public static Result CreateDirectory([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken = default)
+    public static Result CreateDirectory([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         try
         {
-            if (input == null || string.IsNullOrEmpty(input.Directory))
-                throw new ArgumentNullException("Directory cannot be empty.");
-
             ValidationHandler.Run(input, options);
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -45,7 +42,8 @@ public static class Files
         }
     }
 
-    private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
+    private static T RunAsUser<T>(string domain, string username, string password, Func<T> action)
+        where T : Result
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -71,6 +69,7 @@ public static class Files
         {
             throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
         }
+
         return domainAndUserName;
     }
 }
