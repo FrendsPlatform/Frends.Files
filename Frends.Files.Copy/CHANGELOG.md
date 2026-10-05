@@ -1,8 +1,9 @@
 # Changelog
 
-## [3.0.0] - 2026-10-05
+## [2.1.0] - 2026-10-05
 ### Changed
-- [Breaking Change] The Task class is now static. Results also include standard success and error details, with options to control how task failures are reported.
+- Results include standard success and error details,
+- Options to control how task failures are reported.
 
 ## [2.0.0] - 2026-09-10
 ### Changed
