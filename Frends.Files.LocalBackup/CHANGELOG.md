@@ -1,10 +1,9 @@
 # Changelog
 
-## [5.0.0] - 2026-10-05
+## [4.1.0] - 2026-10-05
 ### Changed
 - Added task options to control whether failures are thrown or returned in the result.
 - Added success and error details to the task result.
-- Updated the task method signature to include options.
 
 ## [4.0.0] - 2026-09-10
 ### Changed
