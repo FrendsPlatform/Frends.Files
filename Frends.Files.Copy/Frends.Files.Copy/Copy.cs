@@ -19,7 +19,7 @@ namespace Frends.Files.Copy;
 ///<summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Copy files.
@@ -28,13 +28,21 @@ public class Files
     /// <param name="input">Input parameters for the Task.</param>
     /// <param name="options">Additional options for the Task.</param>
     /// <param name="cancellationToken">CancellationToken given by Frends.</param>
-    /// <returns>Object { List&lt;Object { string SourcePath, string TargetPath }&gt; Files, List&lt;Object { string SourcePath, Exception Exception }&gt; FailedFiles }</returns>
+    /// <returns>Copy results, including any failed file details.</returns>
     public static async Task<Result> Copy([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var (files, failed) = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
+        try
+        {
+            ValidationHandler.Run(input, options);
+            var (files, failed) = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
+                options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
 
-        return new Result(files, failed);
+            return new Result(true, files: files, failedFiles: failed);
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options ?? new Options());
+        }
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -103,6 +111,7 @@ public class Files
             }
             catch (Exception ex)
             {
+                if (ex is OperationCanceledException) throw;
                 if (options.ThrowErrorOnFail) throw;
                 failedFiles.Add(new FailedFileItem(sourceFilePath, ex));
             }

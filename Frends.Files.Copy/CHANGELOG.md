@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.0] - 2026-10-05
+### Changed
+- Added standard task success and error details to the result, with options to control how task failures are reported.
+
 ## [2.0.0] - 2026-09-10
 ### Changed
 - Upgraded the task to .NET 8.
