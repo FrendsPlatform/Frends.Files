@@ -44,7 +44,7 @@ public class UnitTests
             CreateSubdirectories = false
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir))
@@ -76,7 +76,7 @@ public class UnitTests
             CreateSubdirectories = true
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -108,7 +108,7 @@ public class UnitTests
             CreateSubdirectories = true
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "*qwerty123*"))
@@ -139,7 +139,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -171,7 +171,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -203,7 +203,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -235,7 +235,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
 
         foreach (var dir in Directory.GetDirectories(buDir, "2022-05-*"))
@@ -270,7 +270,7 @@ public class UnitTests
             CreateSubdirectories = true,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
     }
 
@@ -295,7 +295,7 @@ public class UnitTests
         Directory.CreateDirectory(backupDirectory);
         Directory.SetLastWriteTimeUtc(backupDirectory, DateTime.Now.AddDays(-2));
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Cleanups);
         Assert.IsFalse(Directory.Exists(backupDirectory));
@@ -320,7 +320,7 @@ public class UnitTests
             CreateSubdirectories = false,
         };
 
-        Files.LocalBackup(input, default);
+        Files.LocalBackup(input, new Options(), default);
         foreach (var dir in Directory.GetDirectories(backup))
             Directory.SetLastWriteTime(dir, DateTime.Now.AddDays(-2));
         var files = Directory.GetFiles(backup).ToList();
@@ -330,7 +330,7 @@ public class UnitTests
             var newName = Path.GetFileNameWithoutExtension(file) + "(1)" + Path.GetExtension(file);
             File.Move(file, Path.Combine(Path.GetDirectoryName(file) ?? backup, newName));
         }
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(4, result.Cleanups.Count);
     }
 
@@ -354,7 +354,7 @@ public class UnitTests
         var newDir = Path.Combine(backup, Guid.NewGuid().ToString());
         Directory.CreateDirectory(newDir);
         Directory.SetCreationTimeUtc(newDir, DateTime.UtcNow.AddDays(-2));
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(1, result.Cleanups.Count);
     }
 
@@ -373,7 +373,7 @@ public class UnitTests
             TaskExecutionId = Guid.NewGuid().ToString()
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(0, result.Cleanups.Count);
     }
 
@@ -396,7 +396,7 @@ public class UnitTests
             DaysOlder = 14,
             TaskExecutionId = Guid.NewGuid().ToString()
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(3, result.FileCountInBackup);
     }
 
@@ -419,7 +419,7 @@ public class UnitTests
             DaysOlder = 14,
             TaskExecutionId = Guid.NewGuid().ToString()
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(3, result.FileCountInBackup);
     }
 
@@ -442,7 +442,7 @@ public class UnitTests
             DaysOlder = 14,
             TaskExecutionId = Guid.NewGuid().ToString()
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(3, result.FileCountInBackup);
     }
 
@@ -465,7 +465,7 @@ public class UnitTests
             DaysOlder = 14,
             TaskExecutionId = Guid.NewGuid().ToString()
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(0, result.FileCountInBackup);
     }
 
@@ -486,7 +486,7 @@ public class UnitTests
             TaskExecutionId = Guid.NewGuid().ToString()
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(0, result.FileCountInBackup);
 
         Directory.Delete(backup, true);
@@ -507,7 +507,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(1, result.Backups.Count);
         Assert.IsTrue(File.Exists(Path.Combine(buDir, input.SourceFile)));
     }
@@ -527,7 +527,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(1, result.Backups.Count);
         Assert.IsTrue(File.Exists(Path.Combine(buDir, input.SourceFile)));
     }
@@ -548,7 +548,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(3, result.Backups.Count);
     }
 
@@ -567,7 +567,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(1, result.Backups.Count);
     }
 
@@ -586,7 +586,7 @@ public class UnitTests
             Cleanup = false,
         };
 
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(1, result.Backups.Count);
     }
 
@@ -606,7 +606,7 @@ public class UnitTests
             DaysOlder = 5,
             Cleanup = false,
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
 
         Assert.AreEqual(1, result.Backups.Count);
         Assert.IsTrue(File.Exists(Path.Combine(buDir, fileName)));
@@ -628,7 +628,7 @@ public class UnitTests
             DaysOlder = 5,
             Cleanup = false,
         };
-        var result = Files.LocalBackup(input, default);
+        var result = Files.LocalBackup(input, new Options(), default);
 
         Assert.AreEqual(1, result.Backups.Count);
         Assert.IsTrue(File.Exists(Path.Combine(buDir, fileName)));

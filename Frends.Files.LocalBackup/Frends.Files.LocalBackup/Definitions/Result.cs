@@ -7,6 +7,18 @@ namespace Frends.Files.LocalBackup.Definitions;
 public class Result
 {
     /// <summary>
+    /// Indicates whether the operation completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; private set; }
+
+    /// <summary>
+    /// Error details. Null when Success is true.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
+
+    /// <summary>
     /// Backup directory.
     /// </summary>
     /// <example>C:\\directory\\backup\\2022-07-07_08_51_02-e7e34166-f4fd-45e5-9307-ea5c2cf8e037</example>
@@ -42,11 +54,13 @@ public class Result
     /// </example>
     public List<string> Cleanups { get; private set; }
 
-    internal Result(string directory, List<string> backups, List<string> cleanups)
+    internal Result(bool success, Error error = null, string directory = null, List<string> backups = null, List<string> cleanups = null)
     {
+        Success = success;
+        Error = error;
         Directory = directory;
-        FileCountInBackup = backups.Count;
         Backups = backups;
+        FileCountInBackup = backups?.Count ?? 0;
         Cleanups = cleanups;
     }
 }
