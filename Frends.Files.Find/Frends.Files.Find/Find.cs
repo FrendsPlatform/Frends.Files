@@ -9,6 +9,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Linq;
+using System.Threading;
 using Frends.Files.Find.Helpers;
 
 namespace Frends.Files.Find;
@@ -16,7 +17,7 @@ namespace Frends.Files.Find;
 ///<summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Find files from directory.
@@ -24,11 +25,24 @@ public class Files
     /// </summary>
     /// <param name="input">Input parameters</param>
     /// <param name="options">Options parameters</param>
-    /// <returns>Object { List [object { string Extension, string DirectoryName, string FullPath, string FileName, bool IsReadOnly, double SizeInMegaBytes, DateTime CreationTime, DateTime CreationTimeUtc, DateTime LastAccessTime, DateTime LastAccessTimeUtc, DateTime LastWriteTime, DateTime LastWriteTimeUtc }] Files }</returns>
-    public static Result Find([PropertyTab] Input input, [PropertyTab] Options options)
+    /// <param name="cancellationToken">Token used to cancel the operation before file discovery.</param>
+    /// <returns>Object { bool Success, object Error, List [object { string Extension, string DirectoryName, string FullPath, string FileName, bool IsReadOnly, double SizeInMegaBytes, DateTime CreationTime, DateTime CreationTimeUtc, DateTime LastAccessTime, DateTime LastAccessTimeUtc, DateTime LastWriteTime, DateTime LastWriteTimeUtc }] Files }</returns>
+    public static Result Find([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken = default)
     {
-        return ExecuteAction(() => ExecuteFind(input),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+        options ??= new Options();
+
+        try
+        {
+            ValidationHandler.Run(input, options);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return ExecuteAction(() => ExecuteFind(input),
+                options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+        }
+        catch (Exception exception)
+        {
+            return exception.Handle(options);
+        }
     }
 
     private static Result ExecuteAction<Result>(Func<Result> action, bool useGivenCredentials, string username, string password)
@@ -51,7 +65,7 @@ public class Files
     {
         var results = FilesHandler.FindMatchingFiles(input.Directory, input.Pattern);
         var files = results.Select(path => new FileItem(new FileInfo(Path.Combine(input.Directory, path)))).ToList();
-        return new Result(files);
+        return new Result(true, files: files);
     }
 
     internal static Tuple<string, string> GetDomainAndUsername(string username)

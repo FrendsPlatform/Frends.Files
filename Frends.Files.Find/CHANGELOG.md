@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.0.0] - 2026-10-05
+### Changed
+- Added the option to return file discovery failures in the task result or throw them with a custom message.
+- Added cancellation support for file discovery.
+
 ## [2.0.0] - 2026-09-10
 ### Changed
 - Upgraded the task to .NET 8.
