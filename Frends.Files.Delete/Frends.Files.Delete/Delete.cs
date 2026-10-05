@@ -21,7 +21,7 @@ namespace Frends.Files.Delete;
 ///<summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     static Files()
     {
@@ -70,9 +70,16 @@ public class Files
     /// <returns>Result object { List&lt;FileItem&gt; }</returns>
     public static Result Delete([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var files = ExecuteAction(() => ExecuteDelete(input, cancellationToken), options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+        try
+        {
+            var files = ExecuteAction(() => ExecuteDelete(input, cancellationToken), options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
 
-        return new Result(files);
+            return new Result(true, files);
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options);
+        }
     }
 
     private static TResult ExecuteAction<TResult>(Func<TResult> action, bool useGivenCredentials, string username, string password)

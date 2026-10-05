@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.0] - 2026-10-05
+### Added
+- Added `ThrowErrorOnFailure` and `ErrorMessageOnFailure` options. By default the Task still throws on failure; when `ThrowErrorOnFailure` is disabled, the Task returns a failed result instead.
+- Added `Success` and `Error` properties to the result.
+
+### Changed
+- [Breaking Change] The Task class is now static.
+
 ## [2.0.0] - 2026-09-10
 ### Changed
 - Upgraded the task to .NET 8.
