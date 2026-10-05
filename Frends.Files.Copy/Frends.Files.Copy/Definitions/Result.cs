@@ -33,7 +33,7 @@ public class Result
     public List<FailedFileItem> FailedFiles { get; private set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Result"/> class.
+    /// Initializes a new result.
     /// </summary>
     /// <param name="success">Whether the operation completed successfully.</param>
     /// <param name="error">Error details when the operation failed.</param>

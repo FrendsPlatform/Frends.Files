@@ -34,10 +34,17 @@ public static class Files
         try
         {
             ValidationHandler.Run(input, options);
-            var (files, failed) = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
-                options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
+            var (files, failed) = await ExecuteActionAsync(
+                () => ExecuteCopyAsync(input, options, cancellationToken),
+                options.UseGivenUserCredentialsForRemoteConnections,
+                options.UserName,
+                options.Password).ConfigureAwait(false);
 
-            return new Result(true, files: files, failedFiles: failed);
+            var error = failed.Count == 0
+                ? null
+                : new Error { Message = failed[0].Exception.Message, AdditionalInfo = failed[0].Exception };
+
+            return new Result(failed.Count == 0, error, files, failed);
         }
         catch (Exception ex)
         {

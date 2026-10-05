@@ -198,6 +198,8 @@ public class UnitTests
 
         var result = await Files.Copy(_input, options, default);
 
+        ClassicAssert.IsFalse(result.Success);
+        ClassicAssert.IsNotNull(result.Error);
         ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
         ClassicAssert.AreEqual(1, result.FailedFiles.Count);
         ClassicAssert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);

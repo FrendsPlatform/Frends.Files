@@ -19,7 +19,10 @@ internal static class ErrorHandler
     internal static Result Handle(this Exception exception, Options options, bool throwCanceled = true)
     {
         ThrowIfCanceled(exception, throwCanceled);
-        if (options.ThrowErrorOnFailure) ThrowBaseException(exception, options.ErrorMessageOnFailure);
+        if (options.ThrowErrorOnFailure)
+        {
+            ThrowBaseException(exception, options.ErrorMessageOnFailure);
+        }
 
         return ReturnResult(exception, options.ErrorMessageOnFailure);
     }

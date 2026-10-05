@@ -70,14 +70,14 @@ public class Options
     public bool ThrowErrorOnFail { get; set; }
 
     /// <summary>
-    /// Whether to throw an error when the task fails.
+    /// Whether to throw an error when the task fails outside individual file copy failures.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
     public bool ThrowErrorOnFailure { get; set; } = true;
 
     /// <summary>
-    /// Overrides the error message when the task fails.
+    /// Overrides the error message for task-level failures.
     /// </summary>
     /// <example>File copy failed due to insufficient permissions</example>
     [DisplayFormat(DataFormatString = "Text")]
