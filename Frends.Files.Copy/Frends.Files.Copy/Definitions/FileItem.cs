@@ -8,11 +8,13 @@ public class FileItem
     /// <summary>
     /// Source path to the file.
     /// </summary>
+    /// <example>C:\test\testfolder\test1.txt</example>
     public string SourcePath { get; set; }
 
     /// <summary>
     /// Target path to the file.
     /// </summary>
+    /// <example>C:\test\moved\test1.txt</example>
     public string TargetPath { get; set; }
 
     internal FileItem(string source, string target)
@@ -21,4 +23,3 @@ public class FileItem
         TargetPath = target;
     }
 }
-

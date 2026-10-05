@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.0] - 2026-10-05
+### Added
+- Added configurable error handling and structured failure details to Copy results.
+
 ## [2.0.0] - 2026-09-10
 ### Changed
 - Upgraded the task to .NET 8.

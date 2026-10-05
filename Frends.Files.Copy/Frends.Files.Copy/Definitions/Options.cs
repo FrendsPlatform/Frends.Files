@@ -42,7 +42,7 @@ public class Options
 
     /// <summary>
     /// If set, will create the target directory if it does not exist,
-    /// as well as any sub directories if <see cref="PreserveDirectoryStructure"/> is set.
+    /// as well as any sub directories if PreserveDirectoryStructure is set.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
@@ -58,14 +58,26 @@ public class Options
     public FileExistsAction IfTargetFileExists { get; set; }
 
     /// <summary>
-    /// Whether to throw an error on a failure to copy a file.
-    /// This option is independent of the <see cref="IfTargetFileExists"/> option with the value of <see cref="FileExistsAction.Throw"/> and will affect handling of all errors during the copy process.
-    /// If set to false, task will continue executing despite files failing to copy, otherwise execution will stop at the first failure.
-    /// 
-    /// Note: When set to false and <see cref="IfTargetFileExists"/> is set to <see cref="FileExistsAction.Throw"/>, the task will continue copying other files despite a failure.
-    /// Behaviour of <see cref="FileExistsAction.Overwrite"/> and <see cref="FileExistsAction.Rename"/> will not be affected by this setting.
+    /// If set to false, copying continues after an individual file fails, and the failure is added to FailedFiles.
+    /// Otherwise, execution stops at the first file failure.
+    /// This setting is independent of ThrowErrorOnFailure, which controls whether task errors are thrown or returned in the result.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
     public bool ThrowErrorOnFail { get; set; }
+
+    /// <summary>
+    /// Whether to throw an error when the task fails.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message when the task fails.
+    /// </summary>
+    /// <example>File copy failed: access denied</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }
