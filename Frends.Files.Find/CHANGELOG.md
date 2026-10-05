@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.0.0] - 2026-10-05
+## [2.1.0] - 2026-10-05
 ### Changed
 - Added the option to return file discovery failures in the task result or throw them with a custom message.
 - Added cancellation support for file discovery.
