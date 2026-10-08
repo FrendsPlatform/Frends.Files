@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Frends.Files.LocalBackup.Attributes;
 
 namespace Frends.Files.LocalBackup.Definitions
@@ -14,7 +14,7 @@ namespace Frends.Files.LocalBackup.Definitions
         /// </summary>
         /// <example>c:\temp</example>
         [DisplayFormat(DataFormatString = "Text")]
-        [RequiredIf(nameof(FilePaths), new object[] { null }, ErrorMessage = "Source parameters required.")]
+        [RequiredIf(nameof(FilePaths), [null], ErrorMessage = "Source parameters required.")]
         public string SourceDirectory { get; set; }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace Frends.Files.LocalBackup.Definitions
         /// Regex: &lt;regex&gt;test.(txt|xml), &lt;regex&gt;^Sub/.+\.txt$, &lt;regex&gt;^(?!prof).*_test.txt
         /// </example>
         [DisplayFormat(DataFormatString = "Text")]
-        [RequiredIf(nameof(FilePaths), new object[] { null }, ErrorMessage = "Source parameters required.")]
+        [RequiredIf(nameof(FilePaths), [null], ErrorMessage = "Source parameters required.")]
         public string SourceFile { get; set; }
 
         /// <summary>

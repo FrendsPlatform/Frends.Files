@@ -2,20 +2,10 @@ using System;
 using System.Runtime.ExceptionServices;
 using Frends.Files.LocalBackup.Definitions;
 
-namespace Frends.Files.LocalBackup.Helpers;
+namespace Frends.Files.LocalBackup;
 
-/// <summary>
-/// Converts an exception into a failed Result object or rethrows based on task options.
-/// </summary>
 internal static class ErrorHandler
 {
-    /// <param name="exception">The exception to handle.</param>
-    /// <param name="options">Task options that control whether failures are returned as a Result object or thrown.</param>
-    /// <param name="throwCanceled">
-    /// When true, an OperationCanceledException is rethrown immediately.
-    /// When false, cancellation is handled like any other failure.
-    /// </param>
-    /// <returns>A failed Result object when the exception is handled instead of rethrown.</returns>
     internal static Result Handle(this Exception exception, Options options, bool throwCanceled = true)
     {
         ThrowIfCanceled(exception, throwCanceled);

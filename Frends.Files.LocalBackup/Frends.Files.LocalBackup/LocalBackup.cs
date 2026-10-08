@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -107,6 +106,7 @@ namespace Frends.Files.LocalBackup
                         Directory.Delete(dir, true);
                         result.Add($"{dir} deleted.");
                     }
+
                     var files = Directory.GetFiles(backupDirectory);
                     foreach (var file in files.Where(f => File.GetLastWriteTime(f) < DateTime.Now.AddDays(-input.DaysOlder)))
                     {
@@ -117,11 +117,10 @@ namespace Frends.Files.LocalBackup
             }
             else
             {
-                ConcurrentDictionary<string, DateTime> _lastCleanup = new();
-                _lastCleanup[backupDirectory] = DateTime.Now;
-
                 if (input.DaysOlder < 0)
-                    throw new ArgumentException("Days older cannot be a negative number", "daysOlder");
+                {
+                    throw new ArgumentException("Days older cannot be a negative number", nameof(input.DaysOlder));
+                }
 
                 var directories = Directory.GetDirectories(backupDirectory).Where(dirName => ShouldBeCleanedUp(dirName, input));
 
@@ -132,24 +131,26 @@ namespace Frends.Files.LocalBackup
                     result.Add($"{dir} deleted.");
                 }
             }
+
             return result;
         }
 
         private static bool ShouldBeCleanedUp(string dirPath, Input input)
         {
-            var TimestampPattern = "yyyy-MM-dd_HH_mm_ss";
-            var DirNamePatternLength = TimestampPattern.Length + input.TaskExecutionId.Length + 1; // Add one to the Length because of '-' character which separates the timestamp and guid.
+            const string timestampPattern = "yyyy-MM-dd_HH_mm_ss";
+            var dirNamePatternLength = timestampPattern.Length + input.TaskExecutionId.Length + 1; // Add one to the Length because of '-' character which separates the timestamp and guid.
             var dirName = Path.GetFileName(dirPath) ?? string.Empty;
 
-            if (dirName.Length == DirNamePatternLength)
+            if (dirName.Length == dirNamePatternLength)
             {
-                var timestampPart = dirName.Substring(0, TimestampPattern.Length);
+                var timestampPart = dirName.Substring(0, timestampPattern.Length);
 
-                if (DateTime.TryParseExact(timestampPart, TimestampPattern, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime timeStamp))
+                if (DateTime.TryParseExact(timestampPart, timestampPattern, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime timeStamp))
                 {
                     return timeStamp < DateTime.UtcNow.AddDays(-input.DaysOlder);
                 }
             }
+
             return File.GetCreationTimeUtc(dirPath) < DateTime.UtcNow.AddDays(-input.DaysOlder);
         }
 
@@ -159,9 +160,7 @@ namespace Frends.Files.LocalBackup
                 throw new ArgumentException($"Invalid type for parameter FilePaths. Expected array but was {objectArray.GetType()}");
 
             var res = objectArray as object[];
-            if (res == null)
-                return null;
-            return res.OfType<string>().ToArray();
+            return res?.OfType<string>().ToArray();
         }
     }
 }

@@ -1,19 +1,19 @@
-using Frends.Files.LocalBackup.Definitions;
-using Frends.Files.LocalBackup.Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using Frends.Files.LocalBackup.Definitions;
+using Frends.Files.LocalBackup.Helpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Frends.Files.LocalBackup.Tests;
 
 [TestClass]
 public class UnitTests
 {
-    private readonly string _dir = Path.Combine(Environment.CurrentDirectory, "Tests"); // ...Test\bin\Debug\net6.0\
-    Input? input;
+    private readonly string dir = Path.Combine(Environment.CurrentDirectory, "Tests"); // ...Test\bin\Debug\net6.0\
+    private Input? input;
 
     [TestInitialize]
     public void Setup()
@@ -44,17 +44,17 @@ public class UnitTests
     [TestMethod]
     public void CopyAll_CreateSubdirectoriesFalse_Test()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
             BackupDirectory = buDir,
             TaskExecutionId = null,
             DaysOlder = 5,
             Cleanup = false,
-            CreateSubdirectories = false
+            CreateSubdirectories = false,
         };
 
         var result = Files.LocalBackup(input, new Options(), default);
@@ -76,17 +76,17 @@ public class UnitTests
     [TestMethod]
     public void CopyAll_CreateSubdirectoriesTrue_Test()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 5,
             Cleanup = false,
-            CreateSubdirectories = true
+            CreateSubdirectories = true,
         };
 
         var result = Files.LocalBackup(input, new Options(), default);
@@ -108,17 +108,17 @@ public class UnitTests
     [TestMethod]
     public void CopyAll_CreateSubdirectoriesTrue_NonGUID_Test()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
             BackupDirectory = buDir,
             TaskExecutionId = "qwerty123",
             DaysOlder = 5,
             Cleanup = false,
-            CreateSubdirectories = true
+            CreateSubdirectories = true,
         };
 
         var result = Files.LocalBackup(input, new Options(), default);
@@ -140,11 +140,11 @@ public class UnitTests
     [TestMethod]
     public void CopyWithPrefixTest()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "Test*",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -172,11 +172,11 @@ public class UnitTests
     [TestMethod]
     public void CopyWithPrefix2Test()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "<regex>Test1.(txt|xml)",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -204,11 +204,11 @@ public class UnitTests
     [TestMethod]
     public void CopyWithPrefix3Test()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "<regex>Test1.[^t][^x][^t]",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -236,11 +236,11 @@ public class UnitTests
     [TestMethod]
     public void CopyWithPrefix4Test()
     {
-        var buDir = Path.Combine(_dir, "Backup", "Pro");
+        var buDir = Path.Combine(dir, "Backup", "Pro");
 
         input = new Input()
         {
-            SourceDirectory = Path.Combine(_dir, "Pro"),
+            SourceDirectory = Path.Combine(dir, "Pro"),
             SourceFile = "<regex>^(?!prof).*_test.txt",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -269,14 +269,14 @@ public class UnitTests
     public void CleanupFile_CreateSubdirectoriesTrue_Test()
     {
         var timestampString = DateTime.UtcNow.AddDays(-10).ToString("yyyy-MM-dd_HH_mm_ss");
-        var backupDirectory = Path.Combine(_dir, "Cleanup", $"{timestampString}-{Guid.NewGuid()}");
+        var backupDirectory = Path.Combine(dir, "Cleanup", $"{timestampString}-{Guid.NewGuid()}");
         Directory.CreateDirectory(backupDirectory);
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
-            BackupDirectory = Path.Combine(_dir, "Cleanup"),
+            BackupDirectory = Path.Combine(dir, "Cleanup"),
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 1,
             Cleanup = true,
@@ -295,16 +295,16 @@ public class UnitTests
     {
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
-            BackupDirectory = Path.Combine(_dir, "Cleanup"),
+            BackupDirectory = Path.Combine(dir, "Cleanup"),
             TaskExecutionId = null,
             DaysOlder = 1,
             Cleanup = true,
             CreateSubdirectories = false,
         };
 
-        var backupDirectory = Path.Combine(_dir, "Cleanup", "DeleteThis");
+        var backupDirectory = Path.Combine(dir, "Cleanup", "DeleteThis");
         Directory.CreateDirectory(backupDirectory);
         Directory.SetLastWriteTimeUtc(backupDirectory, DateTime.Now.AddDays(-2));
 
@@ -320,11 +320,11 @@ public class UnitTests
     [TestMethod]
     public void CleanupFile_CleanIndividualFiles_Test()
     {
-        var backup = Path.Combine(_dir, "Cleanup");
+        var backup = Path.Combine(dir, "Cleanup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
             BackupDirectory = backup,
             TaskExecutionId = null,
@@ -343,6 +343,7 @@ public class UnitTests
             var newName = Path.GetFileNameWithoutExtension(file) + "(1)" + Path.GetExtension(file);
             File.Move(file, Path.Combine(Path.GetDirectoryName(file) ?? backup, newName));
         }
+
         var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(4, result.Cleanups.Count);
     }
@@ -350,18 +351,18 @@ public class UnitTests
     [TestMethod]
     public void CleanupFile_CleanWithoutTimestampInDirectoryName()
     {
-        var backup = Path.Combine(_dir, "Cleanup");
+        var backup = Path.Combine(dir, "Cleanup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
             FilePaths = null,
             BackupDirectory = backup,
             TaskExecutionId = Guid.NewGuid().ToString(),
             DaysOlder = 2,
             Cleanup = true,
-            CreateSubdirectories = true
+            CreateSubdirectories = true,
         };
 
         var newDir = Path.Combine(backup, Guid.NewGuid().ToString());
@@ -379,11 +380,11 @@ public class UnitTests
             SourceDirectory = Environment.CurrentDirectory,
             SourceFile = "FileThatDontExist",
             FilePaths = null,
-            BackupDirectory = _dir,
+            BackupDirectory = dir,
             CreateSubdirectories = true,
             Cleanup = true,
             DaysOlder = 14,
-            TaskExecutionId = Guid.NewGuid().ToString()
+            TaskExecutionId = Guid.NewGuid().ToString(),
         };
 
         var result = Files.LocalBackup(input, new Options(), default);
@@ -395,19 +396,19 @@ public class UnitTests
     {
         var input = new Input
         {
-            SourceDirectory = "",
-            SourceFile = "",
+            SourceDirectory = string.Empty,
+            SourceFile = string.Empty,
             FilePaths = new string[]
             {
-                Path.Combine(_dir, "Test1.txt"),
-                Path.Combine(_dir, "Test2.txt"),
-                Path.Combine(_dir, "Test1.xml"),
+                Path.Combine(dir, "Test1.txt"),
+                Path.Combine(dir, "Test2.txt"),
+                Path.Combine(dir, "Test1.xml"),
             },
-            BackupDirectory = _dir,
+            BackupDirectory = dir,
             CreateSubdirectories = true,
             Cleanup = true,
             DaysOlder = 14,
-            TaskExecutionId = Guid.NewGuid().ToString()
+            TaskExecutionId = Guid.NewGuid().ToString(),
         };
         var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(3, result.FileCountInBackup);
@@ -418,19 +419,19 @@ public class UnitTests
     {
         var input = new Input
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
             FilePaths = new string[]
             {
-                Path.Combine(_dir, "Test1.txt"),
-                Path.Combine(_dir, "Test2.txt"),
-                Path.Combine(_dir, "Test1.xml"),
+                Path.Combine(dir, "Test1.txt"),
+                Path.Combine(dir, "Test2.txt"),
+                Path.Combine(dir, "Test1.xml"),
             },
-            BackupDirectory = _dir,
+            BackupDirectory = dir,
             CreateSubdirectories = true,
             Cleanup = true,
             DaysOlder = 14,
-            TaskExecutionId = Guid.NewGuid().ToString()
+            TaskExecutionId = Guid.NewGuid().ToString(),
         };
         var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(3, result.FileCountInBackup);
@@ -441,19 +442,19 @@ public class UnitTests
     {
         var input = new Input
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*",
             FilePaths = new object[]
             {
-                Path.Combine(_dir, "Test1.txt"),
-                Path.Combine(_dir, "Test2.txt"),
-                Path.Combine(_dir, "Test1.xml"),
+                Path.Combine(dir, "Test1.txt"),
+                Path.Combine(dir, "Test2.txt"),
+                Path.Combine(dir, "Test1.xml"),
             },
-            BackupDirectory = _dir,
+            BackupDirectory = dir,
             CreateSubdirectories = true,
             Cleanup = true,
             DaysOlder = 14,
-            TaskExecutionId = Guid.NewGuid().ToString()
+            TaskExecutionId = Guid.NewGuid().ToString(),
         };
         var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(3, result.FileCountInBackup);
@@ -464,19 +465,19 @@ public class UnitTests
     {
         var input = new Input
         {
-            SourceDirectory = "",
-            SourceFile = "",
+            SourceDirectory = string.Empty,
+            SourceFile = string.Empty,
             FilePaths = new string[]
             {
-                Path.Combine(_dir, "Test56.txt"),
-                Path.Combine(_dir, "Test57.txt"),
-                Path.Combine(_dir, "Test59.xml"),
+                Path.Combine(dir, "Test56.txt"),
+                Path.Combine(dir, "Test57.txt"),
+                Path.Combine(dir, "Test59.xml"),
             },
-            BackupDirectory = _dir,
+            BackupDirectory = dir,
             CreateSubdirectories = true,
             Cleanup = true,
             DaysOlder = 14,
-            TaskExecutionId = Guid.NewGuid().ToString()
+            TaskExecutionId = Guid.NewGuid().ToString(),
         };
         var result = Files.LocalBackup(input, new Options(), default);
         Assert.AreEqual(0, result.FileCountInBackup);
@@ -485,18 +486,18 @@ public class UnitTests
     [TestMethod]
     public void TestBackup_NoFilesForBackupShouldNotDeleteExistingDirectory()
     {
-        var backup = Path.Combine(_dir, "Backup");
+        var backup = Path.Combine(dir, "Backup");
 
         Directory.CreateDirectory(Path.Combine(backup, Guid.NewGuid().ToString()));
 
         var input = new Input
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*.8CO",
             BackupDirectory = backup,
             CreateSubdirectories = false,
             Cleanup = false,
-            TaskExecutionId = Guid.NewGuid().ToString()
+            TaskExecutionId = Guid.NewGuid().ToString(),
         };
 
         var result = Files.LocalBackup(input, new Options(), default);
@@ -508,11 +509,11 @@ public class UnitTests
     [TestMethod]
     public void TestBackup_FileIncludesSpecialCharacters()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = Path.Combine(_dir, "Special"),
+            SourceDirectory = Path.Combine(dir, "Special"),
             SourceFile = "p}ro(_tes[t.txt",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -528,11 +529,11 @@ public class UnitTests
     [TestMethod]
     public void TestBackup_FileIncludesSpecialCharactersInSameSourceFolder()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "p}ro(_tes[t.txt",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -545,15 +546,14 @@ public class UnitTests
         Assert.IsTrue(File.Exists(Path.Combine(buDir, input.SourceFile)));
     }
 
-
     [TestMethod]
     public void TestBackup_FileIncludesSpecialCharactersFoundWithPattern()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*.txt",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -568,11 +568,11 @@ public class UnitTests
     [TestMethod]
     public void TestBackup_FilePatternIncludesSpecialCharacters()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "p}ro(_tes[*",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -587,11 +587,11 @@ public class UnitTests
     [TestMethod]
     public void TestBackup_FilePatternIncludesSpecialCharacters2()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = "*}ro(_tes[t.txt",
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -606,13 +606,13 @@ public class UnitTests
     [TestMethod]
     public void TestBackup_ExactFileNameContainsRoundBrackets()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
         var fileName = "invoice(2024).pdf";
-        File.WriteAllText(Path.Combine(_dir, fileName), "test content");
+        File.WriteAllText(Path.Combine(dir, fileName), "test content");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = fileName,
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -628,13 +628,13 @@ public class UnitTests
     [TestMethod]
     public void TestBackup_ExactFileNameContainsSquareBrackets()
     {
-        var buDir = Path.Combine(_dir, "Backup");
+        var buDir = Path.Combine(dir, "Backup");
         var fileName = "invoice[2024].pdf";
-        File.WriteAllText(Path.Combine(_dir, fileName), "test content");
+        File.WriteAllText(Path.Combine(dir, fileName), "test content");
 
         input = new Input()
         {
-            SourceDirectory = _dir,
+            SourceDirectory = dir,
             SourceFile = fileName,
             BackupDirectory = buDir,
             TaskExecutionId = Guid.NewGuid().ToString(),
@@ -649,29 +649,29 @@ public class UnitTests
 
     public void CreateTestFiles()
     {
-        Directory.CreateDirectory(Path.Combine(_dir, "Sub"));
-        Directory.CreateDirectory(Path.Combine(_dir, "Pro"));
-        Directory.CreateDirectory(Path.Combine(_dir, "Special"));
+        Directory.CreateDirectory(Path.Combine(dir, "Sub"));
+        Directory.CreateDirectory(Path.Combine(dir, "Pro"));
+        Directory.CreateDirectory(Path.Combine(dir, "Special"));
 
         var list = new List<string>
         {
-            Path.Combine(_dir, "Test1.txt"),
-            Path.Combine(_dir, "Test2.txt"),
-            Path.Combine(_dir, "Test1.xml"),
-            Path.Combine(_dir, "p}ro(_tes[t.txt"),
-            Path.Combine(_dir, "Sub", "Overwrite.txt"),
-            Path.Combine(_dir, "Pro", "pro_test.txt"),
-            Path.Combine(_dir, "Pro", "pref_test.txt"),
-            Path.Combine(_dir, "Pro", "_test.txt"),
-            Path.Combine(_dir, "Pro", "prof_test.txt"),
-            Path.Combine(_dir, "Pro", "pro_test.txt"),
-            Path.Combine(_dir, "Special", "p}ro(_tes[t.txt")
+            Path.Combine(dir, "Test1.txt"),
+            Path.Combine(dir, "Test2.txt"),
+            Path.Combine(dir, "Test1.xml"),
+            Path.Combine(dir, "p}ro(_tes[t.txt"),
+            Path.Combine(dir, "Sub", "Overwrite.txt"),
+            Path.Combine(dir, "Pro", "pro_test.txt"),
+            Path.Combine(dir, "Pro", "pref_test.txt"),
+            Path.Combine(dir, "Pro", "_test.txt"),
+            Path.Combine(dir, "Pro", "prof_test.txt"),
+            Path.Combine(dir, "Pro", "pro_test.txt"),
+            Path.Combine(dir, "Special", "p}ro(_tes[t.txt"),
         };
 
         // Create test files and edit creationdate.
         foreach (var file in list)
         {
-            if (file.StartsWith(Path.Combine(_dir, "Overwrite.txt")))
+            if (file.StartsWith(Path.Combine(dir, "Overwrite.txt")))
                 File.AppendAllText(file, "Overwrite complete.");
             else
                 File.AppendAllText(file, $"Test {file}");
@@ -680,7 +680,7 @@ public class UnitTests
 
     public void DeleteTestFolder()
     {
-        DirectoryInfo directoryInfo = new(_dir);
+        DirectoryInfo directoryInfo = new(dir);
         directoryInfo.Delete(true);
     }
 }
