@@ -7,6 +7,14 @@ namespace Frends.Files.Copy.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, Error error = null, List<FileItem> files = null, List<FailedFileItem> failedFiles = null)
+    {
+        Success = success;
+        Error = error;
+        Files = files ?? [];
+        FailedFiles = failedFiles ?? [];
+    }
+
     /// <summary>
     /// Indicates whether the operation completed successfully.
     /// </summary>
@@ -31,19 +39,4 @@ public class Result
     /// </summary>
     /// <example>[object {SourcePath: C:\test\testfolder\test1.txt, Exception: object {Message: Unable to create 'C:\test\moved' directory}}, object {SourcePath: C:\test\testfolder\test2.txt, Exception: object {Message: File 'C:\test\moved\test2.txt' already exists}}]</example>
     public List<FailedFileItem> FailedFiles { get; private set; }
-
-    /// <summary>
-    /// Initializes a new result.
-    /// </summary>
-    /// <param name="success">Whether the operation completed successfully.</param>
-    /// <param name="error">Error details when the operation failed.</param>
-    /// <param name="files">Files copied successfully.</param>
-    /// <param name="failedFiles">Files that failed to copy.</param>
-    public Result(bool success, Error error = null, List<FileItem> files = null, List<FailedFileItem> failedFiles = null)
-    {
-        Success = success;
-        Error = error;
-        Files = files ?? [];
-        FailedFiles = failedFiles ?? [];
-    }
 }

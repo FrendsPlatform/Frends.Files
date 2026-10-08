@@ -7,6 +7,12 @@ namespace Frends.Files.Copy.Definitions;
 /// </summary>
 public class FailedFileItem
 {
+    internal FailedFileItem(string sourcePath, Exception exception)
+    {
+        SourcePath = sourcePath;
+        Exception = exception;
+    }
+
     /// <summary>
     /// Path of the source file.
     /// </summary>
@@ -18,10 +24,4 @@ public class FailedFileItem
     /// </summary>
     /// <example>object { Message: Access to the path is denied. }</example>
     public Exception Exception { get; set; }
-
-    internal FailedFileItem(string sourcePath, Exception exception)
-    {
-        SourcePath = sourcePath;
-        Exception = exception;
-    }
 }
