@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Files.Delete.Definitions;
 
@@ -48,4 +48,3 @@ public class Options
     [DefaultValue("")]
     public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }
-

@@ -1,46 +1,45 @@
+using System;
+using System.IO;
 using Frends.Files.Delete.Definitions;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Frends.Files.Delete.Tests;
 
 [TestFixture]
 public class UnitTests
 {
-    private readonly string _dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
-    Input? _input;
-    Options? _options;
+    private readonly string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../TestData/");
+    private Input input = new();
+    private Options options = new();
 
     [SetUp]
     public void Setup()
     {
-        Helper.CreateTestFiles(_dir);
+        Helper.CreateTestFiles(dir);
 
-        _input = new Input
+        input = new Input
         {
-            Directory = _dir,
-            Pattern = "*"
+            Directory = dir,
+            Pattern = "*",
         };
 
-        _options = new Options
+        options = new Options
         {
-            UseGivenUserCredentialsForRemoteConnections = false
+            UseGivenUserCredentialsForRemoteConnections = false,
         };
     }
 
     [TearDown]
     public void TearDown()
     {
-        Helper.DeleteTestFolder(_dir);
+        Helper.DeleteTestFolder(dir);
     }
 
     [Test]
     public void FileDeleteAll()
     {
-        var result = Files.Delete(_input, _options, default);
+        var result = Files.Delete(input, options, default);
 
         ClassicAssert.AreEqual(7, result.Files.Count);
         ClassicAssert.IsFalse(File.Exists(result.Files[0].Path));
@@ -52,9 +51,11 @@ public class UnitTests
         var result = Files.Delete(
             new Input
             {
-                Directory = _dir,
-                Pattern = "Test1*"
-            }, _options, default);
+                Directory = dir,
+                Pattern = "Test1*",
+            },
+            options,
+            default);
 
         ClassicAssert.AreEqual(2, result.Files.Count);
         ClassicAssert.IsFalse(File.Exists(result.Files[0].Path));
@@ -66,10 +67,10 @@ public class UnitTests
         var result = Files.Delete(
             new Input()
             {
-                Directory = _dir,
-                Pattern = "**/*.unknown"
+                Directory = dir,
+                Pattern = "**/*.unknown",
             },
-            _options,
+            options,
             default);
 
         ClassicAssert.IsEmpty(result.Files);
@@ -81,11 +82,11 @@ public class UnitTests
         var input = new Input()
         {
             Directory = @"F:\directory\that\dont\exists",
-            Pattern = "**/*.unknown"
+            Pattern = "**/*.unknown",
         };
 
-        var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Delete(input, _options, default));
-        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
+        var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Delete(input, options, default));
+        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex!.Message);
     }
 
     [Test]
@@ -94,9 +95,11 @@ public class UnitTests
         var result = Files.Delete(
             new Input
             {
-                Directory = _dir,
+                Directory = dir,
                 Pattern = "<regex>^(?!prof).*_test.txt$",
-            }, _options, default);
+            },
+            options,
+            default);
 
         ClassicAssert.AreEqual(3, result.Files.Count);
         ClassicAssert.IsFalse(File.Exists(result.Files[0].Path));

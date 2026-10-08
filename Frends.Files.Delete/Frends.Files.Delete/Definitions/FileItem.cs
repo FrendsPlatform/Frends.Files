@@ -7,6 +7,13 @@ namespace Frends.Files.Delete.Definitions;
 /// </summary>
 public class FileItem
 {
+    internal FileItem(FileInfo file)
+    {
+        Name = file.Name;
+        Path = file.FullName;
+        SizeInMegaBytes = file.Length / 1024d / 1024d;
+    }
+
     /// <summary>
     /// Name of the deleted file.
     /// </summary>
@@ -24,12 +31,4 @@ public class FileItem
     /// </summary>
     /// <example>1.5</example>
     public double SizeInMegaBytes { get; set; }
-
-    internal FileItem(FileInfo file)
-    {
-        Name = file.Name;
-        Path = file.FullName;
-        SizeInMegaBytes = file.Length / 1024d / 1024d;
-    }
 }
-

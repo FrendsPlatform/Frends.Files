@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.DirectoryServices;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Frends.Files.Delete.Tests;
@@ -41,16 +41,16 @@ internal class Helper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new PlatformNotSupportedException("UseGivenCredentials feature is only supported on Windows.");
 
-        DirectoryEntry AD = new DirectoryEntry("WinNT://" + domain + ",computer");
-        DirectoryEntry NewUser = AD.Children.Add(name, "user");
-        NewUser.Invoke("SetPassword", new object[] { pwd });
-        NewUser.Invoke("Put", new object[] { "Description", "Test User from .NET" });
-        NewUser.CommitChanges();
+        DirectoryEntry aD = new DirectoryEntry("WinNT://" + domain + ",computer");
+        DirectoryEntry newUser = aD.Children.Add(name, "user");
+        newUser.Invoke("SetPassword", new object[] { pwd });
+        newUser.Invoke("Put", new object[] { "Description", "Test User from .NET" });
+        newUser.CommitChanges();
         DirectoryEntry grp;
 
-        grp = AD.Children.Find("Administrators", "group");
+        grp = aD.Children.Find("Administrators", "group");
         if (grp != null)
-            grp.Invoke("Add", new object[] { NewUser.Path.ToString() });
+            grp.Invoke("Add", newUser.Path);
     }
 
     public static void DeleteTestUser(string name)
@@ -64,4 +64,3 @@ internal class Helper
         users.Remove(user);
     }
 }
-

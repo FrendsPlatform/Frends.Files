@@ -1,7 +1,7 @@
-using Frends.Files.Delete.Definitions;
-using NUnit.Framework;
 using System;
 using System.IO;
+using Frends.Files.Delete.Definitions;
+using NUnit.Framework;
 
 namespace Frends.Files.Delete.Tests;
 
@@ -9,12 +9,6 @@ namespace Frends.Files.Delete.Tests;
 public class ErrorHandlerTest
 {
     private const string CustomErrorMessage = "CustomErrorMessage";
-
-    private static Input InvalidInput() => new()
-    {
-        Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NonExistingDirectory"),
-        Pattern = "*"
-    };
 
     [Test]
     public void Should_Throw_Error_When_ThrowErrorOnFailure_Is_True()
@@ -39,4 +33,10 @@ public class ErrorHandlerTest
         var ex = Assert.Throws<Exception>(() => Files.Delete(InvalidInput(), options, default));
         Assert.That(ex!.Message, Does.Contain(CustomErrorMessage));
     }
+
+    private static Input InvalidInput() => new()
+    {
+        Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NonExistingDirectory"),
+        Pattern = "*",
+    };
 }
