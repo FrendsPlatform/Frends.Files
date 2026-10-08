@@ -27,10 +27,8 @@ public static class Files
     /// <param name="options">Options parameters</param>
     /// <param name="cancellationToken">Token used to cancel the operation before file discovery.</param>
     /// <returns>Object { bool Success, object Error, List [object { string Extension, string DirectoryName, string FullPath, string FileName, bool IsReadOnly, double SizeInMegaBytes, DateTime CreationTime, DateTime CreationTimeUtc, DateTime LastAccessTime, DateTime LastAccessTimeUtc, DateTime LastWriteTime, DateTime LastWriteTimeUtc }] Files }</returns>
-    public static Result Find([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken = default)
+    public static Result Find([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        options ??= new Options();
-
         try
         {
             ValidationHandler.Run(input, options);

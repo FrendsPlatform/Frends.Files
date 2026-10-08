@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Threading;
 
 
 namespace Frends.Files.Find.Tests;
@@ -40,7 +41,7 @@ public class UnitTests
     [Test]
     public void FilesFindAll()
     {
-        var result = Files.Find(_input, _options);
+        var result = Files.Find(_input, _options, CancellationToken.None);
         ClassicAssert.AreEqual(7, result.Files.Count);
     }
 
@@ -52,7 +53,7 @@ public class UnitTests
             Directory = _FullPath,
             Pattern = "*.xml",
         };
-        var result = Files.Find(input, _options);
+        var result = Files.Find(input, _options, CancellationToken.None);
         ClassicAssert.AreEqual(1, result.Files.Count);
     }
 
@@ -70,7 +71,7 @@ public class UnitTests
             Pattern = @"\**\sub\*.txt",
         };
 
-        var result = Files.Find(input, _options);
+        var result = Files.Find(input, _options, CancellationToken.None);
         ClassicAssert.AreEqual(6, result.Files.Count);
     }
 
@@ -82,7 +83,7 @@ public class UnitTests
             Directory = @"f:\path\not\exist",
             Pattern = "*",
         };
-        var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Find(input, _options));
+        var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Find(input, _options, CancellationToken.None));
         ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
     }
 }
