@@ -8,6 +8,22 @@ namespace Frends.Files.Find.Definitions;
 /// </summary>
 public class FileItem
 {
+    internal FileItem(FileInfo fileInfo)
+    {
+        Extension = fileInfo.Extension;
+        DirectoryName = fileInfo.DirectoryName;
+        FullPath = fileInfo.FullName;
+        FileName = fileInfo.Name;
+        IsReadOnly = fileInfo.IsReadOnly;
+        SizeInMegaBytes = fileInfo.Length / 1024d / 1024d;
+        CreationTime = fileInfo.CreationTime;
+        CreationTimeUtc = fileInfo.CreationTimeUtc;
+        LastAccessTime = fileInfo.LastAccessTime;
+        LastAccessTimeUtc = fileInfo.LastAccessTimeUtc;
+        LastWriteTime = fileInfo.LastWriteTime;
+        LastWriteTimeUtc = fileInfo.LastWriteTimeUtc;
+    }
+
     /// <summary>
     /// File extension.
     /// </summary>
@@ -79,20 +95,4 @@ public class FileItem
     /// </summary>
     /// <example>2025-01-15T10:30:00Z</example>
     public DateTime LastWriteTimeUtc { get; set; }
-
-    internal FileItem(FileInfo fileInfo)
-    {
-        Extension = fileInfo.Extension;
-        DirectoryName = fileInfo.DirectoryName;
-        FullPath = fileInfo.FullName;
-        FileName = fileInfo.Name;
-        IsReadOnly = fileInfo.IsReadOnly;
-        SizeInMegaBytes = fileInfo.Length / 1024d / 1024d;
-        CreationTime = fileInfo.CreationTime;
-        CreationTimeUtc = fileInfo.CreationTimeUtc;
-        LastAccessTime = fileInfo.LastAccessTime;
-        LastAccessTimeUtc = fileInfo.LastAccessTimeUtc;
-        LastWriteTime = fileInfo.LastWriteTime;
-        LastWriteTimeUtc = fileInfo.LastWriteTimeUtc;
-    }
 }

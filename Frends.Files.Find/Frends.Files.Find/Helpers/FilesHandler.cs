@@ -16,8 +16,10 @@ internal static class FilesHandler
     internal static IEnumerable<string> FindMatchingFiles(string directoryPath, string mask)
     {
         if (!Directory.Exists(directoryPath))
+        {
             throw new DirectoryNotFoundException(
                 $"Directory does not exist or you do not have read access. Tried to access directory '{directoryPath}'");
+        }
 
         if (string.IsNullOrEmpty(mask))
         {
@@ -36,7 +38,10 @@ internal static class FilesHandler
             {
                 string relativePath = NormalizePath(Path.GetRelativePath(normalizedDir, file));
                 string fileName = Path.GetFileName(file);
-                if (regex.IsMatch(relativePath) || regex.IsMatch(fileName)) results.Add(relativePath);
+                if (regex.IsMatch(relativePath) || regex.IsMatch(fileName))
+                {
+                    results.Add(relativePath);
+                }
             }
 
             return results;
@@ -45,9 +50,7 @@ internal static class FilesHandler
         var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
         matcher.AddInclude(NormalizePath(mask));
 
-        var executeResult = matcher.Execute(
-            new DirectoryInfoWrapper(new DirectoryInfo(normalizedDir))
-        );
+        var executeResult = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(normalizedDir)));
 
         results.AddRange(executeResult.Files.Select(file => file.Path));
 

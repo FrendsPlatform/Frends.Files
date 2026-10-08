@@ -84,6 +84,6 @@ public class UnitTests
             Pattern = "*",
         };
         var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Find(input, _options, CancellationToken.None));
-        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'", ex.Message);
+        ClassicAssert.That(ex, Has.Message.EqualTo($"Directory does not exist or you do not have read access. Tried to access directory '{input.Directory}'"));
     }
 }

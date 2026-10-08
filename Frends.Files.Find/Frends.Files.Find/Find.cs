@@ -1,20 +1,19 @@
-﻿using Frends.Files.Find.Definitions;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using Microsoft.Win32.SafeHandles;
-using SimpleImpersonation;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.Linq;
 using System.Threading;
+
+using Frends.Files.Find.Definitions;
 using Frends.Files.Find.Helpers;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.Find;
 
-///<summary>
+/// <summary>
 /// Files task.
 /// </summary>
 public static class Files
@@ -34,8 +33,11 @@ public static class Files
             ValidationHandler.Run(input, options);
             cancellationToken.ThrowIfCancellationRequested();
 
-            return ExecuteAction(() => ExecuteFind(input),
-                options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+            return ExecuteAction(
+                () => ExecuteFind(input),
+                options.UseGivenUserCredentialsForRemoteConnections,
+                options.UserName,
+                options.Password);
         }
         catch (Exception exception)
         {
@@ -43,7 +45,15 @@ public static class Files
         }
     }
 
-    private static Result ExecuteAction<Result>(Func<Result> action, bool useGivenCredentials, string username, string password)
+    internal static Tuple<string, string> GetDomainAndUsername(string username)
+    {
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
+    }
+
+    private static TResult ExecuteAction<TResult>(Func<TResult> action, bool useGivenCredentials, string username, string password)
     {
         if (!useGivenCredentials)
             return action();
@@ -64,13 +74,5 @@ public static class Files
         var results = FilesHandler.FindMatchingFiles(input.Directory, input.Pattern);
         var files = results.Select(path => new FileItem(new FileInfo(Path.Combine(input.Directory, path)))).ToList();
         return new Result(true, files: files);
-    }
-
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 }

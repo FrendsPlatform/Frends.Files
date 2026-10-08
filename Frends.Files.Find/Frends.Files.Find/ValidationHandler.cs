@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace Frends.Files.Find.Helpers;
+namespace Frends.Files.Find;
 
 /// <summary>
 /// Validates objects by their ValidationAttributes.

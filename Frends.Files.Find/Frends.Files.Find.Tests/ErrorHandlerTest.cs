@@ -39,7 +39,7 @@ internal class ErrorHandlerTest
             Files.Find(new Input { Directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N")) }, options, CancellationToken.None));
 
         Assert.That(ex, Is.Not.Null);
-        Assert.That(ex.Message, Does.Contain(CustomErrorMessage));
+        Assert.That(ex, Has.Message.Contain(CustomErrorMessage));
     }
 
     [Test]
