@@ -20,7 +20,8 @@ public class FailedFileItem
     public string SourcePath { get; set; }
 
     /// <summary>
-    /// Exception that caused the copy to fail.
+    /// Exception that caused the copy to fail. Null if the file was not processed
+    /// because copying stopped after an earlier failure.
     /// </summary>
     /// <example>object { Message: Access to the path is denied. }</example>
     public Exception Exception { get; set; }

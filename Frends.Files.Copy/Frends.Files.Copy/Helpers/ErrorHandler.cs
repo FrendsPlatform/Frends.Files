@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using Frends.Files.Copy.Definitions;
 
@@ -11,12 +12,19 @@ internal static class ErrorHandler
     /// </summary>
     /// <param name="exception">The exception to handle.</param>
     /// <param name="options">Task options that control whether failures are returned as a Result object or thrown.</param>
+    /// <param name="files">Files copied before the failure.</param>
+    /// <param name="failedFiles">Failed and unprocessed files.</param>
     /// <param name="throwCanceled">
     /// When true, an OperationCanceledException is rethrown immediately.
     /// When false, cancellation is handled like any other failure.
     /// </param>
     /// <returns>A failed Result object when the exception is handled instead of rethrown.</returns>
-    internal static Result Handle(this Exception exception, Options options, bool throwCanceled = true)
+    internal static Result Handle(
+        this Exception exception,
+        Options options,
+        List<FileItem> files = null,
+        List<FailedFileItem> failedFiles = null,
+        bool throwCanceled = true)
     {
         ThrowIfCanceled(exception, throwCanceled);
         if (options.ThrowErrorOnFailure)
@@ -24,7 +32,7 @@ internal static class ErrorHandler
             ThrowBaseException(exception, options.ErrorMessageOnFailure);
         }
 
-        return ReturnResult(exception, options.ErrorMessageOnFailure);
+        return ReturnResult(exception, options.ErrorMessageOnFailure, files, failedFiles);
     }
 
     private static void ThrowIfCanceled(Exception exception, bool throwCanceled = true)
@@ -40,16 +48,16 @@ internal static class ErrorHandler
         throw new Exception(customMessage, exception);
     }
 
-    private static Result ReturnResult(Exception exception, string customMessage = null)
+    private static Result ReturnResult(Exception exception, string customMessage = null, List<FileItem> files = null, List<FailedFileItem> failedFiles = null)
     {
         var errorMessage = string.IsNullOrEmpty(customMessage)
             ? exception.Message
             : $"{customMessage}: {exception.Message}";
 
-        return new Result(false, new Error
-        {
-            Message = errorMessage,
-            AdditionalInfo = exception,
-        });
+        return new Result(
+            false,
+            new Error { Message = errorMessage, AdditionalInfo = exception },
+            files,
+            failedFiles);
     }
 }

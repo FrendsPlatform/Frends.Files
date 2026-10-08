@@ -30,28 +30,29 @@ public static class Files
     /// <returns>Object {bool Success, List&lt;Object { string SourcePath, string TargetPath }&gt; Files, List&lt;Object { string SourcePath, Exception Exception }&gt; FailedFiles, object Error {string Message, Exception AdditionalInfo} }</returns>
     public static async Task<Result> Copy([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
+        List<FileItem> files;
+        List<FailedFileItem> failed;
         try
         {
             ValidationHandler.Run(input, options);
-            var (files, failed) = await ExecuteActionAsync(
+            (files, failed) = await ExecuteActionAsync(
                 () => ExecuteCopyAsync(input, options, cancellationToken),
                 options.UseGivenUserCredentialsForRemoteConnections,
                 options.UserName,
                 options.Password).ConfigureAwait(false);
-
-            var error = failed.Count == 0
-                ? null
-                : new Error { Message = failed[0].Exception.Message, AdditionalInfo = failed[0].Exception };
-
-            return new Result(failed.Count == 0, error, files, failed);
         }
         catch (Exception ex)
         {
             return ex.Handle(options ?? new Options());
         }
+
+        if (!options.ContinueOnFailure && failed.Count > 0)
+            return failed[0].Exception.Handle(options, files, failed);
+
+        return new Result(true, files: files, failedFiles: failed);
     }
 
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
+    private static Tuple<string, string> GetDomainAndUsername(string username)
     {
         var domainAndUserName = username.Split('\\');
         if (domainAndUserName.Length != 2)
@@ -59,7 +60,7 @@ public static class Files
         return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
-    internal static string GetNonConflictingDestinationFilePath(string sourceFilePath, string destFilePath)
+    private static string GetNonConflictingDestinationFilePath(string sourceFilePath, string destFilePath)
     {
         var count = 1;
         while (File.Exists(destFilePath))
@@ -100,12 +101,18 @@ public static class Files
 
         var files = new List<FileItem>();
         var failedFiles = new List<FailedFileItem>();
+        var stopped = false;
 
         foreach (var entry in fileTransferEntries)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             var sourceFilePath = entry.Key;
+            if (stopped)
+            {
+                failedFiles.Add(new FailedFileItem(sourceFilePath, null));
+                continue;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
             var targetFilePath = entry.Value;
 
             try
@@ -138,8 +145,8 @@ public static class Files
             catch (Exception ex)
             {
                 if (ex is OperationCanceledException) throw;
-                if (options.ThrowErrorOnFail) throw;
                 failedFiles.Add(new FailedFileItem(sourceFilePath, ex));
+                stopped = !options.ContinueOnFailure;
             }
         }
 
