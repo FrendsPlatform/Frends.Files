@@ -1,7 +1,9 @@
 using Frends.Files.LocalBackup.Definitions;
+using Frends.Files.LocalBackup.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 
@@ -23,6 +25,17 @@ public class UnitTests
     public void TearDown()
     {
         DeleteTestFolder();
+    }
+
+    [TestMethod]
+    public void ValidationHandler_ValidatesRequiredInputParameters()
+    {
+        var input = new Input { CreateSubdirectories = true };
+        var exception = Assert.ThrowsException<ValidationException>(() => ValidationHandler.Run(input, new Options()));
+
+        StringAssert.Contains(exception.Message, "Source parameters required.");
+        StringAssert.Contains(exception.Message, "Backup directory required.");
+        StringAssert.Contains(exception.Message, "Task execution id required.");
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using Frends.Files.LocalBackup.Definitions;
 using NUnit.Framework;
@@ -13,7 +14,7 @@ internal class ErrorHandlerTest
     [Test]
     public void Should_Throw_Error_When_ThrowErrorOnFailure_Is_True()
     {
-        var ex = Assert.Throws<Exception>(() =>
+        var ex = Assert.Throws<ValidationException>(() =>
             Files.LocalBackup(new Input(), new Options(), CancellationToken.None));
 
         Assert.That(ex, Is.Not.Null);

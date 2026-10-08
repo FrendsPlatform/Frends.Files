@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using Frends.Files.LocalBackup.Attributes;
 
 namespace Frends.Files.LocalBackup.Definitions
 {
@@ -13,6 +14,7 @@ namespace Frends.Files.LocalBackup.Definitions
         /// </summary>
         /// <example>c:\temp</example>
         [DisplayFormat(DataFormatString = "Text")]
+        [RequiredIf(nameof(FilePaths), new object[] { null }, ErrorMessage = "Source parameters required.")]
         public string SourceDirectory { get; set; }
 
         /// <summary>
@@ -23,6 +25,7 @@ namespace Frends.Files.LocalBackup.Definitions
         /// Regex: &lt;regex&gt;test.(txt|xml), &lt;regex&gt;^Sub/.+\.txt$, &lt;regex&gt;^(?!prof).*_test.txt
         /// </example>
         [DisplayFormat(DataFormatString = "Text")]
+        [RequiredIf(nameof(FilePaths), new object[] { null }, ErrorMessage = "Source parameters required.")]
         public string SourceFile { get; set; }
 
         /// <summary>
@@ -38,6 +41,7 @@ namespace Frends.Files.LocalBackup.Definitions
         /// </summary>
         /// <example>c:\temp\backups, c:\temp\backups\ </example>
         [DisplayFormat(DataFormatString = "Text")]
+        [Required(ErrorMessage = "Backup directory required.")]
         public string BackupDirectory { get; set; }
 
         /// <summary>
@@ -53,6 +57,7 @@ namespace Frends.Files.LocalBackup.Definitions
         /// <example>e7e34166-f4fd-45e5-9307-ea5c2cf8e037, foobar123</example>
         [UIHint(nameof(CreateSubdirectories), "", true)]
         [DefaultValue("#process.executionid")]
+        [RequiredIf(nameof(CreateSubdirectories), true, ErrorMessage = "Task execution id required.")]
         public string TaskExecutionId { get; set; }
 
         /// <summary>

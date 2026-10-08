@@ -16,13 +16,19 @@
         <RepositoryUrl>
             https://github.com/FrendsPlatform/Frends.Files/tree/main/Frends.Files.LocalBackup
         </RepositoryUrl>
+        <NoWarn>
+            CS1591, <!-- StyleCop SA1602 already enforces documentation for enum members -->
+        </NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <AdditionalFiles Include="FrendsTaskMetadata.json" />
-        <None Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
+        <Content Include="migration.json" PackagePath="/" Pack="true"/>
+        <Content Include="../CHANGELOG.md" PackagePath="/" Pack="true"/>
+        <Content Include="FrendsTaskMetadata.json"
+                 Pack="true"
+                 PackagePath="/"
+                 CopyToOutputDirectory="PreserveNewest"/>
+        <AdditionalFiles Include="FrendsTaskMetadata.json"/>
     </ItemGroup>
 
     <ItemGroup>
