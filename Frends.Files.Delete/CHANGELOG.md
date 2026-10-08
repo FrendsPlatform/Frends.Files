@@ -6,7 +6,7 @@
 - Added `Success` and `Error` properties to the result.
 
 ### Changed
-- [Breaking Change] The Task class is now static.
+- The Task class is now static.
 
 ## [2.0.0] - 2026-09-10
 ### Changed

@@ -36,6 +36,10 @@
 		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.12" />
 		<PackageReference Include="System.DirectoryServices" Version="8.0.0" />
+        <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
 	</ItemGroup>
 
     <ItemGroup>
