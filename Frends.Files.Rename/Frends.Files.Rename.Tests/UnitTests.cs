@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Threading;
 
 namespace Frends.Files.Rename.Tests;
 
@@ -40,7 +41,7 @@ public class UnitTests
     [Test]
     public void FilesRenameSimpleRename()
     {
-        var result = Files.Rename(_input, _options);
+        var result = Files.Rename(_input, _options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
     }
 
@@ -50,7 +51,7 @@ public class UnitTests
         var path = Path.Combine(_FullPath, _input.NewFileName);
         File.WriteAllText(path, $"Test {path}");
 
-        var ex = Assert.Throws<IOException>(() => Files.Rename(_input, _options));
+        var ex = Assert.Throws<IOException>(() => Files.Rename(_input, _options, CancellationToken.None));
         ClassicAssert.AreEqual($"File already exists {Path.Combine(_FullPath, _input.NewFileName)}. No file renamed.", ex.Message);
     }
 
@@ -62,7 +63,7 @@ public class UnitTests
 
         _options.RenameBehaviour = RenameBehaviour.Overwrite;
 
-        var result = Files.Rename(_input, _options);
+        var result = Files.Rename(_input, _options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
     }
 
@@ -74,7 +75,7 @@ public class UnitTests
 
         _options.RenameBehaviour = RenameBehaviour.Rename;
 
-        var result = Files.Rename(_input, _options);
+        var result = Files.Rename(_input, _options, CancellationToken.None);
         var newFile = Path.GetFileNameWithoutExtension(_input.NewFileName) + "(1)" + Path.GetExtension(_input.NewFileName);
         ClassicAssert.AreEqual(newFile, Path.GetFileName(result.Path));
         ClassicAssert.IsTrue(File.Exists(Path.Combine(_FullPath, newFile)));
@@ -86,7 +87,7 @@ public class UnitTests
         _input.Path = @"f:\path\not\exist\Test1.txt";
         _input.NewFileName = "test.txt";
 
-        var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Rename(_input, _options));
+        var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Rename(_input, _options, CancellationToken.None));
         ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{Path.GetDirectoryName(_input.Path)}'.", ex.Message);
     }
 }
