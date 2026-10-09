@@ -17,7 +17,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Include="migration.json" PackagePath="/" Pack="true" />
 		<Content Include="../CHANGELOG.md" PackagePath="/" Pack="true" />
 		<Content Include="FrendsTaskMetadata.json" Pack="true" PackagePath="/" CopyToOutputDirectory="PreserveNewest" />
 		<AdditionalFiles Include="FrendsTaskMetadata.json" />
