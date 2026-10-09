@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Files.Copy.Definitions;
 
@@ -42,7 +42,7 @@ public class Options
 
     /// <summary>
     /// If set, will create the target directory if it does not exist,
-    /// as well as any sub directories if <see cref="PreserveDirectoryStructure"/> is set.
+    /// as well as any sub directories when PreserveDirectoryStructure is set.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
@@ -58,14 +58,28 @@ public class Options
     public FileExistsAction IfTargetFileExists { get; set; }
 
     /// <summary>
-    /// Whether to throw an error on a failure to copy a file.
-    /// This option is independent of the <see cref="IfTargetFileExists"/> option with the value of <see cref="FileExistsAction.Throw"/> and will affect handling of all errors during the copy process.
-    /// If set to false, task will continue executing despite files failing to copy, otherwise execution will stop at the first failure.
-    /// 
-    /// Note: When set to false and <see cref="IfTargetFileExists"/> is set to <see cref="FileExistsAction.Throw"/>, the task will continue copying other files despite a failure.
-    /// Behaviour of <see cref="FileExistsAction.Overwrite"/> and <see cref="FileExistsAction.Rename"/> will not be affected by this setting.
+    /// Whether to continue copying after an individual file fails.
+    /// When true, failed files are listed in the result and Success remains true.
+    /// When false, copying stops at the first failure. The failed and unprocessed files
+    /// are listed in FailedFiles when ThrowErrorOnFailure is false.
+    /// </summary>
+    /// <example>false</example>
+    [DefaultValue(false)]
+    public bool ContinueOnFailure { get; set; }
+
+    /// <summary>
+    /// Whether to throw the exception when the task fails, including when a file fails
+    /// and ContinueOnFailure is false. If false, returns a result with Success=false and Error details.
     /// </summary>
     /// <example>true</example>
     [DefaultValue(true)]
-    public bool ThrowErrorOnFail { get; set; }
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message for task-level failures.
+    /// </summary>
+    /// <example>File copy failed due to insufficient permissions</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }

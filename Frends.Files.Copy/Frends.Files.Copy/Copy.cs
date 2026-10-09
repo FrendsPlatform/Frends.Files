@@ -1,25 +1,24 @@
-﻿using Frends.Files.Copy.Definitions;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
-using SimpleImpersonation;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
-using Microsoft.Win32.SafeHandles;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
+
+using Frends.Files.Copy.Definitions;
 using Frends.Files.Copy.Helpers;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.Copy;
-///<summary>
+
+/// <summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Copy files.
@@ -28,13 +27,49 @@ public class Files
     /// <param name="input">Input parameters for the Task.</param>
     /// <param name="options">Additional options for the Task.</param>
     /// <param name="cancellationToken">CancellationToken given by Frends.</param>
-    /// <returns>Object { List&lt;Object { string SourcePath, string TargetPath }&gt; Files, List&lt;Object { string SourcePath, Exception Exception }&gt; FailedFiles }</returns>
+    /// <returns>Object {bool Success, List&lt;Object { string SourcePath, string TargetPath }&gt; Files, List&lt;Object { string SourcePath, Exception Exception }&gt; FailedFiles, object Error {string Message, Exception AdditionalInfo} }</returns>
     public static async Task<Result> Copy([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var (files, failed) = await ExecuteActionAsync(() => ExecuteCopyAsync(input, options, cancellationToken),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
+        List<FileItem> files;
+        List<FailedFileItem> failed;
+        try
+        {
+            ValidationHandler.Run(input, options);
+            (files, failed) = await ExecuteActionAsync(
+                () => ExecuteCopyAsync(input, options, cancellationToken),
+                options.UseGivenUserCredentialsForRemoteConnections,
+                options.UserName,
+                options.Password).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options ?? new Options());
+        }
 
-        return new Result(files, failed);
+        if (!options.ContinueOnFailure && failed.Count > 0)
+            return failed[0].Exception.Handle(options, files, failed);
+
+        return new Result(true, files: files, failedFiles: failed);
+    }
+
+    private static Tuple<string, string> GetDomainAndUsername(string username)
+    {
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
+    }
+
+    private static string GetNonConflictingDestinationFilePath(string sourceFilePath, string destFilePath)
+    {
+        var count = 1;
+        while (File.Exists(destFilePath))
+        {
+            string tempFileName = $"{Path.GetFileNameWithoutExtension(sourceFilePath)}({count++})";
+            destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath));
+        }
+
+        return destFilePath;
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -51,10 +86,9 @@ public class Files
         using SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials);
 
         return await WindowsIdentity.RunImpersonated(userHandle, async () => await action().ConfigureAwait(false));
-
     }
 
-    private static async Task<(List<FileItem>, List<FailedFileItem>)> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
+    private static async Task<(List<FileItem> Files, List<FailedFileItem> FailedFiles)> ExecuteCopyAsync(Input input, Options options, CancellationToken cancellationToken)
     {
         var results = FilesHandler.FindMatchingFiles(input.Directory, input.Pattern);
         var fileTransferEntries = GetFileTransferEntries(results, input.Directory, input.TargetDirectory, options.PreserveDirectoryStructure);
@@ -67,12 +101,18 @@ public class Files
 
         var files = new List<FileItem>();
         var failedFiles = new List<FailedFileItem>();
+        var stopped = false;
 
         foreach (var entry in fileTransferEntries)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             var sourceFilePath = entry.Key;
+            if (stopped)
+            {
+                failedFiles.Add(new FailedFileItem(sourceFilePath, null));
+                continue;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
             var targetFilePath = entry.Value;
 
             try
@@ -99,12 +139,14 @@ public class Files
                         await CopyFileAsync(sourceFilePath, targetFilePath, cancellationToken).ConfigureAwait(false);
                         break;
                 }
+
                 files.Add(new FileItem(sourceFilePath, targetFilePath));
             }
             catch (Exception ex)
             {
-                if (options.ThrowErrorOnFail) throw;
+                if (ex is OperationCanceledException) throw;
                 failedFiles.Add(new FailedFileItem(sourceFilePath, ex));
+                stopped = !options.ContinueOnFailure;
             }
         }
 
@@ -117,14 +159,6 @@ public class Files
         using FileStream destinationStream = File.Open(destination, FileMode.CreateNew);
 
         await sourceStream.CopyToAsync(destinationStream, 81920, cancellationToken).ConfigureAwait(false);
-    }
-
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
     private static Dictionary<string, string> GetFileTransferEntries(IEnumerable<string> fileMatches, string sourceDirectory, string targetDirectory, bool preserveDirectoryStructure)
@@ -148,17 +182,5 @@ public class Files
     private static IList<string> GetDuplicateValues(IEnumerable<string> values)
     {
         return values.GroupBy(v => v).Where(x => x.Count() > 1).Select(k => k.Key).ToList();
-    }
-
-    internal static string GetNonConflictingDestinationFilePath(string sourceFilePath, string destFilePath)
-    {
-        var count = 1;
-        while (File.Exists(destFilePath))
-        {
-            string tempFileName = $"{Path.GetFileNameWithoutExtension(sourceFilePath)}({count++})";
-            destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath));
-        }
-
-        return destFilePath;
     }
 }

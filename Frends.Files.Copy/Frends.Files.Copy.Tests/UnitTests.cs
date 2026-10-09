@@ -1,8 +1,10 @@
 using Frends.Files.Copy.Definitions;
+using Frends.Files.Copy.Helpers;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -35,7 +37,6 @@ public class UnitTests
             PreserveDirectoryStructure = true,
             CreateTargetDirectories = false,
             IfTargetFileExists = FileExistsAction.Throw,
-            ThrowErrorOnFail = true,
         };
     }
 
@@ -181,25 +182,75 @@ public class UnitTests
     }
 
     [Test]
-    public async Task FileCopyShouldNotThrowIfThrowErrorOnFailIsFalse()
+    public async Task FileCopyContinuesOnFailureAndReportsFailedFiles()
     {
-        var testFile = "prof_test.txt";
+        var fileNames = FilesHandler.FindMatchingFiles(_SourceDir, _input.Pattern).ToList();
+        var failedNames = fileNames.Take(2).ToList();
+        _options.ContinueOnFailure = true;
 
-        var options = new Options
-        {
-            UseGivenUserCredentialsForRemoteConnections = false,
-            PreserveDirectoryStructure = true,
-            CreateTargetDirectories = false,
-            IfTargetFileExists = FileExistsAction.Throw,
-            ThrowErrorOnFail = false,
-        };
+        foreach (var name in failedNames)
+            File.Copy(Path.Combine(_SourceDir, name), Path.Combine(_TargetDir, name));
 
-        File.Copy(Path.Combine(_SourceDir, testFile), Path.Combine(_TargetDir, testFile));
+        var result = await Files.Copy(_input, _options, default);
 
-        var result = await Files.Copy(_input, options, default);
+        ClassicAssert.IsTrue(result.Success);
+        ClassicAssert.IsNull(result.Error);
+        ClassicAssert.AreEqual(fileNames.Count - failedNames.Count, result.Files.Count);
+        CollectionAssert.AreEquivalent(failedNames.Select(name => Path.Combine(_SourceDir, name)),
+            result.FailedFiles.Select(file => file.SourcePath));
+        Assert.That(result.FailedFiles.All(file => file.Exception is IOException), Is.True);
+        Assert.That(result.Files.All(file => File.Exists(file.TargetPath)), Is.True);
+    }
 
-        ClassicAssert.IsTrue(File.Exists(result.Files[0].TargetPath));
-        ClassicAssert.AreEqual(1, result.FailedFiles.Count);
-        ClassicAssert.AreEqual(Path.Combine(_SourceDir, testFile), result.FailedFiles[0].SourcePath);
+    [Test]
+    public async Task FileCopyStopsOnFailureAndListsUnprocessedFiles()
+    {
+        var fileNames = FilesHandler.FindMatchingFiles(_SourceDir, _input.Pattern).ToList();
+        var firstName = fileNames[0];
+        File.Copy(Path.Combine(_SourceDir, firstName), Path.Combine(_TargetDir, firstName));
+        _options.ThrowErrorOnFailure = false;
+
+        var result = await Files.Copy(_input, _options, default);
+
+        ClassicAssert.IsFalse(result.Success);
+        ClassicAssert.IsEmpty(result.Files);
+        Assert.That(result.Error.AdditionalInfo, Is.SameAs(result.FailedFiles[0].Exception));
+        CollectionAssert.AreEqual(fileNames.Select(name => Path.Combine(_SourceDir, name)),
+            result.FailedFiles.Select(file => file.SourcePath));
+        Assert.That(result.FailedFiles[0].Exception, Is.TypeOf<IOException>());
+        Assert.That(result.FailedFiles.Skip(1).All(file => file.Exception == null), Is.True);
+        Assert.That(fileNames.Skip(1).All(name => !File.Exists(Path.Combine(_TargetDir, name))), Is.True);
+    }
+
+    [Test]
+    public async Task FileCopyStopsAfterCopyingEarlierFiles()
+    {
+        var fileNames = FilesHandler.FindMatchingFiles(_SourceDir, _input.Pattern).ToList();
+        var failedName = fileNames[1];
+        File.Copy(Path.Combine(_SourceDir, failedName), Path.Combine(_TargetDir, failedName));
+        _options.ThrowErrorOnFailure = false;
+        _options.ErrorMessageOnFailure = "Copy failed";
+
+        var result = await Files.Copy(_input, _options, default);
+
+        Assert.That(result.Success, Is.False);
+        Assert.That(result.Files.Select(file => file.SourcePath),
+            Is.EqualTo(new[] { Path.Combine(_SourceDir, fileNames[0]) }));
+        Assert.That(result.FailedFiles.Select(file => file.SourcePath),
+            Is.EqualTo(fileNames.Skip(1).Select(name => Path.Combine(_SourceDir, name))));
+        Assert.That(result.Error.Message, Does.StartWith("Copy failed: "));
+        Assert.That(result.Error.AdditionalInfo, Is.SameAs(result.FailedFiles[0].Exception));
+        Assert.That(fileNames.Skip(2).All(name => !File.Exists(Path.Combine(_TargetDir, name))), Is.True);
+    }
+
+    [Test]
+    public void FileCopyDefaultOptionsThrowOriginalFileException()
+    {
+        var firstName = FilesHandler.FindMatchingFiles(_SourceDir, _input.Pattern).First();
+        File.Copy(Path.Combine(_SourceDir, firstName), Path.Combine(_TargetDir, firstName));
+
+        var ex = Assert.ThrowsAsync<IOException>(() => Files.Copy(_input, _options, default));
+
+        Assert.That(ex!.Message, Does.Contain(firstName));
     }
 }

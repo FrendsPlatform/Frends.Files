@@ -7,6 +7,27 @@ namespace Frends.Files.Copy.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, Error error = null, List<FileItem> files = null, List<FailedFileItem> failedFiles = null)
+    {
+        Success = success;
+        Error = error;
+        Files = files ?? [];
+        FailedFiles = failedFiles ?? [];
+    }
+
+    /// <summary>
+    /// Indicates whether the operation completed successfully. Remains true if individual
+    /// files fail while ContinueOnFailure is enabled.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; private set; }
+
+    /// <summary>
+    /// Error details. Null when Success is true.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
+
     /// <summary>
     /// List of FileItems including source directory and target directory.
     /// </summary>
@@ -15,14 +36,9 @@ public class Result
 
     /// <summary>
     /// List of FailedItems including path of the source file and failure exception.
-    /// This list will always be empty unless <see cref="Options.ThrowErrorOnFail"/> is set to false.
+    /// When ContinueOnFailure is false, unprocessed files have a null Exception.
+    /// When ContinueOnFailure is true, this list can contain failures even if Success is true.
     /// </summary>
     /// <example>[object {SourcePath: C:\test\testfolder\test1.txt, Exception: object {Message: Unable to create 'C:\test\moved' directory}}, object {SourcePath: C:\test\testfolder\test2.txt, Exception: object {Message: File 'C:\test\moved\test2.txt' already exists}}]</example>
     public List<FailedFileItem> FailedFiles { get; private set; }
-
-    internal Result(List<FileItem> files, List<FailedFileItem> failedFiles)
-    {
-        Files = files;
-        FailedFiles = failedFiles;
-    }
 }
