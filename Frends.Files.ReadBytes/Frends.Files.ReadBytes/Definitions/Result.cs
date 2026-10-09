@@ -8,6 +8,12 @@ namespace Frends.Files.ReadBytes.Definitions;
 public class Result
 {
     /// <summary>
+    /// Indicates whether the operation completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; private set; }
+
+    /// <summary>
     /// File content.
     /// </summary>
     /// <example>This is a test file.</example>
@@ -37,8 +43,18 @@ public class Result
     /// <example>2023-02-06T11:59:13.8696745+02:00</example>
     public DateTime LastWriteTime { get; private set; }
 
-    internal Result(FileInfo info, byte[] content)
+    /// <summary>
+    /// Error details. Null when Success is true.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
+
+    internal Result(bool success, FileInfo info = null, byte[] content = null, Error error = null)
     {
+        Success = success;
+        Error = error;
+        if (info == null) return;
+
         ContentBytes = content;
         Path = info.FullName;
         SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
