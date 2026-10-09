@@ -1,4 +1,5 @@
 ﻿using Frends.Files.ReadBytes.Definitions;
+using Frends.Files.ReadBytes.Helpers;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
 using System;
@@ -14,7 +15,7 @@ namespace Frends.Files.ReadBytes;
 ///<summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Read contents of a file as a byte array.
@@ -23,15 +24,22 @@ public class Files
     /// <param name="input">Input parameters</param>
     /// <param name="options">Options parameters</param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Object { byte[] ContentBytes, string Path, double SizeInMegaBytes, DateTime CreationTime, DateTime LastWriteTime }</returns>
+    /// <returns>Object { bool Success, Error Error, byte[] ContentBytes, string Path, double SizeInMegaBytes, DateTime CreationTime, DateTime LastWriteTime }</returns>
     public static async Task<Result> ReadBytes([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        return await ExecuteActionAsync(
-                    () => ExecuteReadBytes(input, cancellationToken),
-                    options.UseGivenUserCredentialsForRemoteConnections,
-                    options.UserName,
-                    options.Password)
-                .ConfigureAwait(false);
+        try
+        {
+            return await ExecuteActionAsync(
+                        () => ExecuteReadBytes(input, cancellationToken),
+                        options.UseGivenUserCredentialsForRemoteConnections,
+                        options.UserName,
+                        options.Password)
+                    .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options);
+        }
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -56,7 +64,7 @@ public class Files
         var buffer = new byte[file.Length];
         await file.ReadAsync(buffer, 0, (int)file.Length, cancellationToken).ConfigureAwait(false);
 
-        return new Result(new FileInfo(input.Path), buffer);
+        return new Result(true, new FileInfo(input.Path), buffer);
     }
 
     internal static Tuple<string, string> GetDomainAndUsername(string username)
