@@ -1,9 +1,9 @@
 # Changelog
 
-## [2.1.0] - 2026-10-05
+## [3.0.0] - 2026-10-05
 ### Changed
 - Results include `Success`, `Error`, `Files`, and `FailedFiles` details.
-- Added options to control failure handling:
+- [Breaking Change] Added options to control failure handling:
   - `ContinueOnFailure` (default `false`) determines whether copying continues after an individual file fails. When `true`, failed files are listed in `FailedFiles` and `Success` remains `true`; when `false`, copying stops at the first failure and remaining files are listed in `FailedFiles` without an exception.
   - `ThrowErrorOnFailure` (default `true`) determines whether a task-level failure is thrown or returned as `Success = false` with error details in `Error`. This applies when copying stops after a failure.
   - `ErrorMessageOnFailure` optionally supplies a custom message for task-level failures, either in the thrown exception or the returned `Error`.
