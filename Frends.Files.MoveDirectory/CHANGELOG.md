@@ -1,4 +1,12 @@
-# Changelog
+﻿# Changelog
+
+## [2.0.0] - 2026-10-09
+### Changed
+- Task now targets .NET 8.
+- The Task now requires a cancellation token and supports cancellation.
+- The result now contains `Success` and `Error` properties.
+### Added
+- New options `ThrowErrorOnFailure` and `ErrorMessageOnFailure` for controlling error handling. By default the Task still throws on failure.
 
 ## [1.1.0] - 2025-03-19
 ### Changed
