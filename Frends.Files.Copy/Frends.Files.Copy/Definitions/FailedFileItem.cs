@@ -10,11 +10,13 @@ public class FailedFileItem
     /// <summary>
     /// Path of the source file.
     /// </summary>
+    /// <example>C:\test\testfolder\test1.txt</example>
     public string SourcePath { get; set; }
 
     /// <summary>
     /// Exception that caused the copy to fail.
     /// </summary>
+    /// <example>object { Message: Access denied to the file }</example>
     public Exception Exception { get; set; }
 
     internal FailedFileItem(string sourcePath, Exception exception)
