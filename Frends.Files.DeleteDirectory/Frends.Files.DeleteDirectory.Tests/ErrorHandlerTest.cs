@@ -1,7 +1,8 @@
-using System;
-using System.Threading;
 using Frends.Files.DeleteDirectory.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading;
 
 namespace Frends.Files.DeleteDirectory.Tests;
 
@@ -13,7 +14,7 @@ public class ErrorHandlerTest
     [TestMethod]
     public void Should_Throw_Error_When_ThrowErrorOnFailure_Is_True()
     {
-        Assert.ThrowsException<ArgumentNullException>(() =>
+        Assert.ThrowsException<ValidationException>(() =>
             Files.DeleteDirectory(new Input(), new Options(), CancellationToken.None));
     }
 
@@ -25,7 +26,7 @@ public class ErrorHandlerTest
 
         Assert.IsFalse(result.Success);
         Assert.IsNotNull(result.Error);
-        Assert.IsTrue(result.Error.Message.Contains("Directory cannot be empty.", StringComparison.Ordinal));
+        Assert.IsTrue(result.Error.Message.Contains("Directory field is required", StringComparison.Ordinal));
     }
 
     [TestMethod]
