@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Files.DeleteDirectory.Definitions;
 
@@ -12,5 +13,6 @@ public class Input
     /// </summary>
     /// <example>C:\Temp</example>
     [DefaultValue("\"c:\\temp\"")]
+    [Required]
     public string Directory { get; set; }
 }
