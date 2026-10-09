@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.0] - 2026-10-05
+### Added
+- Added `ThrowErrorOnFailure` and `ErrorMessageOnFailure` options.
+- Added `Success` and `Error` properties to the result.
+
+### Changed
+- The Task class is now static.
+
 ## [2.0.0] - 2026-09-10
 ### Changed
 - Upgraded the task to .NET 8.

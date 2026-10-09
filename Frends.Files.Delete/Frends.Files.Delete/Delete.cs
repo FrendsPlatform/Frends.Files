@@ -1,27 +1,24 @@
-﻿using Frends.Files.Delete.Definitions;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using Microsoft.Win32.SafeHandles;
-using SimpleImpersonation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
-using System.Reflection;
 using System.Security.Principal;
 using System.Threading;
-using System.Text.RegularExpressions;
+using Frends.Files.Delete.Definitions;
 using Frends.Files.Delete.Helpers;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.Delete;
 
-///<summary>
+/// <summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     static Files()
     {
@@ -70,9 +67,25 @@ public class Files
     /// <returns>Result object { List&lt;FileItem&gt; }</returns>
     public static Result Delete([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        var files = ExecuteAction(() => ExecuteDelete(input, cancellationToken), options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+        try
+        {
+            var files = ExecuteAction(() => ExecuteDelete(input, cancellationToken), options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
 
-        return new Result(files);
+            return new Result(true, files);
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options);
+        }
+    }
+
+    private static Tuple<string, string> GetDomainAndUsername(string username)
+    {
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
     private static TResult ExecuteAction<TResult>(Func<TResult> action, bool useGivenCredentials, string username, string password)
@@ -113,15 +126,6 @@ public class Files
         }
 
         return fileResults;
-    }
-
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
     private static void OnPluginUnloadingRequested(AssemblyLoadContext obj)
