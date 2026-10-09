@@ -1,4 +1,5 @@
-﻿using Frends.Files.Rename.Definitions;
+using Frends.Files.Rename.Definitions;
+using Frends.Files.Rename.Helpers;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
 using System;
@@ -6,13 +7,14 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Threading;
 
 namespace Frends.Files.Rename;
 
 ///<summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Rename file.
@@ -20,11 +22,20 @@ public class Files
     /// </summary>
     /// <param name="input">Input parameters</param>
     /// <param name="options">Options parameters</param>
-    /// <returns>Object {string Path, double SizeInMegaBytes}</returns>
-    public static Result Rename([PropertyTab] Input input, [PropertyTab] Options options)
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>Object { bool Success, string Path, object Error { string Message, Exception AdditionalInfo } }</returns>
+    public static Result Rename([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        return ExecuteAction(() => ExecuteRename(input, options.RenameBehaviour),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return ExecuteAction(() => ExecuteRename(input, options.RenameBehaviour),
+                options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options);
+        }
     }
 
     private static Result ExecuteAction<Result>(Func<Result> action, bool useGivenCredentials, string username, string password)
@@ -65,7 +76,7 @@ public class Files
                 break;
         }
         File.Move(input.Path, newFileFullPath);
-        return new Result(newFileFullPath);
+        return new Result(true, newFileFullPath);
     }
 
     internal static Tuple<string, string> GetDomainAndUsername(string username)

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
 namespace Frends.Files.Rename.Definitions;
@@ -39,5 +39,19 @@ public class Options
     /// <example>WriteBehaviour.Throw</example>
     [DefaultValue(RenameBehaviour.Throw)]
     public RenameBehaviour RenameBehaviour { get; set; }
-}
 
+    /// <summary>
+    /// Whether to throw an error on failure.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message on failure. If `ThrowErrorOnFailure` is set to `true`, then the original exception will be wrapped in a new Exception with this error message.
+    /// </summary>
+    /// <example>Renaming the file failed: file is locked</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
+}
