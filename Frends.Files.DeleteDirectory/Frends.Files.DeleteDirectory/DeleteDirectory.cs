@@ -1,13 +1,13 @@
-﻿using Frends.Files.DeleteDirectory.Definitions;
-using System;
+﻿using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Threading;
+using Frends.Files.DeleteDirectory.Definitions;
+using Frends.Files.DeleteDirectory.Helpers;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
-using System.IO;
-using Frends.Files.DeleteDirectory.Helpers;
 
 namespace Frends.Files.DeleteDirectory;
 
@@ -18,7 +18,7 @@ public static class Files
 {
     /// <summary>
     /// Deletes all directories and subdirectories in the specified path. Will not do anything if the directory do not exist.
-    /// [Documentation](https://tasks.frends.com/tasks#frends-tasks/Frends.Files.DeleteDirectory)
+    /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends-Files-DeleteDirectory)
     /// </summary>
     /// <param name="input">Input parameters.</param>
     /// <param name="options">Additional task options.</param>
@@ -30,9 +30,6 @@ public static class Files
         {
             cancellationToken.ThrowIfCancellationRequested();
             ValidationHandler.Run(input, options);
-
-            if (string.IsNullOrEmpty(input.Directory))
-                throw new ArgumentNullException("Directory cannot be empty.");
 
             if (!options.UseGivenUserCredentialsForRemoteConnections)
                 return ExecuteDelete(input, options.DeleteRecursively);
@@ -46,7 +43,8 @@ public static class Files
         }
     }
 
-    private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
+    private static T RunAsUser<T>(string domain, string username, string password, Func<T> action)
+        where T : Result
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {

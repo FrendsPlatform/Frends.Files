@@ -16,22 +16,6 @@ public class Options
     public bool DeleteRecursively { get; set; }
 
     /// <summary>
-    /// Whether to throw an error on failure.
-    /// </summary>
-    /// <example>true</example>
-    [DefaultValue(true)]
-    public bool ThrowErrorOnFailure { get; set; } = true;
-
-    /// <summary>
-    /// Overrides the error message on failure. If <see cref="ThrowErrorOnFailure"/> is true,
-    /// the original exception is wrapped in a new exception with this message.
-    /// </summary>
-    /// <example>Directory deletion failed</example>
-    [DisplayFormat(DataFormatString = "Text")]
-    [DefaultValue("")]
-    public string ErrorMessageOnFailure { get; set; } = string.Empty;
-
-    /// <summary>
     /// If set, allows you to give the user credentials to use to create directories on remote hosts.
     /// If not set, the agent service user credentials will be used.
     /// Note: For creating directories on the local machine, the agent service user credentials will always be used, even if this option is set.
@@ -54,4 +38,20 @@ public class Options
     [PasswordPropertyText]
     [UIHint(nameof(UseGivenUserCredentialsForRemoteConnections), "", true)]
     public string Password { get; set; }
+
+    /// <summary>
+    /// Whether to throw an error on failure.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message on failure. If is true,
+    /// the original exception is wrapped in a new exception with this message.
+    /// </summary>
+    /// <example>Directory deletion failed</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
 }

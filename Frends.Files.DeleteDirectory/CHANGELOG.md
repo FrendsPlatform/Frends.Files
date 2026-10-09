@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0] - 2026-09-30
+## [1.2.0] - 2026-09-30
 ### Changed
 - Updated the task to .NET 8 and added cancellation support.
 - Added configurable error handling for directory deletion failures.

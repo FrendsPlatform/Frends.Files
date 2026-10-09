@@ -5,6 +5,13 @@
 /// </summary>
 public class Result
 {
+    internal Result(string path, bool success, Error error = null)
+    {
+        Path = path;
+        Success = success;
+        Error = error;
+    }
+
     /// <summary>
     /// Error that occurred during task execution.
     /// </summary>
@@ -22,11 +29,4 @@ public class Result
     /// </summary>
     /// <example>C:/User/NewDirectory</example>
     public bool Success { get; private set; }
-
-    internal Result(string path, bool success, Error error = null)
-    {
-        Path = path;
-        Success = success;
-        Error = error;
-    }
 }
