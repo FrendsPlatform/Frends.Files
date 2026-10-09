@@ -31,7 +31,7 @@ public class UnitTests
         _context.CreateFiles("temp/bar/foo.txt");
         var sourcePath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
-        var ex = Assert.Throws<IOException>(() => Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Throw }));
+        var ex = Assert.Throws<IOException>(() => Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Throw }, System.Threading.CancellationToken.None));
         Console.WriteLine(ex.Message);
         ClassicAssert.IsTrue(ex.Message.ToString().Contains("Cannot create '" + targetPath + "' because a file or directory with the same name already exists."));
     }
@@ -43,7 +43,7 @@ public class UnitTests
         _context.CreateFiles("temp/bar/foo.txt");
         var sourcePath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
-        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Rename });
+        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Rename }, System.Threading.CancellationToken.None);
         ClassicAssert.AreEqual(targetPath + "(1)", result.TargetPath);
     }
 
@@ -55,7 +55,7 @@ public class UnitTests
         var sourcePath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
 
-        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Overwrite });
+        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Overwrite }, System.Threading.CancellationToken.None);
         ClassicAssert.AreEqual(targetPath, result.TargetPath);
     }
 
@@ -68,7 +68,7 @@ public class UnitTests
         var sourcePath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
 
-        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" });
+        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain/example", Password = "Password123" }, System.Threading.CancellationToken.None);
         ClassicAssert.AreEqual("UserName field must be of format domain\\username was: domain/example", result);
     }
 
@@ -80,7 +80,7 @@ public class UnitTests
         var sourcePath = Path.Combine(_context.RootPath, "temp\\foo\\bar");
         var targetPath = Path.Combine(_context.RootPath, "temp\\bar");
 
-        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Overwrite, UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" });
+        var result = Files.MoveDirectory(new Input() { SourceDirectory = sourcePath, TargetDirectory = targetPath }, new Options() { IfTargetDirectoryExists = DirectoryExistsAction.Overwrite, UseGivenUserCredentialsForRemoteConnections = true, UserName = "domain\\example", Password = "Password123" }, System.Threading.CancellationToken.None);
         ClassicAssert.AreEqual(result.TargetPath, targetPath);
     }
 
@@ -88,7 +88,7 @@ public class UnitTests
     [ExpectedException(typeof(ArgumentNullException))]
     public void ThrowInputEmpty()
     {
-        var result = Files.MoveDirectory(new Input() { }, new Options() { });
+        var result = Files.MoveDirectory(new Input() { }, new Options() { }, System.Threading.CancellationToken.None);
         ClassicAssert.AreEqual("Directory cannot be empty.", result);
     }
 }
