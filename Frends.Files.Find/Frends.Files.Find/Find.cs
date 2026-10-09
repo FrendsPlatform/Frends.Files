@@ -1,22 +1,22 @@
-﻿using Frends.Files.Find.Definitions;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using Microsoft.Win32.SafeHandles;
-using SimpleImpersonation;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.Linq;
+using System.Threading;
+
+using Frends.Files.Find.Definitions;
 using Frends.Files.Find.Helpers;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.Find;
 
-///<summary>
+/// <summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Find files from directory.
@@ -24,14 +24,36 @@ public class Files
     /// </summary>
     /// <param name="input">Input parameters</param>
     /// <param name="options">Options parameters</param>
-    /// <returns>Object { List [object { string Extension, string DirectoryName, string FullPath, string FileName, bool IsReadOnly, double SizeInMegaBytes, DateTime CreationTime, DateTime CreationTimeUtc, DateTime LastAccessTime, DateTime LastAccessTimeUtc, DateTime LastWriteTime, DateTime LastWriteTimeUtc }] Files }</returns>
-    public static Result Find([PropertyTab] Input input, [PropertyTab] Options options)
+    /// <param name="cancellationToken">Token used to cancel the operation before file discovery.</param>
+    /// <returns>Object { bool Success, object Error, List [object { string Extension, string DirectoryName, string FullPath, string FileName, bool IsReadOnly, double SizeInMegaBytes, DateTime CreationTime, DateTime CreationTimeUtc, DateTime LastAccessTime, DateTime LastAccessTimeUtc, DateTime LastWriteTime, DateTime LastWriteTimeUtc }] Files }</returns>
+    public static Result Find([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        return ExecuteAction(() => ExecuteFind(input),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+        try
+        {
+            ValidationHandler.Run(input, options);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return ExecuteAction(
+                () => ExecuteFind(input),
+                options.UseGivenUserCredentialsForRemoteConnections,
+                options.UserName,
+                options.Password);
+        }
+        catch (Exception exception)
+        {
+            return exception.Handle(options);
+        }
     }
 
-    private static Result ExecuteAction<Result>(Func<Result> action, bool useGivenCredentials, string username, string password)
+    internal static Tuple<string, string> GetDomainAndUsername(string username)
+    {
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
+    }
+
+    private static TResult ExecuteAction<TResult>(Func<TResult> action, bool useGivenCredentials, string username, string password)
     {
         if (!useGivenCredentials)
             return action();
@@ -51,14 +73,6 @@ public class Files
     {
         var results = FilesHandler.FindMatchingFiles(input.Directory, input.Pattern);
         var files = results.Select(path => new FileItem(new FileInfo(Path.Combine(input.Directory, path)))).ToList();
-        return new Result(files);
-    }
-
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
+        return new Result(true, files: files);
     }
 }

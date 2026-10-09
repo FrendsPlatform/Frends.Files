@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.0] - 2026-10-05
+### Changed
+- Expanded the result with `Success` and `Error` fields to report whether file discovery succeeded and provide failure details.
+- Added `ThrowErrorOnFailure` and `ErrorMessageOnFailure` options to choose whether failures are returned in the result or thrown, and to set a custom failure message.
+- Added cancellation token support to stop file discovery when cancellation is requested before it starts.
+
 ## [2.0.0] - 2026-09-10
 ### Changed
 - Upgraded the task to .NET 8.

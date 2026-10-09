@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Threading;
 
 namespace Frends.Files.Find.Tests;
 
@@ -61,7 +62,7 @@ class ImpersonationTests
     [Test]
     public void FileFindTestWithCredentials()
     {
-        var result = Files.Find(_input, _options);
+        var result = Files.Find(_input, _options, CancellationToken.None);
         ClassicAssert.AreEqual(7, result.Files.Count);
     }
 
@@ -75,7 +76,7 @@ class ImpersonationTests
             Password = _pwd
         };
 
-        var ex = Assert.Throws<ArgumentException>(() => Files.Find(_input, options));
-        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
+        var ex = Assert.Throws<ArgumentException>(() => Files.Find(_input, options, CancellationToken.None));
+        ClassicAssert.That(ex, Has.Message.EqualTo($@"UserName field must be of format domain\username was: {options.UserName}"));
     }
 }
