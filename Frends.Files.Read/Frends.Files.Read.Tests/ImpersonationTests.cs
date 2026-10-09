@@ -3,6 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -64,7 +65,7 @@ class ImpersonationTests
     [Test]
     public async Task FileReadTestWithCredentials()
     {
-        var result = await Files.Read(_input, _options);
+        var result = await Files.Read(_input, _options, CancellationToken.None);
 
         ClassicAssert.IsTrue(File.Exists(_input.Path));
         ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_input.Path).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
@@ -80,7 +81,7 @@ class ImpersonationTests
             Password = _pwd
         };
 
-        var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Read(_input, options));
+        var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.Read(_input, options, CancellationToken.None));
         ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
     }
 }
