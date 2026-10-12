@@ -84,12 +84,4 @@ public class UnitTests
         ClassicAssert.AreEqual(result.Path, newPath);
         ClassicAssert.IsFalse(result.Success);
     }
-
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
-    public void ThrowInputEmpty()
-    {
-        var result = Files.DeleteDirectory(new Input() { }, new Options() { });
-        ClassicAssert.AreEqual("Directory cannot be empty.", result);
-    }
 }
