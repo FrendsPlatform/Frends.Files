@@ -4,8 +4,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Frends.Files.Write.Definitions;
+using Frends.Files.Write.Helpers;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
 
@@ -14,7 +16,7 @@ namespace Frends.Files.Write;
 /// <summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Write content to a file.
@@ -22,14 +24,23 @@ public class Files
     /// </summary>
     /// <param name="input">Input parameters.</param>
     /// <param name="options">Options parameters.</param>
-    /// <returns>Object { string Path, double SizeInMegaBytes, double SizeInKiloBytes, double SizeInBytes }.</returns>
-    public static async Task<Result> Write([PropertyTab] Input input, [PropertyTab] Options options)
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>Object { bool Success, string Path, double SizeInMegaBytes, double SizeInKiloBytes, double SizeInBytes, Object Error { string Message, Exception AdditionalInfo } }.</returns>
+    public static async Task<Result> Write([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        return await ExecuteActionAsync(
-            () => ExecuteWrite(input, options),
-            options.UseGivenUserCredentialsForRemoteConnections,
-            options.UserName,
-            options.Password).ConfigureAwait(false);
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return await ExecuteActionAsync(
+                () => ExecuteWrite(input, options),
+                options.UseGivenUserCredentialsForRemoteConnections,
+                options.UserName,
+                options.Password).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options);
+        }
     }
 
     /// <summary>
@@ -76,7 +87,7 @@ public class Files
         // Explicitly flush OS-level buffers
         fileStream.Flush(true);
 
-        return new Result(new FileInfo(input.Path));
+        return new Result(true, new FileInfo(input.Path));
     }
 
     private static FileMode GetAndCheckWriteMode(WriteBehaviour givenWriteBehaviour, string filePath)

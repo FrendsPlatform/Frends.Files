@@ -9,6 +9,12 @@ namespace Frends.Files.Write.Definitions;
 public class Result
 {
     /// <summary>
+    /// Indicates whether the write completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; private set; }
+
+    /// <summary>
     /// Full path to the file.
     /// </summary>
     /// <example>c:\temp\foo.txt</example>
@@ -32,8 +38,17 @@ public class Result
     /// <example>32</example>
     public double SizeInBytes { get; private set; }
 
-    internal Result(FileInfo info)
+    /// <summary>
+    /// Error details. Null when Success is true.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
+
+    internal Result(bool success, FileInfo info = null, Error error = null)
     {
+        Success = success;
+        Error = error;
+        if (info == null) return;
         Path = info.FullName;
         SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
         SizeInKiloBytes = Math.Round(info.Length / 1024d, 3);
