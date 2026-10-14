@@ -1,18 +1,18 @@
-﻿using Frends.Files.ReadBytes.Definitions;
-using Frends.Files.ReadBytes.Helpers;
-using Microsoft.Win32.SafeHandles;
-using SimpleImpersonation;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using Frends.Files.ReadBytes.Definitions;
+using Frends.Files.ReadBytes.Helpers;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.ReadBytes;
 
-///<summary>
+/// <summary>
 /// Files task.
 /// </summary>
 public static class Files
@@ -23,7 +23,7 @@ public static class Files
     /// </summary>
     /// <param name="input">Input parameters</param>
     /// <param name="options">Options parameters</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Object { bool Success, Error Error, byte[] ContentBytes, string Path, double SizeInMegaBytes, DateTime CreationTime, DateTime LastWriteTime }</returns>
     public static async Task<Result> ReadBytes([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
@@ -40,6 +40,14 @@ public static class Files
         {
             return ex.Handle(options);
         }
+    }
+
+    internal static Tuple<string, string> GetDomainAndUsername(string username)
+    {
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -65,13 +73,5 @@ public static class Files
         await file.ReadAsync(buffer, 0, (int)file.Length, cancellationToken).ConfigureAwait(false);
 
         return new Result(true, new FileInfo(input.Path), buffer);
-    }
-
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 }

@@ -36,6 +36,6 @@ internal class ErrorHandlerTest
         var options = new Options { ErrorMessageOnFailure = CustomErrorMessage };
         var ex = Assert.ThrowsAsync<Exception>(() =>
             Files.ReadBytes(MissingFileInput(), options, CancellationToken.None));
-        Assert.That(ex.Message, Contains.Substring(CustomErrorMessage));
+        Assert.That(ex?.Message, Contains.Substring(CustomErrorMessage));
     }
 }

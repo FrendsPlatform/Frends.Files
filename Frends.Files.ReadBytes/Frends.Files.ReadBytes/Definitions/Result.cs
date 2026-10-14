@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+
 namespace Frends.Files.ReadBytes.Definitions;
 
 /// <summary>
@@ -7,6 +8,19 @@ namespace Frends.Files.ReadBytes.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, FileInfo info = null, byte[] content = null, Error error = null)
+    {
+        Success = success;
+        Error = error;
+        if (info == null) return;
+
+        ContentBytes = content;
+        Path = info.FullName;
+        SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
+        CreationTime = info.CreationTime;
+        LastWriteTime = info.LastWriteTime;
+    }
+
     /// <summary>
     /// Indicates whether the operation completed successfully.
     /// </summary>
@@ -48,17 +62,4 @@ public class Result
     /// </summary>
     /// <example>null</example>
     public Error Error { get; private set; }
-
-    internal Result(bool success, FileInfo info = null, byte[] content = null, Error error = null)
-    {
-        Success = success;
-        Error = error;
-        if (info == null) return;
-
-        ContentBytes = content;
-        Path = info.FullName;
-        SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
-        CreationTime = info.CreationTime;
-        LastWriteTime = info.LastWriteTime;
-    }
 }
