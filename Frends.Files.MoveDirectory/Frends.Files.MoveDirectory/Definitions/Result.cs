@@ -5,6 +5,14 @@
 /// </summary>
 public class Result
 {
+    internal Result(bool success, string sourcePath, string targetPath, Error error = null)
+    {
+        Success = success;
+        SourcePath = sourcePath;
+        TargetPath = targetPath;
+        Error = error;
+    }
+
     /// <summary>
     /// Source path of directory
     /// </summary>
@@ -28,12 +36,4 @@ public class Result
     /// </summary>
     /// <example>null</example>
     public Error Error { get; private set; }
-
-    internal Result(bool success, string sourcePath, string targetPath, Error error = null)
-    {
-        Success = success;
-        SourcePath = sourcePath;
-        TargetPath = targetPath;
-        Error = error;
-    }
 }

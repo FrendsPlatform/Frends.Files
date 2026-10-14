@@ -1,9 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using Frends.Files.MoveDirectory.Definitions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Assert = NUnit.Framework.Assert;
-using Frends.Files.MoveDirectory.Definitions;
 using NUnit.Framework.Legacy;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using Assert = NUnit.Framework.Assert;
 
 namespace Frends.Files.MoveDirectory.Tests;
 
@@ -85,7 +86,7 @@ public class UnitTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentNullException))]
+    [ExpectedException(typeof(ValidationException))]
     public void ThrowInputEmpty()
     {
         var result = Files.MoveDirectory(new Input() { }, new Options() { }, System.Threading.CancellationToken.None);

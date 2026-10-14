@@ -18,5 +18,5 @@ public enum DirectoryExistsAction
     /// <summary>
     /// Rename the transferred directory by appending a number to the end.
     /// </summary>
-    Rename
+    Rename,
 }

@@ -1,13 +1,13 @@
-﻿using Frends.Files.MoveDirectory.Definitions;
-using System;
+﻿using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Threading;
+using Frends.Files.MoveDirectory.Definitions;
+using Frends.Files.MoveDirectory.Helpers;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
-using System.IO;
-using System.Threading;
-using Frends.Files.MoveDirectory.Helpers;
 
 namespace Frends.Files.MoveDirectory;
 
@@ -28,9 +28,10 @@ public static class Files
     {
         try
         {
+            ValidationHandler.Run(input, options);
+
             cancellationToken.ThrowIfCancellationRequested();
-            if (string.IsNullOrEmpty(input.SourceDirectory) || string.IsNullOrEmpty(input.TargetDirectory))
-                throw new ArgumentNullException(nameof(input), "Source or Target Directory cannot be empty.");
+
             if (!options.UseGivenUserCredentialsForRemoteConnections)
                 return ExecuteMove(input, options.IfTargetDirectoryExists);
 
@@ -55,12 +56,13 @@ public static class Files
                 {
                     destinationFolderPath = $"{destinationFolderPath}({count++})";
                 }
+
                 break;
             case DirectoryExistsAction.Overwrite:
                 if (Directory.Exists(destinationFolderPath))
                     Directory.Delete(destinationFolderPath, true);
                 break;
-            case DirectoryExistsAction.Throw: //Will throw if target folder exist
+            case DirectoryExistsAction.Throw: // Will throw if target folder exist
                 break;
         }
 
@@ -68,7 +70,8 @@ public static class Files
         return new Result(true, input.SourceDirectory, destinationFolderPath);
     }
 
-    private static T RunAsUser<T>(string domain, string username, string password, Func<T> action) where T : Result
+    private static T RunAsUser<T>(string domain, string username, string password, Func<T> action)
+        where T : Result
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             throw new Exception("Impersonation only supported on Windows systems");
@@ -87,4 +90,3 @@ public static class Files
         return domainAndUserName;
     }
 }
-

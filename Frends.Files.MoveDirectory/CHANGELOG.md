@@ -2,6 +2,7 @@
 
 ## [2.0.0] - 2026-10-09
 ### Changed
+- [Breaking Change] Updated task parameter validation to throw ValidationException with a revised error message instead of ArgumentNullException.
 - Task now targets .NET 8.
 - The Task now requires a cancellation token and supports cancellation.
 - The result now contains `Success` and `Error` properties.

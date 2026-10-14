@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Files.MoveDirectory.Definitions;
 
@@ -7,12 +8,12 @@ namespace Frends.Files.MoveDirectory.Definitions;
 /// </summary>
 public class Input
 {
-
     /// <summary>
     /// Source Directory path.
     /// </summary>
     /// <example>C:\Temp</example>
     [DefaultValue("\"c:\\temp\"")]
+    [Required]
     public string SourceDirectory { get; set; }
 
     /// <summary>
@@ -20,5 +21,6 @@ public class Input
     /// </summary>
     /// <example>C:\Temp</example>
     [DefaultValue("\"c:\\temp\"")]
+    [Required]
     public string TargetDirectory { get; set; }
 }
