@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.0] - 2026-10-09
+### Changed
+- The Task now targets .NET 8.
+- By default the Task throws an error when reading fails. Set the new `ThrowErrorOnFailure` option to `false` to receive a failed result instead.
+
+### Added
+- New options `ThrowErrorOnFailure` and `ErrorMessageOnFailure` for controlling error handling.
+- Result now contains `Success` and `Error` properties.
+
 ## [1.2.0] - 2026-05-08
 ### Fixed
 - Fix documentation of result 
