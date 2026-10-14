@@ -6,14 +6,16 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
+using Frends.Files.WriteBytes.Helpers;
 
 namespace Frends.Files.WriteBytes;
 
 ///<summary>
 /// Files task.
 /// </summary>
-public class Files
+public static class Files
 {
     /// <summary>
     /// Write file in bytes.
@@ -21,11 +23,20 @@ public class Files
     /// </summary>
     /// <param name="input">Input parameters</param>
     /// <param name="options">Options parameters</param>
-    /// <returns>Object {string Path, double SizeInMegaBytes}</returns>
-    public static async Task<Result> WriteBytes([PropertyTab] Input input, [PropertyTab] Options options)
+    /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
+    /// <returns>Object { bool Success, string Path, double SizeInMegaBytes, Object Error { string Message, Exception AdditionalInfo } }</returns>
+    public static async Task<Result> WriteBytes([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
-        return await ExecuteActionAsync(() => ExecuteWriteBytes(input, options),
-            options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return await ExecuteActionAsync(() => ExecuteWriteBytes(input, options, cancellationToken),
+                options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            return ex.Handle(options);
+        }
     }
 
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
@@ -44,7 +55,7 @@ public class Files
         return await WindowsIdentity.RunImpersonated(userHandle, async () => await action().ConfigureAwait(false));
     }
 
-    private static async Task<Result> ExecuteWriteBytes(Input input, Options options)
+    private static async Task<Result> ExecuteWriteBytes(Input input, Options options, CancellationToken cancellationToken)
     {
         byte[] bytes = input?.ContentBytes as byte[];
         if (bytes == null)
@@ -54,9 +65,9 @@ public class Files
 
         using var fileStream = new FileStream(input.Path, fileMode, FileAccess.Write, FileShare.Write, 4096, useAsync: true);
         using var memoryStream = new MemoryStream(bytes);
-        await memoryStream.CopyToAsync(fileStream).ConfigureAwait(false);
+        await memoryStream.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
 
-        return new Result(new FileInfo(input.Path));
+        return new Result(true, new FileInfo(input.Path));
     }
 
     internal static Tuple<string, string> GetDomainAndUsername(string username)

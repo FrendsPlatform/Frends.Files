@@ -4,6 +4,7 @@ using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -44,7 +45,7 @@ public class UnitTests
     [Test]
     public async Task FilesWriteSimpleWrite()
     {
-        var result = await Files.WriteBytes(_input, _options);
+        var result = await Files.WriteBytes(_input, _options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
         ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
@@ -52,14 +53,14 @@ public class UnitTests
     [Test]
     public async Task FilesWriteOverwrite()
     {
-        await Files.WriteBytes(_input, _options);
+        await Files.WriteBytes(_input, _options, CancellationToken.None);
 
         var options = new Options
         {
             UseGivenUserCredentialsForRemoteConnections = false,
             WriteBehaviour = WriteBehaviour.Overwrite,
         };
-        var result = await Files.WriteBytes(_input, options);
+        var result = await Files.WriteBytes(_input, options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
         ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
@@ -67,7 +68,7 @@ public class UnitTests
     [Test]
     public async Task FilesWriteAppend()
     {
-        await Files.WriteBytes(_input, _options);
+        await Files.WriteBytes(_input, _options, CancellationToken.None);
 
         var options = new Options
         {
@@ -75,7 +76,7 @@ public class UnitTests
             WriteBehaviour = WriteBehaviour.Append,
         };
 
-        var result = await Files.WriteBytes(_input, options);
+        var result = await Files.WriteBytes(_input, options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
         ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
@@ -83,9 +84,9 @@ public class UnitTests
     [Test]
     public async Task FilesWriteShouldThrowIfFileExists()
     {
-        await Files.WriteBytes(_input, _options);
+        await Files.WriteBytes(_input, _options, CancellationToken.None);
 
-        var ex = Assert.ThrowsAsync<IOException>(() => Files.WriteBytes(_input, _options));
+        var ex = Assert.ThrowsAsync<IOException>(() => Files.WriteBytes(_input, _options, CancellationToken.None));
         ClassicAssert.AreEqual($"File already exists: {_FullPath}.", ex.Message);
     }
 
@@ -94,7 +95,7 @@ public class UnitTests
     {
         _input.Path = @"f:\path\not\exist";
 
-        var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.WriteBytes(_input, _options));
+        var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.WriteBytes(_input, _options, CancellationToken.None));
         ClassicAssert.AreEqual($"Could not find a part of the path '{_input.Path}'.", ex.Message);
     }
 }

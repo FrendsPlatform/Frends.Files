@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.0] - 2026-10-14
+### Changed
+- Upgraded the Task to target .NET 8.
+- The Task now requires a CancellationToken, which Frends provides automatically, and can be cancelled while writing.
+- The Task result now contains `Success` and `Error` properties.
+
+### Added
+- New options `ThrowErrorOnFailure` and `ErrorMessageOnFailure` to control whether failures throw an error or are returned in the result with a custom message.
+
 ## [1.1.0] - 2025-03-19
 ### Changed
 - Update packages:
