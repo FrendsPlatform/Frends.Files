@@ -1,7 +1,3 @@
-using Frends.Files.Read.Definitions;
-using Frends.Files.Read.Helpers;
-using Microsoft.Win32.SafeHandles;
-using SimpleImpersonation;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -10,10 +6,14 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Frends.Files.Read.Definitions;
+using Frends.Files.Read.Helpers;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.Read;
 
-///<summary>
+/// <summary>
 /// Files task.
 /// </summary>
 public static class Files
@@ -46,6 +46,14 @@ public static class Files
         }
     }
 
+    internal static Tuple<string, string> GetDomainAndUsername(string username)
+    {
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
+    }
+
     private static async Task<TResult> ExecuteActionAsync<TResult>(Func<Task<TResult>> action, bool useGivenCredentials, string username, string password)
     {
         if (!useGivenCredentials)
@@ -70,14 +78,6 @@ public static class Files
         using var reader = new StreamReader(fileStream, encoding, detectEncodingFromByteOrderMarks: true);
         var content = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
         return new Result(true, new FileInfo(input.Path), content);
-    }
-
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
     }
 
     private static Encoding GetEncoding(FileEncoding optionsFileEncoding, bool optionsEnableBom, string optionsEncodingInString)

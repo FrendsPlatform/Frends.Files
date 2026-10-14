@@ -33,6 +33,6 @@ internal class ErrorHandlerTests
     public void Should_Use_Custom_ErrorMessageOnFailure()
     {
         var ex = Assert.ThrowsAsync<Exception>(() => Files.Read(MissingFileInput(), new Options { ErrorMessageOnFailure = CustomErrorMessage }, CancellationToken.None));
-        Assert.That(ex.Message, Contains.Substring(CustomErrorMessage));
+        Assert.That(ex?.Message, Contains.Substring(CustomErrorMessage));
     }
 }
