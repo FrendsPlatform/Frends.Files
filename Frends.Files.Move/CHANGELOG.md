@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.1.0] - 2026-10-14
+### Changed
+- Update documentation
+
 ## [3.0.0] - 2026-09-10
 ### Changed
 - Upgraded the task to .NET 8.
