@@ -5,6 +5,13 @@ namespace Frends.Files.Rename.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, string path, Error error = null)
+    {
+        Success = success;
+        Path = path;
+        Error = error;
+    }
+
     /// <summary>
     /// Indicates whether the rename completed successfully.
     /// </summary>
@@ -22,11 +29,4 @@ public class Result
     /// </summary>
     /// <example>null</example>
     public Error Error { get; private set; }
-
-    internal Result(bool success, string path, Error error = null)
-    {
-        Success = success;
-        Path = path;
-        Error = error;
-    }
 }

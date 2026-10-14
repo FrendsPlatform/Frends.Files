@@ -1,17 +1,17 @@
-using Frends.Files.Rename.Definitions;
-using Frends.Files.Rename.Helpers;
-using Microsoft.Win32.SafeHandles;
-using SimpleImpersonation;
 using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Threading;
+using Frends.Files.Rename.Definitions;
+using Frends.Files.Rename.Helpers;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
 
 namespace Frends.Files.Rename;
 
-///<summary>
+/// <summary>
 /// Files task.
 /// </summary>
 public static class Files
@@ -29,8 +29,13 @@ public static class Files
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return ExecuteAction(() => ExecuteRename(input, options.RenameBehaviour),
-                options.UseGivenUserCredentialsForRemoteConnections, options.UserName, options.Password);
+            return ExecuteAction(
+                () => ExecuteRename(
+                input,
+                options.RenameBehaviour),
+                options.UseGivenUserCredentialsForRemoteConnections,
+                options.UserName,
+                options.Password);
         }
         catch (Exception ex)
         {
@@ -38,7 +43,27 @@ public static class Files
         }
     }
 
-    private static Result ExecuteAction<Result>(Func<Result> action, bool useGivenCredentials, string username, string password)
+    internal static Tuple<string, string> GetDomainAndUsername(string username)
+    {
+        var domainAndUserName = username.Split('\\');
+        if (domainAndUserName.Length != 2)
+            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
+        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
+    }
+
+    internal static string GetNonConflictingDestinationFilePath(string sourceFilePath, string destFilePath)
+    {
+        var count = 1;
+        while (File.Exists(destFilePath))
+        {
+            string tempFileName = $"{Path.GetFileNameWithoutExtension(destFilePath)}({count++})";
+            destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath));
+        }
+
+        return destFilePath;
+    }
+
+    private static TResult ExecuteAction<TResult>(Func<TResult> action, bool useGivenCredentials, string username, string password)
     {
         if (!useGivenCredentials)
             return action();
@@ -75,27 +100,8 @@ public static class Files
                 if (File.Exists(newFileFullPath)) throw new IOException($"File already exists {newFileFullPath}. No file renamed.");
                 break;
         }
+
         File.Move(input.Path, newFileFullPath);
         return new Result(true, newFileFullPath);
-    }
-
-    internal static Tuple<string, string> GetDomainAndUsername(string username)
-    {
-        var domainAndUserName = username.Split('\\');
-        if (domainAndUserName.Length != 2)
-            throw new ArgumentException($@"UserName field must be of format domain\username was: {username}");
-        return new Tuple<string, string>(domainAndUserName[0], domainAndUserName[1]);
-    }
-
-    internal static string GetNonConflictingDestinationFilePath(string sourceFilePath, string destFilePath)
-    {
-        var count = 1;
-        while (File.Exists(destFilePath))
-        {
-            string tempFileName = $"{Path.GetFileNameWithoutExtension(destFilePath)}({count++})";
-            destFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), path2: tempFileName + Path.GetExtension(sourceFilePath));
-        }
-
-        return destFilePath;
     }
 }

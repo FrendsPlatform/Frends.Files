@@ -38,6 +38,6 @@ internal class ErrorHandlerTest
     {
         var ex = Assert.Throws<Exception>(() =>
             Files.Rename(InvalidInput(), new Options { ErrorMessageOnFailure = CustomErrorMessage }, CancellationToken.None));
-        StringAssert.Contains(CustomErrorMessage, ex.Message);
+        Assert.That(ex?.Message, Contains.Substring(CustomErrorMessage));
     }
 }

@@ -52,7 +52,7 @@ public class UnitTests
         File.WriteAllText(path, $"Test {path}");
 
         var ex = Assert.Throws<IOException>(() => Files.Rename(_input, _options, CancellationToken.None));
-        ClassicAssert.AreEqual($"File already exists {Path.Combine(_FullPath, _input.NewFileName)}. No file renamed.", ex.Message);
+        ClassicAssert.AreEqual($"File already exists {Path.Combine(_FullPath, _input.NewFileName)}. No file renamed.", ex?.Message);
     }
 
     [Test]
@@ -88,6 +88,6 @@ public class UnitTests
         _input.NewFileName = "test.txt";
 
         var ex = Assert.Throws<DirectoryNotFoundException>(() => Files.Rename(_input, _options, CancellationToken.None));
-        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{Path.GetDirectoryName(_input.Path)}'.", ex.Message);
+        ClassicAssert.AreEqual($"Directory does not exist or you do not have read access. Tried to access directory '{Path.GetDirectoryName(_input.Path)}'.", ex?.Message);
     }
 }
