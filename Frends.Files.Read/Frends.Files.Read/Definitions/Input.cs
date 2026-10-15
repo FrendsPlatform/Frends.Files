@@ -12,5 +12,6 @@ public class Input
     /// </summary>
     /// <example>c:\temp\foo.txt</example>
     [DisplayFormat(DataFormatString = "Text")]
+    [Required]
     public string Path { get; set; }
 }
