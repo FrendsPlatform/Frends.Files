@@ -46,6 +46,8 @@ public static class Files
     /// <summary>
     /// Get domain and username.
     /// </summary>
+    /// <param name="username">Username in format domain\username.</param>
+    /// <returns>Tuple of domain and username.</returns>
     internal static Tuple<string, string> GetDomainAndUsername(string username)
     {
         var domainAndUserName = username.Split('\\');

@@ -8,6 +8,17 @@ namespace Frends.Files.Write.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, FileInfo info = null, Error error = null)
+    {
+        Success = success;
+        Error = error;
+        if (info == null) return;
+        Path = info.FullName;
+        SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
+        SizeInKiloBytes = Math.Round(info.Length / 1024d, 3);
+        SizeInBytes = info.Length;
+    }
+
     /// <summary>
     /// Indicates whether the write completed successfully.
     /// </summary>
@@ -43,15 +54,4 @@ public class Result
     /// </summary>
     /// <example>null</example>
     public Error Error { get; private set; }
-
-    internal Result(bool success, FileInfo info = null, Error error = null)
-    {
-        Success = success;
-        Error = error;
-        if (info == null) return;
-        Path = info.FullName;
-        SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
-        SizeInKiloBytes = Math.Round(info.Length / 1024d, 3);
-        SizeInBytes = info.Length;
-    }
 }

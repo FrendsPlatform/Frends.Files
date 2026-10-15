@@ -1,5 +1,6 @@
 ﻿// self explanatory.
 #pragma warning disable CS1591
+#pragma warning disable SA1602
 namespace Frends.Files.Write.Definitions;
 
 /// <summary>

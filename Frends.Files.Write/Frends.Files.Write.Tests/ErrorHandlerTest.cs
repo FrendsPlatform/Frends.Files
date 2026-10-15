@@ -50,6 +50,6 @@ internal class ErrorHandlerTest
         var ex = Assert.ThrowsAsync<Exception>(() =>
             Files.Write(InvalidInput(), options, CancellationToken.None));
         Assert.That(ex, Is.Not.Null);
-        Assert.That(ex.Message, Contains.Substring(CustomErrorMessage));
+        Assert.That(ex?.Message, Contains.Substring(CustomErrorMessage));
     }
 }

@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0] - 2026-10-14
+## [1.6.0] - 2026-10-14
 ### Changed
 - Upgraded the Task to target .NET 8.
 - The Task now accepts a cancellation token and returns `Success` and `Error` in the result.
