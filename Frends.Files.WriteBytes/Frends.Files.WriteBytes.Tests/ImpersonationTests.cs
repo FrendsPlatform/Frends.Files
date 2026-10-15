@@ -84,6 +84,6 @@ class ImpersonationTests
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(() => Files.WriteBytes(_input, options, CancellationToken.None));
-        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex.Message);
+        ClassicAssert.AreEqual($@"UserName field must be of format domain\username was: {options.UserName}", ex?.Message);
     }
 }

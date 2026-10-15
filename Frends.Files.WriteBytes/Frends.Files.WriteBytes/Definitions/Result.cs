@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+
 namespace Frends.Files.WriteBytes.Definitions;
 
 /// <summary>
@@ -7,6 +8,14 @@ namespace Frends.Files.WriteBytes.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, FileInfo info = null, Error error = null)
+    {
+        Success = success;
+        Path = info?.FullName;
+        SizeInMegaBytes = info == null ? 0 : Math.Round(info.Length / 1024d / 1024d, 3);
+        Error = error;
+    }
+
     /// <summary>
     /// Indicates whether the operation completed successfully.
     /// </summary>
@@ -30,12 +39,4 @@ public class Result
     /// </summary>
     /// <example>null</example>
     public Error Error { get; private set; }
-
-    internal Result(bool success, FileInfo info = null, Error error = null)
-    {
-        Success = success;
-        Path = info?.FullName;
-        SizeInMegaBytes = info == null ? 0 : Math.Round(info.Length / 1024d / 1024d, 3);
-        Error = error;
-    }
 }

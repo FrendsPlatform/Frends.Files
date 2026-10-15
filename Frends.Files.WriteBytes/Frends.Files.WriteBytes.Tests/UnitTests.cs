@@ -87,7 +87,7 @@ public class UnitTests
         await Files.WriteBytes(_input, _options, CancellationToken.None);
 
         var ex = Assert.ThrowsAsync<IOException>(() => Files.WriteBytes(_input, _options, CancellationToken.None));
-        ClassicAssert.AreEqual($"File already exists: {_FullPath}.", ex.Message);
+        ClassicAssert.AreEqual($"File already exists: {_FullPath}.", ex?.Message);
     }
 
     [Test]
@@ -96,6 +96,6 @@ public class UnitTests
         _input.Path = @"f:\path\not\exist";
 
         var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.WriteBytes(_input, _options, CancellationToken.None));
-        ClassicAssert.AreEqual($"Could not find a part of the path '{_input.Path}'.", ex.Message);
+        ClassicAssert.AreEqual($"Could not find a part of the path '{_input.Path}'.", ex?.Message);
     }
 }
