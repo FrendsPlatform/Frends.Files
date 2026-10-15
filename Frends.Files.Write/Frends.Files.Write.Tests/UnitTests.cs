@@ -2,6 +2,7 @@ using Frends.Files.Write.Definitions;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using System;
+using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ public class UnitTests
     [Test]
     public async Task FilesWriteSimpleWrite()
     {
-        var result = await Files.Write(_input, _options);
+        var result = await Files.Write(_input, _options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
         ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
@@ -52,7 +53,7 @@ public class UnitTests
     [Test]
     public async Task FilesWriteOverwrite()
     {
-        await Files.Write(_input, _options);
+        await Files.Write(_input, _options, CancellationToken.None);
 
         var options = new Options
         {
@@ -61,7 +62,7 @@ public class UnitTests
             FileEncoding = FileEncoding.UTF8,
             EnableBom = true
         };
-        var result = await Files.Write(_input, options);
+        var result = await Files.Write(_input, options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
         ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
@@ -69,7 +70,7 @@ public class UnitTests
     [Test]
     public async Task FilesWriteAppend()
     {
-        await Files.Write(_input, _options);
+        await Files.Write(_input, _options, CancellationToken.None);
 
         var options = new Options
         {
@@ -79,7 +80,7 @@ public class UnitTests
             EnableBom = true
         };
 
-        var result = await Files.Write(_input, options);
+        var result = await Files.Write(_input, options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
         ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
@@ -87,7 +88,7 @@ public class UnitTests
     [Test]
     public async Task FilesWriteEncodeWindows1252()
     {
-        await Files.Write(_input, _options);
+        await Files.Write(_input, _options, CancellationToken.None);
 
         var options = new Options
         {
@@ -97,7 +98,7 @@ public class UnitTests
             EnableBom = true
         };
 
-        var result = await Files.Write(_input, options);
+        var result = await Files.Write(_input, options, CancellationToken.None);
         ClassicAssert.IsTrue(File.Exists(result.Path));
         ClassicAssert.AreEqual(Math.Round(File.ReadAllText(_FullPath).Length / 1024d / 1024d, 3), result.SizeInMegaBytes);
     }
@@ -105,10 +106,10 @@ public class UnitTests
     [Test]
     public async Task FilesWriteShouldThrowIfFileExists()
     {
-        await Files.Write(_input, _options);
+        await Files.Write(_input, _options, CancellationToken.None);
 
-        var ex = Assert.ThrowsAsync<IOException>(() => Files.Write(_input, _options));
-        ClassicAssert.AreEqual($"File already exists: {_FullPath}.", ex.Message);
+        var ex = Assert.ThrowsAsync<IOException>(() => Files.Write(_input, _options, CancellationToken.None));
+        ClassicAssert.AreEqual($"File already exists: {_FullPath}.", ex?.Message);
     }
 
     [Test]
@@ -119,14 +120,14 @@ public class UnitTests
             Content = "test",
             Path = @"f:\path\not\exist",
         };
-        var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Write(input, _options));
-        ClassicAssert.AreEqual($"Could not find a part of the path '{input.Path}'.", ex.Message);
+        var ex = Assert.ThrowsAsync<DirectoryNotFoundException>(() => Files.Write(input, _options, CancellationToken.None));
+        ClassicAssert.AreEqual($"Could not find a part of the path '{input.Path}'.", ex?.Message);
     }
 
     [Test]
     public async Task FilesWrite_ReturnsCorrectFileSizes()
     {
-        var result = await Files.Write(_input, _options);
+        var result = await Files.Write(_input, _options, CancellationToken.None);
 
         ClassicAssert.IsTrue(File.Exists(result.Path), "File should exist after write.");
 

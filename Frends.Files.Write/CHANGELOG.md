@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.0] - 2026-10-14
+### Changed
+- Upgraded the Task to target .NET 8.
+- The Task now accepts a cancellation token and returns `Success` and `Error` in the result.
+- Added `ThrowErrorOnFailure` and `ErrorMessageOnFailure` options to control how failures are reported.
+
 ## [1.5.0] - 2026-06-23
 ### Fixed
 - Fix stale reads on network storage writes.
