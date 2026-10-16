@@ -3,7 +3,6 @@
 ## [1.3.0] - 2026-10-09
 ### Changed
 - Upgraded the Task to target .NET 8.
-- The Task is now static and requires a cancellation token, which Frends provides automatically.
 - The Task now throws an error on failure by default. Set `ThrowErrorOnFailure` to false in Options to receive a result with `Success` set to false and error details in `Error` instead.
 ### Added
 - Added `Success` and `Error` properties to the result.
