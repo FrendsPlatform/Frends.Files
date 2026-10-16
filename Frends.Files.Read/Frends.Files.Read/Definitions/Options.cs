@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Frends.Files.Read.Definitions;
 
@@ -54,5 +54,19 @@ public class Options
     /// <example>ISO-8859-2</example>
     [UIHint(nameof(FileEncoding), "", FileEncoding.Other)]
     public string EncodingInString { get; set; }
-}
 
+    /// <summary>
+    /// Whether to throw an error on failure.
+    /// </summary>
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Overrides the error message on failure. If `ThrowErrorOnFailure` is set to `true`, then the original exception will be wrapped in a new Exception with this error message.
+    /// </summary>
+    /// <example>Reading the file failed: file is missing</example>
+    [DisplayFormat(DataFormatString = "Text")]
+    [DefaultValue("")]
+    public string ErrorMessageOnFailure { get; set; } = string.Empty;
+}

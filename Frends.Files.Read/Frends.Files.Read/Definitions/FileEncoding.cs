@@ -1,5 +1,5 @@
-﻿// self explanatory.
-#pragma warning disable CS1591
+﻿#pragma warning disable CS1591 // self explanatory
+#pragma warning disable SA1602 // self explanatory
 namespace Frends.Files.Read.Definitions;
 
 /// <summary>
@@ -12,5 +12,5 @@ public enum FileEncoding
     ASCII,
     Unicode,
     Windows1252,
-    Other
+    Other,
 }

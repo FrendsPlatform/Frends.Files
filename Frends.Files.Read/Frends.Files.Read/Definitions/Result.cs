@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.IO;
+
 namespace Frends.Files.Read.Definitions;
 
 /// <summary>
@@ -7,6 +8,32 @@ namespace Frends.Files.Read.Definitions;
 /// </summary>
 public class Result
 {
+    internal Result(bool success, FileInfo info, string content, Error error = null)
+    {
+        Success = success;
+        Error = error;
+        Content = content;
+        if (info == null) return;
+        Path = info.FullName;
+        SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
+        SizeInKiloBytes = Math.Round(info.Length / 1024d, 3);
+        SizeInBytes = info.Length;
+        CreationTime = info.CreationTime;
+        LastWriteTime = info.LastWriteTime;
+    }
+
+    /// <summary>
+    /// Indicates whether the operation completed successfully.
+    /// </summary>
+    /// <example>true</example>
+    public bool Success { get; private set; }
+
+    /// <summary>
+    /// Error details. Null when Success is true.
+    /// </summary>
+    /// <example>null</example>
+    public Error Error { get; private set; }
+
     /// <summary>
     /// File content.
     /// </summary>
@@ -48,15 +75,4 @@ public class Result
     /// </summary>
     /// <example>2023-02-06T11:59:13.8696745+02:00</example>
     public DateTime LastWriteTime { get; private set; }
-
-    internal Result(FileInfo info, string content)
-    {
-        Content = content;
-        Path = info.FullName;
-        SizeInMegaBytes = Math.Round(info.Length / 1024d / 1024d, 3);
-        SizeInKiloBytes = Math.Round(info.Length / 1024d, 3);
-        SizeInBytes = info.Length;
-        CreationTime = info.CreationTime;
-        LastWriteTime = info.LastWriteTime;
-    }
 }

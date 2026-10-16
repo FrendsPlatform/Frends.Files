@@ -4,6 +4,7 @@ using NUnit.Framework.Legacy;
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -32,7 +33,7 @@ public class UnitTests
         var fileContent = "Well this is content with some extra nice ümlauts: ÄÖåå 你好!";
         Directory.CreateDirectory(Path.Combine(_root, "folder"));
         File.WriteAllText(Path.Combine(_root, "folder", "test.txt"), fileContent);
-        var result = await Files.Read(new Input() { Path = Path.Combine(_root, "folder/test.txt") }, _options);
+        var result = await Files.Read(new Input() { Path = Path.Combine(_root, "folder/test.txt") }, _options, CancellationToken.None);
         ClassicAssert.AreEqual(fileContent, result.Content);
 
         Directory.Delete(Path.Combine(_root, "folder"), true);
@@ -47,7 +48,7 @@ public class UnitTests
             FileEncoding = FileEncoding.Other,
             EncodingInString = "Latin1",
         };
-        var result = await Files.Read(new Input() { Path = Path.Combine(_root, "ansi.txt") }, options);
+        var result = await Files.Read(new Input() { Path = Path.Combine(_root, "ansi.txt") }, options, CancellationToken.None);
 
         ClassicAssert.AreEqual(File.ReadAllText(result.Path, Encoding.GetEncoding("Latin1")), result.Content);
     }
