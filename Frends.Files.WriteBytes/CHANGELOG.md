@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0] - 2026-10-14
+### Changed
+- Upgraded the Task to target .NET 8.
+- The Task now throws an error on failure by default. Set `ThrowErrorOnFailure` to false in Options to receive a result with `Success` set to false and error details in `Error` instead.
+### Added
+- Added `Success` and `Error` properties to the result.
+- Added `ThrowErrorOnFailure` and `ErrorMessageOnFailure` options.
+
 ## [1.1.0] - 2025-03-19
 ### Changed
 - Update packages:
